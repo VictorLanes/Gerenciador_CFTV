@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VTAL Manutenção de Unidades</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --bg-soft: #ffffff;
+      --bg-muted: #f1f5f9;
+      --text: #0f172a;
+      --text-soft: #64748b;
+      --border: #cbd5e1;
+      --primary: #0f172a;
+      --success: #166534;
+      --danger: #b91c1c;
+      --warning: #d97706;
+      --shadow: 0 8px 24px rgba(15,23,42,.08);
+    }
+
+    body.dark {
+      --bg: #020617;
+      --bg-soft: #0f172a;
+      --bg-muted: #1e293b;
+      --text: #e2e8f0;
+      --text-soft: #94a3b8;
+      --border: #334155;
+      --primary: #e2e8f0;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --shadow: 0 8px 24px rgba(0,0,0,.35);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      transition: background .2s, color .2s;
+    }
+
+    .hidden { display: none !important; }
+
+    .container {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .header {
+      background: var(--bg-soft);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .header-inner {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: var(--primary);
+      color: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    .brand small {
+      color: var(--text-soft);
+      display: block;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .pill,
+    input,
+    select,
+    button,
+    textarea {
+      border: 1px solid var(--border);
+      background: var(--bg-soft);
+      color: var(--text);
+      border-radius: 16px;
+      font-size: 14px;
+    }
+
+    .pill {
+      padding: 10px 14px;
+    }
+
+    input, select, button, textarea {
+      width: 100%;
+      padding: 12px 14px;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--text-soft);
+    }
+
+    button {
+      cursor: pointer;
+      background: var(--primary);
+      color: var(--bg);
+      font-weight: 700;
+    }
+
+    button.secondary {
+      background: var(--bg-soft);
+      color: var(--text);
+    }
+
+    button.success {
+      background: var(--success);
+      color: #fff;
+    }
+
+    button.danger {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    button.warning {
+      background: var(--warning);
+      color: #fff;
+    }
+
+    button:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+    }
+
+    .grid-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: var(--bg-soft);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+
+    .card-body {
+      padding: 24px;
+    }
+
+    .stat-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .stat-card h2 {
+      font-size: 34px;
+      margin: 10px 0 4px;
+    }
+
+    .muted {
+      color: var(--text-soft);
+      font-size: 14px;
+    }
+
+    .icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      background: var(--bg-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.7fr 1fr;
+      gap: 24px;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .section-head h3 {
+      font-size: 22px;
+      margin-bottom: 6px;
+    }
+
+    .filters,
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .unit-list,
+    .permission-list,
+    .user-list {
+      display: grid;
+      gap: 16px;
+    }
+
+    .unit-card,
+    .user-card {
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background: var(--bg-soft);
+      padding: 18px;
+    }
+
+    .unit-top,
+    .user-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .badges {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+
+    .badge {
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid var(--border);
+      background: var(--bg-soft);
+      color: var(--text);
+    }
+
+    .badge.active {
+      background: var(--primary);
+      color: var(--bg);
+      border-color: var(--primary);
+    }
+
+    .badge.secondary {
+      background: var(--bg-muted);
+    }
+
+    .badge.success {
+      background: rgba(34,197,94,.12);
+      color: var(--success);
+      border-color: rgba(34,197,94,.25);
+    }
+
+    .info-grid,
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .unit-info-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .info-item {
+      border: 1px solid var(--border);
+      background: var(--bg-muted);
+      border-radius: 16px;
+      padding: 12px;
+    }
+
+    .info-item strong {
+      display: block;
+      font-size: 12px;
+      color: var(--text-soft);
+      margin-bottom: 6px;
+    }
+
+    .actions-box {
+      min-width: 290px;
+      background: var(--bg-muted);
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .action-grid,
+    .admin-actions {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .admin-actions {
+      grid-template-columns: 1fr;
+    }
+
+    .message {
+      margin-bottom: 18px;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      background: var(--bg-soft);
+      border-radius: 16px;
+      font-size: 14px;
+    }
+
+    .login-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 430px;
+      background: var(--bg-soft);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 28px;
+      border: 1px solid var(--border);
+    }
+
+    .login-card h1 {
+      margin: 16px 0 8px;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .permission-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border: 1px solid var(--border);
+      padding: 12px;
+      border-radius: 16px;
+      font-size: 14px;
+    }
+
+    .obs-box,
+    .summary-box {
+      margin-top: 12px;
+      background: var(--bg-muted);
+      border-radius: 16px;
+      padding: 12px;
+      font-size: 14px;
+      color: var(--text-soft);
+      border: 1px dashed var(--border);
+    }
+
+    .section-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .section-tabs button {
+      width: auto;
+      padding: 10px 16px;
+    }
+
+    .section-tabs button.active {
+      outline: 2px solid var(--text-soft);
+    }
+
+    @media (max-width: 1100px) {
+      .grid-stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .grid-stats,
+      .form-grid,
+      .unit-info-grid,
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+      .container,
+      .header-inner {
+        padding: 16px;
+      }
+      .filters input {
+        min-width: 100% !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section id="loginScreen" class="login-wrap">
+    <div class="login-card">
+      <div class="text-center">
+        <div class="brand-icon" style="margin:0 auto;">VT</div>
+        <h1>VTAL Manutenção</h1>
+        <p class="muted">Painel com acesso por perfil, UF e permissões.</p>
+      </div>
+
+      <div style="margin-top: 20px; display: grid; gap: 12px;">
+        <input id="email" type="email" placeholder="Email" />
+        <input id="senha" type="password" placeholder="Senha" />
+        <button id="loginBtn">Entrar</button>
+        <button id="forgotBtn" class="secondary">Esqueci minha senha</button>
+
+        <div id="forgotBox" class="hidden" style="display:grid; gap:10px;">
+          <input id="forgotEmail" type="email" placeholder="Seu email" />
+          <input id="forgotSenha" type="text" placeholder="Nova senha" />
+          <button id="forgotSubmit" class="secondary">Resetar minha senha</button>
+        </div>
+
+        <p id="loginError" style="color:#dc2626; font-size:14px;"></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="appScreen" class="hidden">
+    <header class="header">
+      <div class="header-inner">
+        <div class="brand">
+          <div class="brand-icon">VT</div>
+          <div>
+            <small>Painel Operacional</small>
+            <strong>VTAL Manutenção de Unidades</strong>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <div class="pill">Perfil: <strong id="perfilAtual"></strong></div>
+          <div class="pill">Usuário: <strong id="nomeUsuario"></strong></div>
+          <div class="pill">UFs: <strong id="ufsUsuario"></strong></div>
+          <button class="secondary" id="themeBtn">Modo escuro</button>
+          <button class="secondary" id="refreshBtn">Atualizar</button>
+          <button class="secondary" id="logoutBtn">Sair</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <div id="messageBox" class="message hidden"></div>
+
+      <div class="section-tabs">
+        <button id="tabUnidades" class="active">Unidades</button>
+        <button id="tabUsuarios" class="hidden">Usuários</button>
+      </div>
+
+      <section id="unidadesSection">
+        <section class="grid-stats">
+          <div class="card"><div class="card-body stat-card"><div><div class="muted">Total de unidades</div><h2 id="statTotal">0</h2><div class="muted">Base operacional cadastrada</div></div><div class="icon-box">🏢</div></div></div>
+          <div class="card"><div class="card-body stat-card"><div><div class="muted">Unidades ativas</div><h2 id="statAtivas">0</h2><div class="muted">Operação disponível</div></div><div class="icon-box">🖥️</div></div></div>
+          <div class="card"><div class="card-body stat-card"><div><div class="muted">Em manutenção</div><h2 id="statManutencao">0</h2><div class="muted">Precisam de acompanhamento</div></div><div class="icon-box">🛠️</div></div></div>
+          <div class="card"><div class="card-body stat-card"><div><div class="muted">Total de câmeras</div><h2 id="statCameras">0</h2><div class="muted">Inventário monitorado</div></div><div class="icon-box">📷</div></div></div>
+        </section>
+
+        <section class="main-grid">
+          <div class="card">
+            <div class="card-body">
+              <div class="section-head">
+                <div>
+                  <h3>Consulta das unidades</h3>
+                  <p class="muted">Busca por unidade, login, IP, alarme e filtro por UF.</p>
+                </div>
+                <div class="filters">
+                  <input id="searchInput" placeholder="Pesquisar unidade, IP, login, alarme..." style="min-width:280px;" />
+                  <select id="ufFilter" style="width:180px;">
+                    <option value="all">Todas as UFs</option>
+                  </select>
+                  <button id="searchBtn" style="width:auto;">Consultar</button>
+                  <button id="exportBtn" class="success" style="width:auto;">Gerar Excel</button>
+                </div>
+              </div>
+
+              <div id="searchSummary" class="summary-box hidden"></div>
+              <div id="unitList" class="unit-list"></div>
+            </div>
+          </div>
+
+          <div style="display:grid; gap:24px;">
+            <div class="card">
+              <div class="card-body">
+                <h3 style="margin-bottom:6px;">Permissões do perfil</h3>
+                <p class="muted">Acesso carregado da aba USUARIOS.</p>
+                <div id="permissionList" class="permission-list"></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-body">
+                <h3 style="margin-bottom:6px;">Cadastro de unidade</h3>
+                <p class="muted" style="margin-bottom:14px;">Somente com permissão de inclusão.</p>
+
+                <div class="form-grid">
+                  <input id="formUf" placeholder="UF" />
+                  <input id="formNomeUnidade" placeholder="Nome da unidade" />
+                  <input id="formCloudNvr" placeholder="Cloud NVR" />
+                  <input id="formLogin" placeholder="Login" />
+                  <input id="formSenha" placeholder="Senha" />
+                  <input id="formIp" placeholder="IP" />
+                  <input id="formHd" placeholder="HD" />
+                  <input id="formQuantidadeCameras" placeholder="Qtd. de câmeras" />
+                  <input id="formAlarmeMac" placeholder="MAC do alarme" />
+                  <input id="formSensores" placeholder="Sensores do alarme" />
+                  <input id="formSenhaAlarme" placeholder="Senha do alarme" />
+                  <input id="formCentral" placeholder="Acesso da central" />
+                </div>
+
+                <textarea id="formObservacoes" placeholder="Observações" style="margin-top:12px;"></textarea>
+
+                <select id="formStatus" style="margin-top:12px;">
+                  <option value="Ativa">Ativa</option>
+                  <option value="Manutenção">Manutenção</option>
+                  <option value="Pendente">Pendente</option>
+                  <option value="Inativa">Inativa</option>
+                </select>
+
+                <button id="saveBtn" style="margin-top:12px;">Cadastrar unidade</button>
+                <p id="copyMessage" style="margin-top:10px; color:#16a34a; font-size:14px;"></p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section id="usuariosSection" class="hidden">
+        <div class="main-grid">
+          <div class="card">
+            <div class="card-body">
+              <div class="section-head">
+                <div>
+                  <h3>Gestão de usuários</h3>
+                  <p class="muted">Criar, listar, excluir e resetar senha.</p>
+                </div>
+                <button id="reloadUsersBtn" class="secondary" style="width:auto;">Atualizar usuários</button>
+              </div>
+
+              <div id="userList" class="user-list"></div>
+            </div>
+          </div>
+
+          <div style="display:grid; gap:24px;">
+            <div class="card">
+              <div class="card-body">
+                <h3 style="margin-bottom:6px;">Criar usuário</h3>
+                <p class="muted" style="margin-bottom:14px;">Somente admin.</p>
+
+                <div class="form-grid">
+                  <input id="userNome" placeholder="Nome" />
+                  <input id="userEmail" placeholder="Email" />
+                  <input id="userSenha" placeholder="Senha" />
+
+                  <select id="userPerfil">
+                    <option value="tecnico">Técnico</option>
+                    <option value="admin">Administrador</option>
+                  </select>
+
+                  <input id="userUfs" placeholder="UFs permitidas (ex: SP,RJ ou TODAS)" />
+
+                  <select id="userStatus">
+                    <option value="ATIVO">ATIVO</option>
+                    <option value="INATIVO">INATIVO</option>
+                  </select>
+
+                  <select id="permVisualizar">
+                    <option value="SIM">Pode visualizar: SIM</option>
+                    <option value="NÃO">Pode visualizar: NÃO</option>
+                  </select>
+
+                  <select id="permIncluir">
+                    <option value="SIM">Pode incluir: SIM</option>
+                    <option value="NÃO">Pode incluir: NÃO</option>
+                  </select>
+
+                  <select id="permEditar">
+                    <option value="SIM">Pode editar: SIM</option>
+                    <option value="NÃO">Pode editar: NÃO</option>
+                  </select>
+
+                  <select id="permExcluir">
+                    <option value="SIM">Pode excluir: SIM</option>
+                    <option value="NÃO">Pode excluir: NÃO</option>
+                  </select>
+                </div>
+
+                <button id="createUserBtn" style="margin-top:12px;">Criar usuário</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-body">
+                <h3 style="margin-bottom:6px;">Reset de senha</h3>
+                <p class="muted" style="margin-bottom:14px;">Admin pode resetar qualquer usuário. Usuário pode resetar a própria.</p>
+
+                <div style="display:grid; gap:12px;">
+                  <input id="resetEmail" placeholder="Email do usuário" />
+                  <input id="resetNovaSenha" placeholder="Nova senha" />
+                  <button id="resetBtn" class="secondary">Resetar senha</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </section>
+
+  <script>
+    const API_BASE = 'https://script.google.com/macros/s/AKfycbyFi7PxyruXvWqFJG_MtW8UnlTKpE2BJiy7wGrkxu-pWLzEzGqdDJlTCGzF5eLvn4-B/exec';
+
+    let currentUser = null;
+    let units = [];
+    let users = [];
+
+    const el = (id) => document.getElementById(id);
+
+    function showMessage(text) {
+      const box = el('messageBox');
+      box.textContent = text;
+      box.classList.remove('hidden');
+    }
+
+    function hideMessage() {
+      el('messageBox').classList.add('hidden');
+      el('messageBox').textContent = '';
+    }
+
+    async function apiGet(params) {
+      const query = new URLSearchParams(params).toString();
+      const response = await fetch(`${API_BASE}?${query}`);
+      return response.json();
+    }
+
+    async function apiPost(payload) {
+      const response = await fetch(API_BASE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+      return response.json();
+    }
+
+    function normalizeUnits(data) {
+      return (data || []).map(item => ({
+        id: String(item['ID'] || ''),
+        uf: item['UF'] || '',
+        unidade: item['Nome da unidade'] || '',
+        cloudNvr: item['Cloud NVR'] || '',
+        login: item['Login'] || '',
+        senha: item['Senha'] || '',
+        ip: item['IP'] || '',
+        hd: item['HD'] || '',
+        cameras: Number(item['Quantidade de câmeras'] || 0),
+        alarmeMac: item['MAC do alarme'] || '',
+        sensores: item['Sensores'] || '',
+        senhaAlarme: item['Senha do alarme'] || '',
+        central: item['Acesso da central'] || '',
+        observacoes: item['Observações'] || '',
+        status: item['Status'] || 'Ativa',
+        updatedAt: item['Última atualização'] || '',
+        updatedBy: item['Atualizado por'] || ''
+      }));
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function userCanInclude() {
+      return currentUser && (currentUser.perfil === 'admin' || currentUser.podeIncluir);
+    }
+
+    function userCanEdit() {
+      return currentUser && (currentUser.perfil === 'admin' || currentUser.podeEditar);
+    }
+
+    function userCanDelete() {
+      return currentUser && (currentUser.perfil === 'admin' || currentUser.podeExcluir);
+    }
+
+    function userCanView() {
+      return currentUser && (currentUser.perfil === 'admin' || currentUser.podeVisualizar);
+    }
+
+    async function login() {
+      const email = el('email').value.trim();
+      const senha = el('senha').value.trim();
+      el('loginError').textContent = '';
+
+      try {
+        const result = await apiGet({ action: 'login', email, senha });
+
+        if (!result.success) {
+          el('loginError').textContent = result.message || 'Falha no login.';
+          return;
+        }
+
+        currentUser = result.user;
+        localStorage.setItem('vtal_user', JSON.stringify(currentUser));
+        updateScreen();
+        await loadUnits();
+
+        if (currentUser.perfil === 'admin') {
+          await loadUsers();
+        }
+      } catch (error) {
+        el('loginError').textContent = 'Não foi possível fazer login.';
+      }
+    }
+
+    async function resetOwnPassword() {
+      const email = el('forgotEmail').value.trim();
+      const novaSenha = el('forgotSenha').value.trim();
+
+      if (!email || !novaSenha) {
+        el('loginError').textContent = 'Informe email e nova senha.';
+        return;
+      }
+
+      try {
+        const result = await apiPost({
+          action: 'resetSenha',
+          email,
+          novaSenha,
+          usuario: { email }
+        });
+
+        el('loginError').textContent = result.message || 'Processado';
+      } catch (e) {
+        el('loginError').textContent = 'Erro ao resetar senha.';
+      }
+    }
+
+    function logout() {
+      currentUser = null;
+      units = [];
+      users = [];
+      localStorage.removeItem('vtal_user');
+      el('loginScreen').classList.remove('hidden');
+      el('appScreen').classList.add('hidden');
+      el('loginError').textContent = '';
+    }
+
+    function applyTheme(mode) {
+      document.body.classList.toggle('dark', mode === 'dark');
+      localStorage.setItem('vtal_theme', mode);
+      el('themeBtn').textContent = mode === 'dark' ? 'Modo claro' : 'Modo escuro';
+    }
+
+    function updateScreen() {
+      el('loginScreen').classList.add('hidden');
+      el('appScreen').classList.remove('hidden');
+      el('nomeUsuario').textContent = currentUser.nome || '';
+      el('perfilAtual').textContent = currentUser.perfil === 'admin' ? 'Administrador' : 'Técnico';
+      el('ufsUsuario').textContent = (currentUser.ufsPermitidas || []).join(', ') || '-';
+      el('tabUsuarios').classList.toggle('hidden', currentUser.perfil !== 'admin');
+      renderPermissions();
+      setFormPermissions();
+    }
+
+    function renderPermissions() {
+      const items = [
+        ['Pode visualizar', currentUser.perfil === 'admin' || currentUser.podeVisualizar],
+        ['Pode incluir', currentUser.perfil === 'admin' || currentUser.podeIncluir],
+        ['Pode editar', currentUser.perfil === 'admin' || currentUser.podeEditar],
+        ['Pode excluir', currentUser.perfil === 'admin' || currentUser.podeExcluir]
+      ];
+
+      el('permissionList').innerHTML = items.map(([label, ok]) => `
+        <div class="permission-row">
+          <span>${label}</span>
+          <span class="badge ${ok ? 'active' : ''}">${ok ? 'Permitido' : 'Bloqueado'}</span>
+        </div>
+      `).join('');
+    }
+
+    function setFormPermissions() {
+      const allowed = !!userCanInclude();
+      [
+        'formUf','formNomeUnidade','formCloudNvr','formLogin','formSenha','formIp',
+        'formHd','formQuantidadeCameras','formAlarmeMac','formSensores',
+        'formSenhaAlarme','formCentral','formObservacoes','formStatus','saveBtn'
+      ].forEach(id => {
+        el(id).disabled = !allowed;
+      });
+    }
+
+    async function loadUnits() {
+      hideMessage();
+
+      try {
+        const result = await apiGet({ action: 'listar', email: currentUser.email });
+
+        if (!result.success) {
+          showMessage(result.message || 'Erro ao carregar unidades.');
+          return;
+        }
+
+        units = normalizeUnits(result.data);
+        renderStats();
+        renderUfFilter();
+        renderUnits();
+      } catch (e) {
+        showMessage('Erro ao carregar unidades.');
+      }
+    }
+
+    async function loadUsers() {
+      try {
+        const result = await apiGet({ action: 'listarUsuarios', email: currentUser.email });
+
+        if (!result.success) {
+          showMessage(result.message || 'Erro ao carregar usuários.');
+          return;
+        }
+
+        users = result.data || [];
+        renderUsers();
+      } catch (e) {
+        showMessage('Erro ao carregar usuários.');
+      }
+    }
+
+    function renderStats() {
+      el('statTotal').textContent = units.length;
+      el('statAtivas').textContent = units.filter(u => u.status === 'Ativa').length;
+      el('statManutencao').textContent = units.filter(u => u.status === 'Manutenção').length;
+      el('statCameras').textContent = units.reduce((a, u) => a + Number(u.cameras || 0), 0);
+    }
+
+    function renderUfFilter() {
+      const select = el('ufFilter');
+      const current = select.value;
+      const ufs = [...new Set(units.map(u => u.uf).filter(Boolean))].sort();
+
+      select.innerHTML = '<option value="all">Todas as UFs</option>' +
+        ufs.map(uf => `<option value="${uf}">${uf}</option>`).join('');
+
+      select.value = ufs.includes(current) || current === 'all' ? current : 'all';
+    }
+
+    function getFilteredUnits() {
+      const term = el('searchInput').value.trim().toLowerCase();
+      const uf = el('ufFilter').value;
+
+      return units.filter(unit => {
+        const text = [
+          unit.uf, unit.unidade, unit.cloudNvr, unit.login, unit.ip, unit.hd,
+          unit.alarmeMac, unit.sensores, unit.central, unit.observacoes,
+          unit.status, String(unit.cameras)
+        ].join(' ').toLowerCase();
+
+        return (!term || text.includes(term)) && (uf === 'all' || unit.uf === uf);
+      });
+    }
+
+    function renderSearchSummary(filtered) {
+      const box = el('searchSummary');
+      const term = el('searchInput').value.trim();
+      const uf = el('ufFilter').value === 'all' ? 'todas as UFs liberadas' : el('ufFilter').value;
+
+      box.innerHTML = `Consulta atual: <strong>${filtered.length}</strong> resultado(s) em <strong>${uf}</strong>${term ? ` para o termo <strong>${escapeHtml(term)}</strong>` : ''}.`;
+      box.classList.remove('hidden');
+    }
+
+    function getStatusBadgeClass(status) {
+      if (status === 'Ativa') return 'badge active';
+      if (status === 'Manutenção') return 'badge secondary';
+      return 'badge';
+    }
+
+    function copyText(value, label) {
+      navigator.clipboard.writeText(String(value || ''));
+      el('copyMessage').textContent = `Copiado: ${label}`;
+      setTimeout(() => el('copyMessage').textContent = '', 1500);
+    }
+
+    function renderUnits() {
+      const list = el('unitList');
+      const filtered = getFilteredUnits();
+      renderSearchSummary(filtered);
+
+      if (!filtered.length) {
+        list.innerHTML = '<div class="unit-card"><div class="muted">Nenhuma unidade encontrada com os filtros aplicados.</div></div>';
+        return;
+      }
+
+      list.innerHTML = filtered.map(unit => `
+        <div class="unit-card">
+          <div class="unit-top">
+            <div style="flex:1; min-width:280px;">
+              <div class="badges">
+                <span style="font-size:20px; font-weight:700; margin-right:6px;">${escapeHtml(unit.unidade)}</span>
+                <span class="${getStatusBadgeClass(unit.status)}">${escapeHtml(unit.status)}</span>
+                <span class="badge">${escapeHtml(unit.uf)}</span>
+                ${unit.alarmeMac ? `<span class="badge success">MAC alarme: ${escapeHtml(unit.alarmeMac)}</span>` : ''}
+              </div>
+
+              <div class="unit-info-grid">
+                <div class="info-item"><strong>UF</strong><div>${escapeHtml(unit.uf)}</div></div>
+                <div class="info-item"><strong>IP</strong><div>${escapeHtml(unit.ip)}</div></div>
+                <div class="info-item"><strong>HD</strong><div>${escapeHtml(unit.hd)}</div></div>
+                <div class="info-item"><strong>Câmeras</strong><div>${escapeHtml(unit.cameras)}</div></div>
+                <div class="info-item"><strong>Cloud NVR</strong><div>${escapeHtml(unit.cloudNvr)}</div></div>
+                <div class="info-item"><strong>Login</strong><div>${escapeHtml(unit.login)}</div></div>
+                <div class="info-item"><strong>MAC do alarme</strong><div>${escapeHtml(unit.alarmeMac)}</div></div>
+                <div class="info-item"><strong>Sensores</strong><div>${escapeHtml(unit.sensores)}</div></div>
+                <div class="info-item"><strong>Senha alarme</strong><div>${escapeHtml(unit.senhaAlarme)}</div></div>
+                <div class="info-item"><strong>Central</strong><div>${escapeHtml(unit.central)}</div></div>
+              </div>
+
+              ${unit.observacoes ? `<div class="obs-box"><strong style="color:var(--text)">Observações:</strong> ${escapeHtml(unit.observacoes)}</div>` : ''}
+            </div>
+
+            <div class="actions-box">
+              <div class="muted" style="font-weight:700; margin-bottom:8px;">Ações liberadas</div>
+
+              <div class="action-grid">
+                <button class="secondary" data-copy-value="${escapeHtml(unit.login)}" data-copy-label="Login ${escapeHtml(unit.unidade)}">Login</button>
+                <button class="secondary" data-copy-value="${escapeHtml(unit.ip)}" data-copy-label="IP ${escapeHtml(unit.unidade)}">IP</button>
+                <button class="secondary" data-copy-value="${escapeHtml(unit.cloudNvr)}" data-copy-label="NVR ${escapeHtml(unit.unidade)}">NVR</button>
+                <button class="secondary" data-copy-value="${escapeHtml(unit.senha)}" data-copy-label="Senha ${escapeHtml(unit.unidade)}">Senha</button>
+              </div>
+
+              ${userCanDelete() ? `<div class="admin-actions"><button class="danger" data-delete-id="${escapeHtml(unit.id)}">Excluir cadastro</button></div>` : ''}
+
+              <div style="margin-top:12px; font-size:12px; color:var(--text-soft); line-height:1.6;">
+                <div>Atualização: ${escapeHtml(unit.updatedAt || '-')}</div>
+                <div>Atualizado por: ${escapeHtml(unit.updatedBy || '-')}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      list.querySelectorAll('button[data-copy-value]').forEach((btn) => {
+        btn.addEventListener('click', () => copyText(btn.getAttribute('data-copy-value'), btn.getAttribute('data-copy-label')));
+      });
+
+      list.querySelectorAll('button[data-delete-id]').forEach((btn) => {
+        btn.addEventListener('click', () => deleteUnit(btn.getAttribute('data-delete-id')));
+      });
+    }
+
+    async function saveUnit() {
+      if (!userCanInclude()) {
+        showMessage('Você não tem permissão para cadastrar unidades.');
+        return;
+      }
+
+      const payload = {
+        action: 'criarUnidade',
+        usuario: currentUser,
+        uf: el('formUf').value.trim().toUpperCase(),
+        nomeUnidade: el('formNomeUnidade').value.trim(),
+        cloudNvr: el('formCloudNvr').value.trim(),
+        login: el('formLogin').value.trim(),
+        senha: el('formSenha').value.trim(),
+        ip: el('formIp').value.trim(),
+        hd: el('formHd').value.trim(),
+        quantidadeCameras: Number(el('formQuantidadeCameras').value || 0),
+        alarmeMac: el('formAlarmeMac').value.trim(),
+        sensores: el('formSensores').value.trim(),
+        senhaAlarme: el('formSenhaAlarme').value.trim(),
+        central: el('formCentral').value.trim(),
+        observacoes: el('formObservacoes').value.trim(),
+        status: el('formStatus').value
+      };
+
+      if (!payload.uf || !payload.nomeUnidade || !payload.login || !payload.ip) {
+        showMessage('Preencha UF, nome da unidade, login e IP.');
+        return;
+      }
+
+      try {
+        const result = await apiPost(payload);
+        showMessage(result.message || 'Processado');
+
+        if (result.success) {
+          resetUnitForm();
+          await loadUnits();
+        }
+      } catch (e) {
+        showMessage('Erro ao cadastrar unidade.');
+      }
+    }
+
+    async function deleteUnit(id) {
+      if (!userCanDelete()) {
+        showMessage('Você não tem permissão para excluir unidades.');
+        return;
+      }
+
+      if (!window.confirm('Tem certeza que deseja excluir este cadastro?')) return;
+
+      try {
+        const result = await apiPost({
+          action: 'excluirUnidade',
+          id,
+          usuario: currentUser
+        });
+
+        showMessage(result.message || 'Processado');
+
+        if (result.success) {
+          await loadUnits();
+        }
+      } catch (e) {
+        showMessage('Erro ao excluir unidade.');
+      }
+    }
+
+    function resetUnitForm() {
+      [
+        'formUf','formNomeUnidade','formCloudNvr','formLogin','formSenha','formIp',
+        'formHd','formQuantidadeCameras','formAlarmeMac','formSensores',
+        'formSenhaAlarme','formCentral','formObservacoes'
+      ].forEach(id => el(id).value = '');
+
+      el('formStatus').value = 'Ativa';
+    }
+
+    function downloadExcelFromFiltered() {
+      const filtered = getFilteredUnits();
+
+      if (!filtered.length) {
+        showMessage('Não há dados para exportar no filtro atual.');
+        return;
+      }
+
+      const headers = [
+        'ID','UF','Nome da unidade','Cloud NVR','Login','Senha','IP','HD',
+        'Quantidade de câmeras','MAC do alarme','Sensores','Senha do alarme',
+        'Acesso da central','Observações','Status','Última atualização','Atualizado por'
+      ];
+
+      const rows = filtered.map(u => [
+        u.id,u.uf,u.unidade,u.cloudNvr,u.login,u.senha,u.ip,u.hd,u.cameras,
+        u.alarmeMac,u.sensores,u.senhaAlarme,u.central,u.observacoes,u.status,
+        u.updatedAt,u.updatedBy
+      ]);
+
+      const tableHtml = `
+        <table>
+          <tr>
+            ${headers.map(h => `<th style="background:#0f172a;color:#fff;border:1px solid #cbd5e1;padding:8px;">${h}</th>`).join('')}
+          </tr>
+          ${rows.map(r => `<tr>${r.map(c => `<td style="border:1px solid #cbd5e1;padding:8px;">${escapeHtml(c)}</td>`).join('')}</tr>`).join('')}
+        </table>
+      `;
+
+      const blob = new Blob([tableHtml], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.href = url;
+      link.download = 'vtal_unidades.xls';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    async function createUser() {
+      const payload = {
+        action: 'criarUsuario',
+        usuario: currentUser,
+        nome: el('userNome').value.trim(),
+        email: el('userEmail').value.trim(),
+        senha: el('userSenha').value.trim(),
+        perfil: el('userPerfil').value,
+        ufsPermitidas: el('userUfs').value.trim(),
+        podeVisualizar: el('permVisualizar').value,
+        podeIncluir: el('permIncluir').value,
+        podeEditar: el('permEditar').value,
+        podeExcluir: el('permExcluir').value,
+        status: el('userStatus').value
+      };
+
+      try {
+        const result = await apiPost(payload);
+        showMessage(result.message || 'Processado');
+
+        if (result.success) {
+          ['userNome','userEmail','userSenha','userUfs'].forEach(id => el(id).value = '');
+          await loadUsers();
+        }
+      } catch (e) {
+        showMessage('Erro ao criar usuário.');
+      }
+    }
+
+    function renderUsers() {
+      const list = el('userList');
+
+      if (!users.length) {
+        list.innerHTML = '<div class="user-card"><div class="muted">Nenhum usuário cadastrado.</div></div>';
+        return;
+      }
+
+      list.innerHTML = users.map(user => `
+        <div class="user-card">
+          <div class="user-top">
+            <div style="flex:1; min-width:280px;">
+              <div class="badges">
+                <span style="font-size:20px; font-weight:700; margin-right:6px;">${escapeHtml(user['Nome'] || '-')}</span>
+                <span class="badge active">${escapeHtml(user['Perfil'] || '-')}</span>
+                <span class="badge">${escapeHtml(user['Status'] || '-')}</span>
+              </div>
+
+              <div class="info-grid">
+                <div class="info-item"><strong>Email</strong><div>${escapeHtml(user['Email'] || '-')}</div></div>
+                <div class="info-item"><strong>UFs permitidas</strong><div>${escapeHtml(user['UFs permitidas'] || '-')}</div></div>
+                <div class="info-item"><strong>Pode visualizar</strong><div>${escapeHtml(user['Pode visualizar'] || '-')}</div></div>
+                <div class="info-item"><strong>Pode incluir</strong><div>${escapeHtml(user['Pode incluir'] || '-')}</div></div>
+                <div class="info-item"><strong>Pode editar</strong><div>${escapeHtml(user['Pode editar'] || '-')}</div></div>
+                <div class="info-item"><strong>Pode excluir</strong><div>${escapeHtml(user['Pode excluir'] || '-')}</div></div>
+              </div>
+            </div>
+
+            <div class="actions-box">
+              <div class="muted" style="font-weight:700; margin-bottom:8px;">Ações do usuário</div>
+
+              <div class="admin-actions">
+                <button class="secondary" data-reset-email="${escapeHtml(user['Email'] || '')}">Preencher reset</button>
+                <button class="danger" data-delete-user-id="${escapeHtml(user['ID'] || '')}">Excluir usuário</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      list.querySelectorAll('button[data-reset-email]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          el('resetEmail').value = btn.getAttribute('data-reset-email');
+          showMessage('Email carregado no campo de reset de senha.');
+        });
+      });
+
+      list.querySelectorAll('button[data-delete-user-id]').forEach(btn => {
+        btn.addEventListener('click', () => deleteUser(btn.getAttribute('data-delete-user-id')));
+      });
+    }
+
+    async function deleteUser(id) {
+      if (!window.confirm('Tem certeza que deseja excluir este usuário?')) return;
+
+      try {
+        const result = await apiPost({
+          action: 'excluirUsuario',
+          id,
+          usuario: currentUser
+        });
+
+        showMessage(result.message || 'Processado');
+
+        if (result.success) {
+          await loadUsers();
+        }
+      } catch (e) {
+        showMessage('Erro ao excluir usuário.');
+      }
+    }
+
+    async function resetPasswordAdmin() {
+      const email = el('resetEmail').value.trim();
+      const novaSenha = el('resetNovaSenha').value.trim();
+
+      if (!email || !novaSenha) {
+        showMessage('Informe email e nova senha.');
+        return;
+      }
+
+      try {
+        const result = await apiPost({
+          action: 'resetSenha',
+          email,
+          novaSenha,
+          usuario: currentUser
+        });
+
+        showMessage(result.message || 'Processado');
+
+        if (result.success) {
+          el('resetNovaSenha').value = '';
+        }
+      } catch (e) {
+        showMessage('Erro ao resetar senha.');
+      }
+    }
+
+    function showTab(tab) {
+      const unitsTab = tab === 'unidades';
+      el('unidadesSection').classList.toggle('hidden', !unitsTab);
+      el('usuariosSection').classList.toggle('hidden', unitsTab);
+      el('tabUnidades').classList.toggle('active', unitsTab);
+      el('tabUsuarios').classList.toggle('active', !unitsTab);
+    }
+
+    el('loginBtn').addEventListener('click', login);
+    el('forgotBtn').addEventListener('click', () => el('forgotBox').classList.toggle('hidden'));
+    el('forgotSubmit').addEventListener('click', resetOwnPassword);
+    el('logoutBtn').addEventListener('click', logout);
+
+    el('refreshBtn').addEventListener('click', async () => {
+      await loadUnits();
+      if (currentUser.perfil === 'admin') {
+        await loadUsers();
+      }
+    });
+
+    el('searchBtn').addEventListener('click', renderUnits);
+    el('searchInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') renderUnits();
+    });
+    el('ufFilter').addEventListener('change', renderUnits);
+    el('saveBtn').addEventListener('click', saveUnit);
+    el('exportBtn').addEventListener('click', downloadExcelFromFiltered);
+
+    el('tabUnidades').addEventListener('click', () => showTab('unidades'));
+    el('tabUsuarios').addEventListener('click', () => showTab('usuarios'));
+    el('createUserBtn').addEventListener('click', createUser);
+    el('reloadUsersBtn').addEventListener('click', loadUsers);
+    el('resetBtn').addEventListener('click', resetPasswordAdmin);
+
+    el('themeBtn').addEventListener('click', () => {
+      applyTheme(document.body.classList.contains('dark') ? 'light' : 'dark');
+    });
+
+    window.addEventListener('load', async () => {
+      applyTheme(localStorage.getItem('vtal_theme') || 'light');
+
+      const saved = localStorage.getItem('vtal_user');
+      if (saved) {
+        currentUser = JSON.parse(saved);
+        updateScreen();
+        await loadUnits();
+        if (currentUser.perfil === 'admin') {
+          await loadUsers();
+        }
+      }
+    });
+  </script>
+</body>
+</html>
