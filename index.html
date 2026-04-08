@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -20,7 +19,6 @@
       --warning: #d97706;
       --info: #1d4ed8;
       --shadow: 0 10px 28px rgba(15, 23, 42, .08);
-      --radius: 20px;
     }
 
     body.dark {
@@ -52,9 +50,7 @@
       transition: background .2s, color .2s;
     }
 
-    .hidden {
-      display: none !important;
-    }
+    .hidden { display: none !important; }
 
     .container {
       max-width: 1400px;
@@ -68,7 +64,7 @@
       position: sticky;
       top: 0;
       z-index: 20;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, .03);
+      box-shadow: 0 2px 10px rgba(0,0,0,.03);
     }
 
     .header-inner {
@@ -150,10 +146,7 @@
       font-weight: 700;
     }
 
-    input,
-    select,
-    button,
-    textarea {
+    input, select, button, textarea {
       width: 100%;
       padding: 12px 14px;
       outline: none;
@@ -164,9 +157,7 @@
       resize: vertical;
     }
 
-    input:focus,
-    select:focus,
-    textarea:focus {
+    input:focus, select:focus, textarea:focus {
       border-color: var(--text-soft);
     }
 
@@ -381,27 +372,27 @@
     }
 
     .badge.success {
-      background: rgba(34, 197, 94, .12);
+      background: rgba(34,197,94,.12);
       color: var(--success);
-      border-color: rgba(34, 197, 94, .25);
+      border-color: rgba(34,197,94,.25);
     }
 
     .badge.warning {
-      background: rgba(245, 158, 11, .12);
+      background: rgba(245,158,11,.12);
       color: var(--warning);
-      border-color: rgba(245, 158, 11, .25);
+      border-color: rgba(245,158,11,.25);
     }
 
     .badge.danger {
-      background: rgba(239, 68, 68, .12);
+      background: rgba(239,68,68,.12);
       color: var(--danger);
-      border-color: rgba(239, 68, 68, .25);
+      border-color: rgba(239,68,68,.25);
     }
 
     .badge.info {
-      background: rgba(37, 99, 235, .12);
+      background: rgba(37,99,235,.12);
       color: var(--info);
-      border-color: rgba(37, 99, 235, .25);
+      border-color: rgba(37,99,235,.25);
     }
 
     .info-grid,
@@ -488,9 +479,7 @@
       margin: 16px 0 8px;
     }
 
-    .text-center {
-      text-align: center;
-    }
+    .text-center { text-align: center; }
 
     .permission-row {
       display: flex;
@@ -558,7 +547,6 @@
     }
 
     @media (max-width: 768px) {
-
       .grid-stats,
       .form-grid,
       .unit-info-grid,
@@ -594,7 +582,6 @@
     }
   </style>
 </head>
-
 <body>
   <section id="loginScreen" class="login-wrap">
     <div class="login-card">
@@ -653,49 +640,10 @@
 
       <section id="unidadesSection">
         <section class="grid-stats">
-          <div class="card">
-            <div class="card-body stat-card">
-              <div>
-                <div class="muted">Total de unidades</div>
-                <h2 id="statTotal">0</h2>
-                <div class="muted">Base operacional cadastrada</div>
-              </div>
-              <div class="icon-box">🏢</div>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-body stat-card">
-              <div>
-                <div class="muted">Unidades ativas</div>
-                <h2 id="statAtivas">0</h2>
-                <div class="muted">Operação disponível</div>
-              </div>
-              <div class="icon-box">🖥️</div>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-body stat-card">
-              <div>
-                <div class="muted">Em manutenção</div>
-                <h2 id="statManutencao">0</h2>
-                <div class="muted">Precisam de acompanhamento</div>
-              </div>
-              <div class="icon-box">🛠️</div>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-body stat-card">
-              <div>
-                <div class="muted">Total de câmeras</div>
-                <h2 id="statCameras">0</h2>
-                <div class="muted">Inventário monitorado</div>
-              </div>
-              <div class="icon-box">📷</div>
-            </div>
-          </div>
+          <div class="card"><div class="card-body stat-card"><div><div class="muted">Total de unidades</div><h2 id="statTotal">0</h2><div class="muted">Base operacional cadastrada</div></div><div class="icon-box">🏢</div></div></div>
+          <div class="card"><div class="card-body stat-card"><div><div class="muted">Unidades ativas</div><h2 id="statAtivas">0</h2><div class="muted">Operação disponível</div></div><div class="icon-box">🖥️</div></div></div>
+          <div class="card"><div class="card-body stat-card"><div><div class="muted">Em manutenção</div><h2 id="statManutencao">0</h2><div class="muted">Precisam de acompanhamento</div></div><div class="icon-box">🛠️</div></div></div>
+          <div class="card"><div class="card-body stat-card"><div><div class="muted">Total de câmeras</div><h2 id="statCameras">0</h2><div class="muted">Inventário monitorado</div></div><div class="icon-box">📷</div></div></div>
         </section>
 
         <section class="main-grid">
@@ -750,6 +698,7 @@
                   <input id="formCloudNvr" placeholder="Cloud NVR" />
                   <input id="formLogin" placeholder="Login" />
                   <input id="formSenha" placeholder="Senha" />
+                  <input id="formSenhaCameras" placeholder="Senha câmeras" />
                   <input id="formIp" placeholder="IP" />
                   <input id="formHd" placeholder="HD" />
                   <input id="formQuantidadeCameras" placeholder="Qtd. de câmeras" />
@@ -854,8 +803,7 @@
             <div class="card">
               <div class="card-body">
                 <h3 style="margin-bottom:6px;">Reset de senha</h3>
-                <p class="muted" style="margin-bottom:14px;">Admin pode resetar qualquer usuário. Usuário pode resetar a
-                  própria.</p>
+                <p class="muted" style="margin-bottom:14px;">Admin pode resetar qualquer usuário. Usuário pode resetar a própria.</p>
 
                 <div style="display:grid; gap:12px;">
                   <input id="resetEmail" placeholder="Email do usuário" />
@@ -914,6 +862,7 @@
         cloudNvr: item['Cloud NVR'] || '',
         login: item['Login'] || '',
         senha: item['Senha'] || '',
+        senhaCameras: item['Senha câmeras'] || '',
         ip: item['IP'] || '',
         hd: item['HD'] || '',
         cameras: Number(item['Quantidade de câmeras'] || 0),
@@ -940,7 +889,6 @@
     function normalizePermissionValue(value) {
       if (value === true) return true;
       if (value === false) return false;
-
       const normalized = String(value || '').trim().toUpperCase();
       return normalized === 'SIM' || normalized === 'TRUE';
     }
@@ -1062,9 +1010,9 @@
       const enabled = editingUnitId ? canEdit : canCreate;
 
       [
-        'formUf', 'formNomeUnidade', 'formCloudNvr', 'formLogin', 'formSenha', 'formIp',
-        'formHd', 'formQuantidadeCameras', 'formAlarmeMac', 'formSensores',
-        'formSenhaAlarme', 'formCentral', 'formObservacoes', 'formStatus'
+        'formUf','formNomeUnidade','formCloudNvr','formLogin','formSenha','formSenhaCameras','formIp',
+        'formHd','formQuantidadeCameras','formAlarmeMac','formSensores',
+        'formSenhaAlarme','formCentral','formObservacoes','formStatus'
       ].forEach(id => {
         el(id).disabled = !enabled;
       });
@@ -1135,8 +1083,8 @@
       return units.filter(unit => {
         const text = [
           unit.uf, unit.unidade, unit.cloudNvr, unit.login, unit.ip, unit.hd,
-          unit.alarmeMac, unit.sensores, unit.central, unit.observacoes,
-          unit.status, String(unit.cameras)
+          unit.senhaCameras, unit.alarmeMac, unit.sensores, unit.central,
+          unit.observacoes, unit.status, String(unit.cameras)
         ].join(' ').toLowerCase();
 
         return (!term || text.includes(term)) && (uf === 'all' || unit.uf === uf);
@@ -1195,6 +1143,7 @@
                 <div class="info-item"><strong>UF</strong><div>${escapeHtml(unit.uf)}</div></div>
                 <div class="info-item"><strong>IP</strong><div>${escapeHtml(unit.ip)}</div></div>
                 <div class="info-item"><strong>HD</strong><div>${escapeHtml(unit.hd)}</div></div>
+                <div class="info-item"><strong>Senha câmeras</strong><div>${escapeHtml(unit.senhaCameras)}</div></div>
                 <div class="info-item"><strong>Câmeras</strong><div>${escapeHtml(unit.cameras)}</div></div>
                 <div class="info-item"><strong>Cloud NVR</strong><div>${escapeHtml(unit.cloudNvr)}</div></div>
                 <div class="info-item"><strong>Login</strong><div>${escapeHtml(unit.login)}</div></div>
@@ -1215,6 +1164,7 @@
                 <button class="secondary" data-copy-value="${escapeHtml(unit.ip)}" data-copy-label="IP ${escapeHtml(unit.unidade)}">IP</button>
                 <button class="secondary" data-copy-value="${escapeHtml(unit.cloudNvr)}" data-copy-label="NVR ${escapeHtml(unit.unidade)}">NVR</button>
                 <button class="secondary" data-copy-value="${escapeHtml(unit.senha)}" data-copy-label="Senha ${escapeHtml(unit.unidade)}">Senha</button>
+                <button class="secondary" data-copy-value="${escapeHtml(unit.senhaCameras)}" data-copy-label="Senha câmeras ${escapeHtml(unit.unidade)}">Senha câmeras</button>
               </div>
 
               <div class="admin-actions">
@@ -1251,6 +1201,7 @@
       el('formCloudNvr').value = unit.cloudNvr || '';
       el('formLogin').value = unit.login || '';
       el('formSenha').value = unit.senha || '';
+      el('formSenhaCameras').value = unit.senhaCameras || '';
       el('formIp').value = unit.ip || '';
       el('formHd').value = unit.hd || '';
       el('formQuantidadeCameras').value = unit.cameras || '';
@@ -1312,6 +1263,7 @@
         cloudNvr: el('formCloudNvr').value.trim(),
         login: el('formLogin').value.trim(),
         senha: el('formSenha').value.trim(),
+        senhaCameras: el('formSenhaCameras').value.trim(),
         ip: el('formIp').value.trim(),
         hd: el('formHd').value.trim(),
         quantidadeCameras: Number(el('formQuantidadeCameras').value || 0),
@@ -1422,9 +1374,9 @@
 
     function resetUnitForm() {
       [
-        'editingUnitId', 'formUf', 'formNomeUnidade', 'formCloudNvr', 'formLogin', 'formSenha', 'formIp',
-        'formHd', 'formQuantidadeCameras', 'formAlarmeMac', 'formSensores',
-        'formSenhaAlarme', 'formCentral', 'formObservacoes'
+        'editingUnitId','formUf','formNomeUnidade','formCloudNvr','formLogin','formSenha','formSenhaCameras','formIp',
+        'formHd','formQuantidadeCameras','formAlarmeMac','formSensores',
+        'formSenhaAlarme','formCentral','formObservacoes'
       ].forEach(id => el(id).value = '');
 
       el('formStatus').value = 'Ativa';
@@ -1439,15 +1391,15 @@
       }
 
       const headers = [
-        'ID', 'UF', 'Nome da unidade', 'Cloud NVR', 'Login', 'Senha', 'IP', 'HD',
-        'Quantidade de câmeras', 'MAC do alarme', 'Sensores', 'Senha do alarme',
-        'Acesso da central', 'Observações', 'Status', 'Última atualização', 'Atualizado por'
+        'ID','UF','Nome da unidade','Cloud NVR','Login','Senha','Senha câmeras','IP','HD',
+        'Quantidade de câmeras','MAC do alarme','Sensores','Senha do alarme',
+        'Acesso da central','Observações','Status','Última atualização','Atualizado por'
       ];
 
       const rows = filtered.map(u => [
-        u.id, u.uf, u.unidade, u.cloudNvr, u.login, u.senha, u.ip, u.hd, u.cameras,
-        u.alarmeMac, u.sensores, u.senhaAlarme, u.central, u.observacoes, u.status,
-        u.updatedAt, u.updatedBy
+        u.id,u.uf,u.unidade,u.cloudNvr,u.login,u.senha,u.senhaCameras,u.ip,u.hd,u.cameras,
+        u.alarmeMac,u.sensores,u.senhaAlarme,u.central,u.observacoes,u.status,
+        u.updatedAt,u.updatedBy
       ]);
 
       const tableHtml = `
@@ -1491,7 +1443,7 @@
         showMessage(result.message || 'Processado');
 
         if (result.success) {
-          ['userNome', 'userEmail', 'userSenha', 'userUfs'].forEach(id => el(id).value = '');
+          ['userNome','userEmail','userSenha','userUfs'].forEach(id => el(id).value = '');
           await loadUsers();
         }
       } catch (e) {
@@ -1659,5 +1611,4 @@
     });
   </script>
 </body>
-
 </html>
