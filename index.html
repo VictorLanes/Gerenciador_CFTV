@@ -13,10 +13,13 @@
       --text-soft: #64748b;
       --border: #cbd5e1;
       --primary: #0f172a;
+      --primary-soft: #1e293b;
       --success: #166534;
       --danger: #b91c1c;
       --warning: #d97706;
-      --shadow: 0 8px 24px rgba(15,23,42,.08);
+      --info: #1d4ed8;
+      --shadow: 0 10px 28px rgba(15, 23, 42, .08);
+      --radius: 20px;
     }
 
     body.dark {
@@ -27,13 +30,19 @@
       --text-soft: #94a3b8;
       --border: #334155;
       --primary: #e2e8f0;
+      --primary-soft: #cbd5e1;
       --success: #22c55e;
       --danger: #ef4444;
       --warning: #f59e0b;
-      --shadow: 0 8px 24px rgba(0,0,0,.35);
+      --info: #60a5fa;
+      --shadow: 0 10px 28px rgba(0, 0, 0, .35);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
       font-family: Arial, Helvetica, sans-serif;
@@ -45,9 +54,9 @@
     .hidden { display: none !important; }
 
     .container {
-      max-width: 1320px;
+      max-width: 1400px;
       margin: 0 auto;
-      padding: 24px;
+      padding: 20px;
     }
 
     .header {
@@ -56,50 +65,64 @@
       position: sticky;
       top: 0;
       z-index: 20;
+      box-shadow: 0 2px 10px rgba(0,0,0,.03);
     }
 
     .header-inner {
-      max-width: 1320px;
+      max-width: 1400px;
       margin: 0 auto;
-      padding: 16px 24px;
+      padding: 14px 20px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      gap: 16px;
+      justify-content: space-between;
+      gap: 18px;
       flex-wrap: wrap;
     }
 
-    .brand {
+    .brand-area {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
+      min-width: 280px;
     }
 
     .brand-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      background: var(--primary);
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-soft));
       color: var(--bg);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: bold;
+      font-weight: 800;
+      font-size: 20px;
+      flex-shrink: 0;
     }
 
-    .brand small {
+    .brand-text small {
+      display: block;
       color: var(--text-soft);
+      font-size: 13px;
+      margin-bottom: 2px;
+    }
+
+    .brand-text strong {
+      font-size: 24px;
+      line-height: 1.2;
       display: block;
     }
 
-    .header-actions {
+    .top-menu {
       display: flex;
+      align-items: center;
       gap: 10px;
       flex-wrap: wrap;
-      align-items: center;
+      justify-content: flex-end;
+      flex: 1;
     }
 
-    .pill,
+    .top-chip,
     input,
     select,
     button,
@@ -107,12 +130,21 @@
       border: 1px solid var(--border);
       background: var(--bg-soft);
       color: var(--text);
-      border-radius: 16px;
+      border-radius: 14px;
       font-size: 14px;
     }
 
-    .pill {
+    .top-chip {
       padding: 10px 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 42px;
+      white-space: nowrap;
+    }
+
+    .top-chip strong {
+      font-weight: 700;
     }
 
     input, select, button, textarea {
@@ -122,7 +154,7 @@
     }
 
     textarea {
-      min-height: 90px;
+      min-height: 100px;
       resize: vertical;
     }
 
@@ -135,6 +167,11 @@
       background: var(--primary);
       color: var(--bg);
       font-weight: 700;
+      transition: transform .15s ease, opacity .15s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
     }
 
     button.secondary {
@@ -157,16 +194,29 @@
       color: #fff;
     }
 
+    button.info {
+      background: var(--info);
+      color: #fff;
+    }
+
     button:disabled {
       opacity: .6;
       cursor: not-allowed;
+      transform: none;
+    }
+
+    .compact-btn {
+      width: auto;
+      min-width: 120px;
+      padding: 10px 14px;
+      min-height: 42px;
     }
 
     .grid-stats {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 16px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
     .card {
@@ -177,7 +227,7 @@
     }
 
     .card-body {
-      padding: 24px;
+      padding: 22px;
     }
 
     .stat-card {
@@ -197,8 +247,8 @@
     }
 
     .icon-box {
-      width: 48px;
-      height: 48px;
+      width: 50px;
+      height: 50px;
       border-radius: 16px;
       background: var(--bg-muted);
       display: flex;
@@ -209,8 +259,8 @@
 
     .main-grid {
       display: grid;
-      grid-template-columns: 1.7fr 1fr;
-      gap: 24px;
+      grid-template-columns: 1.65fr .95fr;
+      gap: 20px;
     }
 
     .section-head {
@@ -230,9 +280,17 @@
     .filters,
     .toolbar {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
       align-items: center;
+    }
+
+    .filters input {
+      min-width: 260px;
+    }
+
+    .filters select {
+      width: 180px;
     }
 
     .unit-list,
@@ -245,9 +303,20 @@
     .unit-card,
     .user-card {
       border: 1px solid var(--border);
-      border-radius: 24px;
+      border-radius: 22px;
       background: var(--bg-soft);
       padding: 18px;
+      transition: border-color .15s ease, transform .15s ease, box-shadow .15s ease;
+    }
+
+    .unit-card:hover {
+      border-color: var(--text-soft);
+      transform: translateY(-1px);
+    }
+
+    .unit-card.selected {
+      border-color: var(--info);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, .10);
     }
 
     .unit-top,
@@ -262,8 +331,25 @@
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       align-items: center;
+    }
+
+    .unit-title-btn {
+      border: none;
+      background: transparent;
+      color: var(--text);
+      font-size: 20px;
+      font-weight: 700;
+      padding: 0;
+      width: auto;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .unit-title-btn:hover {
+      color: var(--info);
+      transform: none;
     }
 
     .badge {
@@ -290,6 +376,24 @@
       background: rgba(34,197,94,.12);
       color: var(--success);
       border-color: rgba(34,197,94,.25);
+    }
+
+    .badge.warning {
+      background: rgba(245,158,11,.12);
+      color: var(--warning);
+      border-color: rgba(245,158,11,.25);
+    }
+
+    .badge.danger {
+      background: rgba(239,68,68,.12);
+      color: var(--danger);
+      border-color: rgba(239,68,68,.25);
+    }
+
+    .badge.info {
+      background: rgba(37,99,235,.12);
+      color: var(--info);
+      border-color: rgba(37,99,235,.25);
     }
 
     .info-grid,
@@ -328,7 +432,8 @@
     }
 
     .action-grid,
-    .admin-actions {
+    .admin-actions,
+    .edit-actions {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 10px;
@@ -337,6 +442,11 @@
 
     .admin-actions {
       grid-template-columns: 1fr;
+    }
+
+    .edit-actions {
+      grid-template-columns: repeat(2, 1fr);
+      margin-top: 14px;
     }
 
     .message {
@@ -370,9 +480,7 @@
       margin: 16px 0 8px;
     }
 
-    .text-center {
-      text-align: center;
-    }
+    .text-center { text-align: center; }
 
     .permission-row {
       display: flex;
@@ -386,7 +494,8 @@
     }
 
     .obs-box,
-    .summary-box {
+    .summary-box,
+    .editing-box {
       margin-top: 12px;
       background: var(--bg-muted);
       border-radius: 16px;
@@ -394,6 +503,11 @@
       font-size: 14px;
       color: var(--text-soft);
       border: 1px dashed var(--border);
+    }
+
+    .editing-box {
+      border-style: solid;
+      color: var(--text);
     }
 
     .section-tabs {
@@ -412,12 +526,24 @@
       outline: 2px solid var(--text-soft);
     }
 
-    @media (max-width: 1100px) {
+    .small-note {
+      font-size: 12px;
+      color: var(--text-soft);
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 1180px) {
       .grid-stats {
         grid-template-columns: repeat(2, 1fr);
       }
+
       .main-grid {
         grid-template-columns: 1fr;
+      }
+
+      .top-menu {
+        justify-content: flex-start;
       }
     }
 
@@ -428,12 +554,31 @@
       .info-grid {
         grid-template-columns: 1fr;
       }
+
       .container,
       .header-inner {
         padding: 16px;
       }
-      .filters input {
+
+      .filters input,
+      .filters select,
+      .filters button {
+        width: 100% !important;
         min-width: 100% !important;
+      }
+
+      .action-grid,
+      .edit-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .brand-text strong {
+        font-size: 20px;
+      }
+
+      .top-chip,
+      .compact-btn {
+        width: 100%;
       }
     }
   </style>
@@ -467,21 +612,21 @@
   <section id="appScreen" class="hidden">
     <header class="header">
       <div class="header-inner">
-        <div class="brand">
+        <div class="brand-area">
           <div class="brand-icon">VT</div>
-          <div>
+          <div class="brand-text">
             <small>Painel Operacional</small>
             <strong>VTAL Manutenção de Unidades</strong>
           </div>
         </div>
 
-        <div class="header-actions">
-          <div class="pill">Perfil: <strong id="perfilAtual"></strong></div>
-          <div class="pill">Usuário: <strong id="nomeUsuario"></strong></div>
-          <div class="pill">UFs: <strong id="ufsUsuario"></strong></div>
-          <button class="secondary" id="themeBtn">Modo escuro</button>
-          <button class="secondary" id="refreshBtn">Atualizar</button>
-          <button class="secondary" id="logoutBtn">Sair</button>
+        <div class="top-menu">
+          <div class="top-chip">Perfil: <strong id="perfilAtual"></strong></div>
+          <div class="top-chip">Usuário: <strong id="nomeUsuario"></strong></div>
+          <div class="top-chip">UFs: <strong id="ufsUsuario"></strong></div>
+          <button class="secondary compact-btn" id="themeBtn">Modo escuro</button>
+          <button class="secondary compact-btn" id="refreshBtn">Atualizar</button>
+          <button class="secondary compact-btn" id="logoutBtn">Sair</button>
         </div>
       </div>
     </header>
@@ -496,10 +641,49 @@
 
       <section id="unidadesSection">
         <section class="grid-stats">
-          <div class="card"><div class="card-body stat-card"><div><div class="muted">Total de unidades</div><h2 id="statTotal">0</h2><div class="muted">Base operacional cadastrada</div></div><div class="icon-box">🏢</div></div></div>
-          <div class="card"><div class="card-body stat-card"><div><div class="muted">Unidades ativas</div><h2 id="statAtivas">0</h2><div class="muted">Operação disponível</div></div><div class="icon-box">🖥️</div></div></div>
-          <div class="card"><div class="card-body stat-card"><div><div class="muted">Em manutenção</div><h2 id="statManutencao">0</h2><div class="muted">Precisam de acompanhamento</div></div><div class="icon-box">🛠️</div></div></div>
-          <div class="card"><div class="card-body stat-card"><div><div class="muted">Total de câmeras</div><h2 id="statCameras">0</h2><div class="muted">Inventário monitorado</div></div><div class="icon-box">📷</div></div></div>
+          <div class="card">
+            <div class="card-body stat-card">
+              <div>
+                <div class="muted">Total de unidades</div>
+                <h2 id="statTotal">0</h2>
+                <div class="muted">Base operacional cadastrada</div>
+              </div>
+              <div class="icon-box">🏢</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body stat-card">
+              <div>
+                <div class="muted">Unidades ativas</div>
+                <h2 id="statAtivas">0</h2>
+                <div class="muted">Operação disponível</div>
+              </div>
+              <div class="icon-box">🖥️</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body stat-card">
+              <div>
+                <div class="muted">Em manutenção</div>
+                <h2 id="statManutencao">0</h2>
+                <div class="muted">Precisam de acompanhamento</div>
+              </div>
+              <div class="icon-box">🛠️</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-body stat-card">
+              <div>
+                <div class="muted">Total de câmeras</div>
+                <h2 id="statCameras">0</h2>
+                <div class="muted">Inventário monitorado</div>
+              </div>
+              <div class="icon-box">📷</div>
+            </div>
+          </div>
         </section>
 
         <section class="main-grid">
@@ -510,13 +694,14 @@
                   <h3>Consulta das unidades</h3>
                   <p class="muted">Busca por unidade, login, IP, alarme e filtro por UF.</p>
                 </div>
+
                 <div class="filters">
-                  <input id="searchInput" placeholder="Pesquisar unidade, IP, login, alarme..." style="min-width:280px;" />
-                  <select id="ufFilter" style="width:180px;">
+                  <input id="searchInput" placeholder="Pesquisar unidade, IP, login, alarme..." />
+                  <select id="ufFilter">
                     <option value="all">Todas as UFs</option>
                   </select>
-                  <button id="searchBtn" style="width:auto;">Consultar</button>
-                  <button id="exportBtn" class="success" style="width:auto;">Gerar Excel</button>
+                  <button id="searchBtn" class="compact-btn">Consultar</button>
+                  <button id="exportBtn" class="success compact-btn">Gerar Excel</button>
                 </div>
               </div>
 
@@ -525,7 +710,7 @@
             </div>
           </div>
 
-          <div style="display:grid; gap:24px;">
+          <div style="display:grid; gap:20px;">
             <div class="card">
               <div class="card-body">
                 <h3 style="margin-bottom:6px;">Permissões do perfil</h3>
@@ -536,8 +721,16 @@
 
             <div class="card">
               <div class="card-body">
-                <h3 style="margin-bottom:6px;">Cadastro de unidade</h3>
-                <p class="muted" style="margin-bottom:14px;">Somente com permissão de inclusão.</p>
+                <div class="section-head" style="margin-bottom:10px;">
+                  <div>
+                    <h3 style="margin-bottom:6px;" id="formTitle">Cadastro de unidade</h3>
+                    <p class="muted" id="formSubtitle">Somente com permissão de inclusão.</p>
+                  </div>
+                </div>
+
+                <div id="editingBox" class="editing-box hidden"></div>
+
+                <input id="editingUnitId" type="hidden" />
 
                 <div class="form-grid">
                   <input id="formUf" placeholder="UF" />
@@ -558,13 +751,24 @@
 
                 <select id="formStatus" style="margin-top:12px;">
                   <option value="Ativa">Ativa</option>
+                  <option value="Offline sem conexão">Offline sem conexão</option>
+                  <option value="Vandalizada">Vandalizada</option>
                   <option value="Manutenção">Manutenção</option>
                   <option value="Pendente">Pendente</option>
                   <option value="Inativa">Inativa</option>
                 </select>
 
-                <button id="saveBtn" style="margin-top:12px;">Cadastrar unidade</button>
+                <div id="createActions" style="margin-top:12px;">
+                  <button id="saveBtn">Cadastrar unidade</button>
+                </div>
+
+                <div id="editActions" class="edit-actions hidden">
+                  <button id="updateBtn" class="info">Salvar alterações</button>
+                  <button id="cancelEditBtn" class="secondary">Cancelar edição</button>
+                </div>
+
                 <p id="copyMessage" style="margin-top:10px; color:#16a34a; font-size:14px;"></p>
+                <p class="small-note">Clique no nome de uma unidade para carregar os dados no formulário e editar.</p>
               </div>
             </div>
           </div>
@@ -580,14 +784,14 @@
                   <h3>Gestão de usuários</h3>
                   <p class="muted">Criar, listar, excluir e resetar senha.</p>
                 </div>
-                <button id="reloadUsersBtn" class="secondary" style="width:auto;">Atualizar usuários</button>
+                <button id="reloadUsersBtn" class="secondary compact-btn">Atualizar usuários</button>
               </div>
 
               <div id="userList" class="user-list"></div>
             </div>
           </div>
 
-          <div style="display:grid; gap:24px;">
+          <div style="display:grid; gap:20px;">
             <div class="card">
               <div class="card-body">
                 <h3 style="margin-bottom:6px;">Criar usuário</h3>
@@ -659,6 +863,7 @@
     let currentUser = null;
     let units = [];
     let users = [];
+    let editingUnitId = null;
 
     const el = (id) => document.getElementById(id);
 
@@ -719,20 +924,24 @@
         .replace(/'/g, '&#039;');
     }
 
+    function normalizePermissionValue(value) {
+      return String(value || '').toUpperCase() === 'SIM';
+    }
+
     function userCanInclude() {
-      return currentUser && (currentUser.perfil === 'admin' || currentUser.podeIncluir);
+      return currentUser && (currentUser.perfil === 'admin' || normalizePermissionValue(currentUser.podeIncluir));
     }
 
     function userCanEdit() {
-      return currentUser && (currentUser.perfil === 'admin' || currentUser.podeEditar);
+      return currentUser && (currentUser.perfil === 'admin' || normalizePermissionValue(currentUser.podeEditar));
     }
 
     function userCanDelete() {
-      return currentUser && (currentUser.perfil === 'admin' || currentUser.podeExcluir);
+      return currentUser && (currentUser.perfil === 'admin' || normalizePermissionValue(currentUser.podeExcluir));
     }
 
     function userCanView() {
-      return currentUser && (currentUser.perfil === 'admin' || currentUser.podeVisualizar);
+      return currentUser && (currentUser.perfil === 'admin' || normalizePermissionValue(currentUser.podeVisualizar));
     }
 
     async function login() {
@@ -788,10 +997,13 @@
       currentUser = null;
       units = [];
       users = [];
+      editingUnitId = null;
       localStorage.removeItem('vtal_user');
       el('loginScreen').classList.remove('hidden');
       el('appScreen').classList.add('hidden');
       el('loginError').textContent = '';
+      resetUnitForm();
+      exitEditMode();
     }
 
     function applyTheme(mode) {
@@ -804,7 +1016,7 @@
       el('loginScreen').classList.add('hidden');
       el('appScreen').classList.remove('hidden');
       el('nomeUsuario').textContent = currentUser.nome || '';
-      el('perfilAtual').textContent = currentUser.perfil === 'admin' ? 'Administrador' : 'Técnico';
+      el('perfilAtual').textContent = `${currentUser.perfil === 'admin' ? 'Administrador' : 'Técnico'} - ${currentUser.nome || ''}`;
       el('ufsUsuario').textContent = (currentUser.ufsPermitidas || []).join(', ') || '-';
       el('tabUsuarios').classList.toggle('hidden', currentUser.perfil !== 'admin');
       renderPermissions();
@@ -813,10 +1025,10 @@
 
     function renderPermissions() {
       const items = [
-        ['Pode visualizar', currentUser.perfil === 'admin' || currentUser.podeVisualizar],
-        ['Pode incluir', currentUser.perfil === 'admin' || currentUser.podeIncluir],
-        ['Pode editar', currentUser.perfil === 'admin' || currentUser.podeEditar],
-        ['Pode excluir', currentUser.perfil === 'admin' || currentUser.podeExcluir]
+        ['Pode visualizar', currentUser.perfil === 'admin' || normalizePermissionValue(currentUser.podeVisualizar)],
+        ['Pode incluir', currentUser.perfil === 'admin' || normalizePermissionValue(currentUser.podeIncluir)],
+        ['Pode editar', currentUser.perfil === 'admin' || normalizePermissionValue(currentUser.podeEditar)],
+        ['Pode excluir', currentUser.perfil === 'admin' || normalizePermissionValue(currentUser.podeExcluir)]
       ];
 
       el('permissionList').innerHTML = items.map(([label, ok]) => `
@@ -828,14 +1040,20 @@
     }
 
     function setFormPermissions() {
-      const allowed = !!userCanInclude();
+      const canCreate = !!userCanInclude();
+      const canEdit = !!userCanEdit();
+      const enabled = editingUnitId ? canEdit : canCreate;
+
       [
         'formUf','formNomeUnidade','formCloudNvr','formLogin','formSenha','formIp',
         'formHd','formQuantidadeCameras','formAlarmeMac','formSensores',
-        'formSenhaAlarme','formCentral','formObservacoes','formStatus','saveBtn'
+        'formSenhaAlarme','formCentral','formObservacoes','formStatus'
       ].forEach(id => {
-        el(id).disabled = !allowed;
+        el(id).disabled = !enabled;
       });
+
+      el('saveBtn').disabled = !canCreate;
+      el('updateBtn').disabled = !canEdit;
     }
 
     async function loadUnits() {
@@ -886,8 +1104,9 @@
       const current = select.value;
       const ufs = [...new Set(units.map(u => u.uf).filter(Boolean))].sort();
 
-      select.innerHTML = '<option value="all">Todas as UFs</option>' +
-        ufs.map(uf => `<option value="${uf}">${uf}</option>`).join('');
+      select.innerHTML =
+        '<option value="all">Todas as UFs</option>' +
+        ufs.map(uf => `<option value="${escapeHtml(uf)}">${escapeHtml(uf)}</option>`).join('');
 
       select.value = ufs.includes(current) || current === 'all' ? current : 'all';
     }
@@ -912,13 +1131,17 @@
       const term = el('searchInput').value.trim();
       const uf = el('ufFilter').value === 'all' ? 'todas as UFs liberadas' : el('ufFilter').value;
 
-      box.innerHTML = `Consulta atual: <strong>${filtered.length}</strong> resultado(s) em <strong>${uf}</strong>${term ? ` para o termo <strong>${escapeHtml(term)}</strong>` : ''}.`;
+      box.innerHTML = `Consulta atual: <strong>${filtered.length}</strong> resultado(s) em <strong>${escapeHtml(uf)}</strong>${term ? ` para o termo <strong>${escapeHtml(term)}</strong>` : ''}.`;
       box.classList.remove('hidden');
     }
 
     function getStatusBadgeClass(status) {
       if (status === 'Ativa') return 'badge active';
-      if (status === 'Manutenção') return 'badge secondary';
+      if (status === 'Manutenção') return 'badge warning';
+      if (status === 'Offline sem conexão') return 'badge info';
+      if (status === 'Vandalizada') return 'badge danger';
+      if (status === 'Pendente') return 'badge secondary';
+      if (status === 'Inativa') return 'badge';
       return 'badge';
     }
 
@@ -939,11 +1162,13 @@
       }
 
       list.innerHTML = filtered.map(unit => `
-        <div class="unit-card">
+        <div class="unit-card ${editingUnitId === unit.id ? 'selected' : ''}" data-card-id="${escapeHtml(unit.id)}">
           <div class="unit-top">
             <div style="flex:1; min-width:280px;">
               <div class="badges">
-                <span style="font-size:20px; font-weight:700; margin-right:6px;">${escapeHtml(unit.unidade)}</span>
+                <button class="unit-title-btn" data-edit-id="${escapeHtml(unit.id)}" title="Clique para editar">
+                  ${escapeHtml(unit.unidade)}
+                </button>
                 <span class="${getStatusBadgeClass(unit.status)}">${escapeHtml(unit.status)}</span>
                 <span class="badge">${escapeHtml(unit.uf)}</span>
                 ${unit.alarmeMac ? `<span class="badge success">MAC alarme: ${escapeHtml(unit.alarmeMac)}</span>` : ''}
@@ -975,7 +1200,10 @@
                 <button class="secondary" data-copy-value="${escapeHtml(unit.senha)}" data-copy-label="Senha ${escapeHtml(unit.unidade)}">Senha</button>
               </div>
 
-              ${userCanDelete() ? `<div class="admin-actions"><button class="danger" data-delete-id="${escapeHtml(unit.id)}">Excluir cadastro</button></div>` : ''}
+              <div class="admin-actions">
+                ${userCanEdit() ? `<button class="info" data-edit-id="${escapeHtml(unit.id)}">Editar unidade</button>` : ''}
+                ${userCanDelete() ? `<button class="danger" data-delete-id="${escapeHtml(unit.id)}">Excluir cadastro</button>` : ''}
+              </div>
 
               <div style="margin-top:12px; font-size:12px; color:var(--text-soft); line-height:1.6;">
                 <div>Atualização: ${escapeHtml(unit.updatedAt || '-')}</div>
@@ -993,17 +1221,75 @@
       list.querySelectorAll('button[data-delete-id]').forEach((btn) => {
         btn.addEventListener('click', () => deleteUnit(btn.getAttribute('data-delete-id')));
       });
+
+      list.querySelectorAll('button[data-edit-id]').forEach((btn) => {
+        btn.addEventListener('click', () => startEditUnit(btn.getAttribute('data-edit-id')));
+      });
     }
 
-    async function saveUnit() {
-      if (!userCanInclude()) {
-        showMessage('Você não tem permissão para cadastrar unidades.');
+    function fillUnitForm(unit) {
+      el('editingUnitId').value = unit.id || '';
+      el('formUf').value = unit.uf || '';
+      el('formNomeUnidade').value = unit.unidade || '';
+      el('formCloudNvr').value = unit.cloudNvr || '';
+      el('formLogin').value = unit.login || '';
+      el('formSenha').value = unit.senha || '';
+      el('formIp').value = unit.ip || '';
+      el('formHd').value = unit.hd || '';
+      el('formQuantidadeCameras').value = unit.cameras || '';
+      el('formAlarmeMac').value = unit.alarmeMac || '';
+      el('formSensores').value = unit.sensores || '';
+      el('formSenhaAlarme').value = unit.senhaAlarme || '';
+      el('formCentral').value = unit.central || '';
+      el('formObservacoes').value = unit.observacoes || '';
+      el('formStatus').value = unit.status || 'Ativa';
+    }
+
+    function startEditUnit(id) {
+      if (!userCanEdit()) {
+        showMessage('Você não tem permissão para editar unidades.');
         return;
       }
 
-      const payload = {
-        action: 'criarUnidade',
-        usuario: currentUser,
+      const unit = units.find(u => u.id === String(id));
+      if (!unit) {
+        showMessage('Unidade não encontrada para edição.');
+        return;
+      }
+
+      editingUnitId = unit.id;
+      fillUnitForm(unit);
+
+      el('formTitle').textContent = 'Editar unidade';
+      el('formSubtitle').textContent = 'Altere as informações e salve as mudanças.';
+      el('editingBox').innerHTML = `Editando a unidade: <strong>${escapeHtml(unit.unidade)}</strong> | ID: <strong>${escapeHtml(unit.id)}</strong>`;
+      el('editingBox').classList.remove('hidden');
+
+      el('createActions').classList.add('hidden');
+      el('editActions').classList.remove('hidden');
+
+      setFormPermissions();
+      renderUnits();
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function exitEditMode() {
+      editingUnitId = null;
+      el('editingUnitId').value = '';
+      el('editingBox').classList.add('hidden');
+      el('editingBox').textContent = '';
+      el('formTitle').textContent = 'Cadastro de unidade';
+      el('formSubtitle').textContent = 'Somente com permissão de inclusão.';
+      el('createActions').classList.remove('hidden');
+      el('editActions').classList.add('hidden');
+      setFormPermissions();
+      renderUnits();
+    }
+
+    function collectUnitFormData() {
+      return {
+        id: el('editingUnitId').value.trim(),
         uf: el('formUf').value.trim().toUpperCase(),
         nomeUnidade: el('formNomeUnidade').value.trim(),
         cloudNvr: el('formCloudNvr').value.trim(),
@@ -1019,6 +1305,19 @@
         observacoes: el('formObservacoes').value.trim(),
         status: el('formStatus').value
       };
+    }
+
+    async function saveUnit() {
+      if (!userCanInclude()) {
+        showMessage('Você não tem permissão para cadastrar unidades.');
+        return;
+      }
+
+      const payload = {
+        action: 'criarUnidade',
+        usuario: currentUser,
+        ...collectUnitFormData()
+      };
 
       if (!payload.uf || !payload.nomeUnidade || !payload.login || !payload.ip) {
         showMessage('Preencha UF, nome da unidade, login e IP.');
@@ -1031,10 +1330,47 @@
 
         if (result.success) {
           resetUnitForm();
+          exitEditMode();
           await loadUnits();
         }
       } catch (e) {
         showMessage('Erro ao cadastrar unidade.');
+      }
+    }
+
+    async function updateUnit() {
+      if (!userCanEdit()) {
+        showMessage('Você não tem permissão para editar unidades.');
+        return;
+      }
+
+      const payload = {
+        action: 'editarUnidade',
+        usuario: currentUser,
+        ...collectUnitFormData()
+      };
+
+      if (!payload.id) {
+        showMessage('Nenhuma unidade selecionada para edição.');
+        return;
+      }
+
+      if (!payload.uf || !payload.nomeUnidade || !payload.login || !payload.ip) {
+        showMessage('Preencha UF, nome da unidade, login e IP.');
+        return;
+      }
+
+      try {
+        const result = await apiPost(payload);
+        showMessage(result.message || 'Processado');
+
+        if (result.success) {
+          resetUnitForm();
+          exitEditMode();
+          await loadUnits();
+        }
+      } catch (e) {
+        showMessage('Erro ao editar unidade.');
       }
     }
 
@@ -1056,6 +1392,10 @@
         showMessage(result.message || 'Processado');
 
         if (result.success) {
+          if (editingUnitId === String(id)) {
+            resetUnitForm();
+            exitEditMode();
+          }
           await loadUnits();
         }
       } catch (e) {
@@ -1065,7 +1405,7 @@
 
     function resetUnitForm() {
       [
-        'formUf','formNomeUnidade','formCloudNvr','formLogin','formSenha','formIp',
+        'editingUnitId','formUf','formNomeUnidade','formCloudNvr','formLogin','formSenha','formIp',
         'formHd','formQuantidadeCameras','formAlarmeMac','formSensores',
         'formSenhaAlarme','formCentral','formObservacoes'
       ].forEach(id => el(id).value = '');
@@ -1266,7 +1606,15 @@
       if (e.key === 'Enter') renderUnits();
     });
     el('ufFilter').addEventListener('change', renderUnits);
+
     el('saveBtn').addEventListener('click', saveUnit);
+    el('updateBtn').addEventListener('click', updateUnit);
+    el('cancelEditBtn').addEventListener('click', () => {
+      resetUnitForm();
+      exitEditMode();
+      showMessage('Edição cancelada.');
+    });
+
     el('exportBtn').addEventListener('click', downloadExcelFromFiltered);
 
     el('tabUnidades').addEventListener('click', () => showTab('unidades'));
