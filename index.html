@@ -82,7 +82,8 @@
       display: flex;
       align-items: center;
       gap: 14px;
-      min-width: 280px;
+      flex: 1;
+      min-width: 200px; /* Ajustado para mobile */
     }
 
     .brand-icon {
@@ -118,7 +119,7 @@
       gap: 10px;
       flex-wrap: wrap;
       justify-content: flex-end;
-      flex: 1;
+      flex: 2;
     }
 
     .top-chip,
@@ -430,9 +431,7 @@
       padding: 14px;
     }
 
-    .action-grid,
-    .admin-actions,
-    .edit-actions {
+    .action-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 10px;
@@ -440,11 +439,16 @@
     }
 
     .admin-actions {
+      display: grid;
       grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 10px;
     }
 
     .edit-actions {
+      display: grid;
       grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
       margin-top: 14px;
     }
 
@@ -559,6 +563,11 @@
         padding: 16px;
       }
 
+      .brand-area {
+        min-width: 100%;
+        margin-bottom: 10px;
+      }
+
       .filters input,
       .filters select,
       .filters button {
@@ -615,13 +624,12 @@
           <div class="brand-icon">VT</div>
           <div class="brand-text">
             <small>Painel Operacional</small>
-            <strong>VTAL Manutenção de Unidades</strong>
+            <strong>VTAL Manutenção</strong>
           </div>
         </div>
 
         <div class="top-menu">
-          <div class="top-chip">Perfil: <strong id="perfilAtual"></strong></div>
-          <div class="top-chip">Usuário: <strong id="nomeUsuario"></strong></div>
+          <div class="top-chip">Acesso: <strong id="perfilAtual"></strong></div>
           <div class="top-chip">UFs: <strong id="ufsUsuario"></strong></div>
           <button class="secondary compact-btn" id="themeBtn">Modo escuro</button>
           <button class="secondary compact-btn" id="refreshBtn">Atualizar</button>
@@ -640,10 +648,10 @@
 
       <section id="unidadesSection">
         <section class="grid-stats">
-          <div class="card"><div class="card-body stat-card"><div><div class="muted">Total de unidades</div><h2 id="statTotal">0</h2><div class="muted">Base operacional cadastrada</div></div><div class="icon-box">🏢</div></div></div>
-          <div class="card"><div class="card-body stat-card"><div><div class="muted">Unidades ativas</div><h2 id="statAtivas">0</h2><div class="muted">Operação disponível</div></div><div class="icon-box">🖥️</div></div></div>
-          <div class="card"><div class="card-body stat-card"><div><div class="muted">Em manutenção</div><h2 id="statManutencao">0</h2><div class="muted">Precisam de acompanhamento</div></div><div class="icon-box">🛠️</div></div></div>
-          <div class="card"><div class="card-body stat-card"><div><div class="muted">Total de câmeras</div><h2 id="statCameras">0</h2><div class="muted">Inventário monitorado</div></div><div class="icon-box">📷</div></div></div>
+          <div class="card"><div class="card-body stat-card"><div><div class="muted">Total de unidades</div><h2 id="statTotal">0</h2><div class="muted">Base operacional</div></div><div class="icon-box">🏢</div></div></div>
+          <div class="card"><div class="card-body stat-card"><div><div class="muted">Unidades ativas</div><h2 id="statAtivas">0</h2><div class="muted">Em operação</div></div><div class="icon-box">🖥️</div></div></div>
+          <div class="card"><div class="card-body stat-card"><div><div class="muted">Em manutenção</div><h2 id="statManutencao">0</h2><div class="muted">Acompanhamento</div></div><div class="icon-box">🛠️</div></div></div>
+          <div class="card"><div class="card-body stat-card"><div><div class="muted">Total de câmeras</div><h2 id="statCameras">0</h2><div class="muted">Inventário</div></div><div class="icon-box">📷</div></div></div>
         </section>
 
         <section class="main-grid">
@@ -652,11 +660,11 @@
               <div class="section-head">
                 <div>
                   <h3>Consulta das unidades</h3>
-                  <p class="muted">Busca por unidade, login, IP, alarme e filtro por UF.</p>
+                  <p class="muted">Filtre por unidade, IP ou UF.</p>
                 </div>
 
                 <div class="filters">
-                  <input id="searchInput" placeholder="Pesquisar unidade, IP, login, alarme..." />
+                  <input id="searchInput" placeholder="Pesquisar..." />
                   <select id="ufFilter">
                     <option value="all">Todas as UFs</option>
                   </select>
@@ -674,17 +682,16 @@
             <div class="card">
               <div class="card-body">
                 <h3 style="margin-bottom:6px;">Permissões do perfil</h3>
-                <p class="muted">Acesso carregado da aba USUARIOS.</p>
                 <div id="permissionList" class="permission-list"></div>
               </div>
             </div>
 
-            <div class="card">
+            <div class="card" id="unitFormContainer">
               <div class="card-body">
                 <div class="section-head" style="margin-bottom:10px;">
                   <div>
                     <h3 style="margin-bottom:6px;" id="formTitle">Cadastro de unidade</h3>
-                    <p class="muted" id="formSubtitle">Somente com permissão de inclusão.</p>
+                    <p class="muted" id="formSubtitle">Preencha os campos abaixo.</p>
                   </div>
                 </div>
 
@@ -729,7 +736,7 @@
                 </div>
 
                 <p id="copyMessage" style="margin-top:10px; color:#16a34a; font-size:14px;"></p>
-                <p class="small-note">Clique no nome de uma unidade para carregar os dados no formulário e editar.</p>
+                <p class="small-note">Clique em "Editar unidade" em uma das unidades da lista para carregar os dados aqui.</p>
               </div>
             </div>
           </div>
@@ -743,11 +750,9 @@
               <div class="section-head">
                 <div>
                   <h3>Gestão de usuários</h3>
-                  <p class="muted">Criar, listar, excluir e resetar senha.</p>
                 </div>
                 <button id="reloadUsersBtn" class="secondary compact-btn">Atualizar usuários</button>
               </div>
-
               <div id="userList" class="user-list"></div>
             </div>
           </div>
@@ -756,60 +761,21 @@
             <div class="card">
               <div class="card-body">
                 <h3 style="margin-bottom:6px;">Criar usuário</h3>
-                <p class="muted" style="margin-bottom:14px;">Somente admin.</p>
-
                 <div class="form-grid">
                   <input id="userNome" placeholder="Nome" />
                   <input id="userEmail" placeholder="Email" />
                   <input id="userSenha" placeholder="Senha" />
-
                   <select id="userPerfil">
                     <option value="tecnico">Técnico</option>
                     <option value="admin">Administrador</option>
                   </select>
-
-                  <input id="userUfs" placeholder="UFs permitidas (ex: SP,RJ ou TODAS)" />
-
+                  <input id="userUfs" placeholder="UFs (ex: SP,RJ ou TODAS)" />
                   <select id="userStatus">
                     <option value="ATIVO">ATIVO</option>
                     <option value="INATIVO">INATIVO</option>
                   </select>
-
-                  <select id="permVisualizar">
-                    <option value="SIM">Pode visualizar: SIM</option>
-                    <option value="NÃO">Pode visualizar: NÃO</option>
-                  </select>
-
-                  <select id="permIncluir">
-                    <option value="SIM">Pode incluir: SIM</option>
-                    <option value="NÃO">Pode incluir: NÃO</option>
-                  </select>
-
-                  <select id="permEditar">
-                    <option value="SIM">Pode editar: SIM</option>
-                    <option value="NÃO">Pode editar: NÃO</option>
-                  </select>
-
-                  <select id="permExcluir">
-                    <option value="SIM">Pode excluir: SIM</option>
-                    <option value="NÃO">Pode excluir: NÃO</option>
-                  </select>
                 </div>
-
                 <button id="createUserBtn" style="margin-top:12px;">Criar usuário</button>
-              </div>
-            </div>
-
-            <div class="card">
-              <div class="card-body">
-                <h3 style="margin-bottom:6px;">Reset de senha</h3>
-                <p class="muted" style="margin-bottom:14px;">Admin pode resetar qualquer usuário. Usuário pode resetar a própria.</p>
-
-                <div style="display:grid; gap:12px;">
-                  <input id="resetEmail" placeholder="Email do usuário" />
-                  <input id="resetNovaSenha" placeholder="Nova senha" />
-                  <button id="resetBtn" class="secondary">Resetar senha</button>
-                </div>
               </div>
             </div>
           </div>
@@ -905,10 +871,6 @@
       return !!(currentUser && (currentUser.perfil === 'admin' || normalizePermissionValue(currentUser.podeExcluir)));
     }
 
-    function userCanView() {
-      return !!(currentUser && (currentUser.perfil === 'admin' || normalizePermissionValue(currentUser.podeVisualizar)));
-    }
-
     async function login() {
       const email = el('email').value.trim();
       const senha = el('senha').value.trim();
@@ -931,44 +893,14 @@
           await loadUsers();
         }
       } catch (error) {
-        el('loginError').textContent = 'Não foi possível fazer login.';
-      }
-    }
-
-    async function resetOwnPassword() {
-      const email = el('forgotEmail').value.trim();
-      const novaSenha = el('forgotSenha').value.trim();
-
-      if (!email || !novaSenha) {
-        el('loginError').textContent = 'Informe email e nova senha.';
-        return;
-      }
-
-      try {
-        const result = await apiPost({
-          action: 'resetSenha',
-          email,
-          novaSenha,
-          usuario: { email }
-        });
-
-        el('loginError').textContent = result.message || 'Processado';
-      } catch (e) {
-        el('loginError').textContent = 'Erro ao resetar senha.';
+        el('loginError').textContent = 'Erro de conexão.';
       }
     }
 
     function logout() {
       currentUser = null;
-      units = [];
-      users = [];
-      editingUnitId = null;
       localStorage.removeItem('vtal_user');
-      el('loginScreen').classList.remove('hidden');
-      el('appScreen').classList.add('hidden');
-      el('loginError').textContent = '';
-      resetUnitForm();
-      exitEditMode();
+      location.reload();
     }
 
     function applyTheme(mode) {
@@ -980,8 +912,11 @@
     function updateScreen() {
       el('loginScreen').classList.add('hidden');
       el('appScreen').classList.remove('hidden');
-      el('nomeUsuario').textContent = currentUser.nome || '';
-      el('perfilAtual').textContent = `${currentUser.perfil === 'admin' ? 'Administrador' : 'Técnico'} - ${currentUser.nome || ''}`;
+      
+      // Ajuste para mostrar perfil e nome solicitado
+      const perfilFormatado = currentUser.perfil.charAt(0).toUpperCase() + currentUser.perfil.slice(1);
+      el('perfilAtual').textContent = `${perfilFormatado} - ${currentUser.nome || 'Usuário'}`;
+      
       el('ufsUsuario').textContent = (currentUser.ufsPermitidas || []).join(', ') || '-';
       el('tabUsuarios').classList.toggle('hidden', currentUser.perfil !== 'admin');
       renderPermissions();
@@ -990,16 +925,16 @@
 
     function renderPermissions() {
       const items = [
-        ['Pode visualizar', currentUser.perfil === 'admin' || normalizePermissionValue(currentUser.podeVisualizar)],
-        ['Pode incluir', currentUser.perfil === 'admin' || normalizePermissionValue(currentUser.podeIncluir)],
-        ['Pode editar', currentUser.perfil === 'admin' || normalizePermissionValue(currentUser.podeEditar)],
-        ['Pode excluir', currentUser.perfil === 'admin' || normalizePermissionValue(currentUser.podeExcluir)]
+        ['Visualizar', true],
+        ['Incluir', userCanInclude()],
+        ['Editar', userCanEdit()],
+        ['Excluir', userCanDelete()]
       ];
 
       el('permissionList').innerHTML = items.map(([label, ok]) => `
         <div class="permission-row">
           <span>${label}</span>
-          <span class="badge ${ok ? 'active' : ''}">${ok ? 'Permitido' : 'Bloqueado'}</span>
+          <span class="badge ${ok ? 'active' : ''}">${ok ? 'SIM' : 'NÃO'}</span>
         </div>
       `).join('');
     }
@@ -1013,9 +948,7 @@
         'formUf','formNomeUnidade','formCloudNvr','formLogin','formSenha','formSenhaCameras','formIp',
         'formHd','formQuantidadeCameras','formAlarmeMac','formSensores',
         'formSenhaAlarme','formCentral','formObservacoes','formStatus'
-      ].forEach(id => {
-        el(id).disabled = !enabled;
-      });
+      ].forEach(id => { el(id).disabled = !enabled; });
 
       el('saveBtn').disabled = !canCreate;
       el('updateBtn').disabled = !canEdit;
@@ -1023,15 +956,9 @@
 
     async function loadUnits() {
       hideMessage();
-
       try {
         const result = await apiGet({ action: 'listar', email: currentUser.email });
-
-        if (!result.success) {
-          showMessage(result.message || 'Erro ao carregar unidades.');
-          return;
-        }
-
+        if (!result.success) return;
         units = normalizeUnits(result.data);
         renderStats();
         renderUfFilter();
@@ -1044,17 +971,10 @@
     async function loadUsers() {
       try {
         const result = await apiGet({ action: 'listarUsuarios', email: currentUser.email });
-
-        if (!result.success) {
-          showMessage(result.message || 'Erro ao carregar usuários.');
-          return;
-        }
-
+        if (!result.success) return;
         users = result.data || [];
         renderUsers();
-      } catch (e) {
-        showMessage('Erro ao carregar usuários.');
-      }
+      } catch (e) { }
     }
 
     function renderStats() {
@@ -1066,488 +986,140 @@
 
     function renderUfFilter() {
       const select = el('ufFilter');
-      const current = select.value;
       const ufs = [...new Set(units.map(u => u.uf).filter(Boolean))].sort();
-
-      select.innerHTML =
-        '<option value="all">Todas as UFs</option>' +
+      select.innerHTML = '<option value="all">Todas as UFs</option>' + 
         ufs.map(uf => `<option value="${escapeHtml(uf)}">${escapeHtml(uf)}</option>`).join('');
-
-      select.value = ufs.includes(current) || current === 'all' ? current : 'all';
     }
 
     function getFilteredUnits() {
       const term = el('searchInput').value.trim().toLowerCase();
       const uf = el('ufFilter').value;
-
       return units.filter(unit => {
-        const text = [
-          unit.uf, unit.unidade, unit.cloudNvr, unit.login, unit.ip, unit.hd,
-          unit.senhaCameras, unit.alarmeMac, unit.sensores, unit.central,
-          unit.observacoes, unit.status, String(unit.cameras)
-        ].join(' ').toLowerCase();
-
+        const text = [unit.unidade, unit.ip, unit.login, unit.uf].join(' ').toLowerCase();
         return (!term || text.includes(term)) && (uf === 'all' || unit.uf === uf);
       });
-    }
-
-    function renderSearchSummary(filtered) {
-      const box = el('searchSummary');
-      const term = el('searchInput').value.trim();
-      const uf = el('ufFilter').value === 'all' ? 'todas as UFs liberadas' : el('ufFilter').value;
-
-      box.innerHTML = `Consulta atual: <strong>${filtered.length}</strong> resultado(s) em <strong>${escapeHtml(uf)}</strong>${term ? ` para o termo <strong>${escapeHtml(term)}</strong>` : ''}.`;
-      box.classList.remove('hidden');
-    }
-
-    function getStatusBadgeClass(status) {
-      if (status === 'Ativa') return 'badge active';
-      if (status === 'Manutenção') return 'badge warning';
-      if (status === 'Offline sem conexão') return 'badge info';
-      if (status === 'Vandalizada') return 'badge danger';
-      if (status === 'Pendente') return 'badge secondary';
-      if (status === 'Inativa') return 'badge';
-      return 'badge';
-    }
-
-    function copyText(value, label) {
-      navigator.clipboard.writeText(String(value || ''));
-      el('copyMessage').textContent = `Copiado: ${label}`;
-      setTimeout(() => el('copyMessage').textContent = '', 1500);
     }
 
     function renderUnits() {
       const list = el('unitList');
       const filtered = getFilteredUnits();
-      renderSearchSummary(filtered);
-
+      
       if (!filtered.length) {
-        list.innerHTML = '<div class="unit-card"><div class="muted">Nenhuma unidade encontrada com os filtros aplicados.</div></div>';
+        list.innerHTML = '<div class="unit-card">Nenhuma unidade encontrada.</div>';
         return;
       }
 
       list.innerHTML = filtered.map(unit => `
-        <div class="unit-card ${editingUnitId === unit.id ? 'selected' : ''}" data-card-id="${escapeHtml(unit.id)}">
+        <div class="unit-card ${editingUnitId === unit.id ? 'selected' : ''}">
           <div class="unit-top">
-            <div style="flex:1; min-width:280px;">
+            <div style="flex:1;">
               <div class="badges">
-                <button class="unit-title-btn" data-edit-id="${escapeHtml(unit.id)}" title="Clique para editar">
-                  ${escapeHtml(unit.unidade)}
-                </button>
-                <span class="${getStatusBadgeClass(unit.status)}">${escapeHtml(unit.status)}</span>
+                <strong style="font-size:18px;">${escapeHtml(unit.unidade)}</strong>
+                <span class="badge active">${escapeHtml(unit.status)}</span>
                 <span class="badge">${escapeHtml(unit.uf)}</span>
-                ${unit.alarmeMac ? `<span class="badge success">MAC alarme: ${escapeHtml(unit.alarmeMac)}</span>` : ''}
               </div>
-
               <div class="unit-info-grid">
-                <div class="info-item"><strong>UF</strong><div>${escapeHtml(unit.uf)}</div></div>
-                <div class="info-item"><strong>IP</strong><div>${escapeHtml(unit.ip)}</div></div>
-                <div class="info-item"><strong>HD</strong><div>${escapeHtml(unit.hd)}</div></div>
-                <div class="info-item"><strong>Senha câmeras</strong><div>${escapeHtml(unit.senhaCameras)}</div></div>
-                <div class="info-item"><strong>Câmeras</strong><div>${escapeHtml(unit.cameras)}</div></div>
-                <div class="info-item"><strong>Cloud NVR</strong><div>${escapeHtml(unit.cloudNvr)}</div></div>
-                <div class="info-item"><strong>Login</strong><div>${escapeHtml(unit.login)}</div></div>
-                <div class="info-item"><strong>MAC do alarme</strong><div>${escapeHtml(unit.alarmeMac)}</div></div>
-                <div class="info-item"><strong>Sensores</strong><div>${escapeHtml(unit.sensores)}</div></div>
-                <div class="info-item"><strong>Senha alarme</strong><div>${escapeHtml(unit.senhaAlarme)}</div></div>
-                <div class="info-item"><strong>Central</strong><div>${escapeHtml(unit.central)}</div></div>
+                <div class="info-item"><strong>IP</strong>${escapeHtml(unit.ip)}</div>
+                <div class="info-item"><strong>Login</strong>${escapeHtml(unit.login)}</div>
+                <div class="info-item"><strong>Câmeras</strong>${escapeHtml(unit.cameras)}</div>
               </div>
-
-              ${unit.observacoes ? `<div class="obs-box"><strong style="color:var(--text)">Observações:</strong> ${escapeHtml(unit.observacoes)}</div>` : ''}
             </div>
-
             <div class="actions-box">
-              <div class="muted" style="font-weight:700; margin-bottom:8px;">Ações liberadas</div>
-
-              <div class="action-grid">
-                <button class="secondary" data-copy-value="${escapeHtml(unit.login)}" data-copy-label="Login ${escapeHtml(unit.unidade)}">Login</button>
-                <button class="secondary" data-copy-value="${escapeHtml(unit.ip)}" data-copy-label="IP ${escapeHtml(unit.unidade)}">IP</button>
-                <button class="secondary" data-copy-value="${escapeHtml(unit.cloudNvr)}" data-copy-label="NVR ${escapeHtml(unit.unidade)}">NVR</button>
-                <button class="secondary" data-copy-value="${escapeHtml(unit.senha)}" data-copy-label="Senha ${escapeHtml(unit.unidade)}">Senha</button>
-                <button class="secondary" data-copy-value="${escapeHtml(unit.senhaCameras)}" data-copy-label="Senha câmeras ${escapeHtml(unit.unidade)}">Senha câmeras</button>
-              </div>
-
               <div class="admin-actions">
-                ${userCanEdit() ? `<button class="info" data-edit-id="${escapeHtml(unit.id)}">Editar unidade</button>` : ''}
-                ${userCanDelete() ? `<button class="danger" data-delete-id="${escapeHtml(unit.id)}">Excluir cadastro</button>` : ''}
-              </div>
-
-              <div style="margin-top:12px; font-size:12px; color:var(--text-soft); line-height:1.6;">
-                <div>Atualização: ${escapeHtml(unit.updatedAt || '-')}</div>
-                <div>Atualizado por: ${escapeHtml(unit.updatedBy || '-')}</div>
+                ${userCanEdit() ? `<button class="info" data-edit-id="${unit.id}">Editar unidade</button>` : ''}
+                ${userCanDelete() ? `<button class="danger" onclick="deleteUnit('${unit.id}')">Excluir</button>` : ''}
               </div>
             </div>
           </div>
         </div>
       `).join('');
 
-      list.querySelectorAll('button[data-copy-value]').forEach((btn) => {
-        btn.addEventListener('click', () => copyText(btn.getAttribute('data-copy-value'), btn.getAttribute('data-copy-label')));
-      });
-
-      list.querySelectorAll('button[data-delete-id]').forEach((btn) => {
-        btn.addEventListener('click', () => deleteUnit(btn.getAttribute('data-delete-id')));
-      });
-
-      list.querySelectorAll('button[data-edit-id]').forEach((btn) => {
+      list.querySelectorAll('button[data-edit-id]').forEach(btn => {
         btn.addEventListener('click', () => startEditUnit(btn.getAttribute('data-edit-id')));
       });
     }
 
-    function fillUnitForm(unit) {
-      el('editingUnitId').value = unit.id || '';
-      el('formUf').value = unit.uf || '';
-      el('formNomeUnidade').value = unit.unidade || '';
-      el('formCloudNvr').value = unit.cloudNvr || '';
-      el('formLogin').value = unit.login || '';
-      el('formSenha').value = unit.senha || '';
-      el('formSenhaCameras').value = unit.senhaCameras || '';
-      el('formIp').value = unit.ip || '';
-      el('formHd').value = unit.hd || '';
-      el('formQuantidadeCameras').value = unit.cameras || '';
-      el('formAlarmeMac').value = unit.alarmeMac || '';
-      el('formSensores').value = unit.sensores || '';
-      el('formSenhaAlarme').value = unit.senhaAlarme || '';
-      el('formCentral').value = unit.central || '';
-      el('formObservacoes').value = unit.observacoes || '';
-      el('formStatus').value = unit.status || 'Ativa';
-    }
-
     function startEditUnit(id) {
-      if (!userCanEdit()) {
-        showMessage('Você não tem permissão para editar unidades.');
-        return;
-      }
-
       const unit = units.find(u => u.id === String(id));
-      if (!unit) {
-        showMessage('Unidade não encontrada para edição.');
-        return;
-      }
+      if (!unit) return;
 
       editingUnitId = unit.id;
-      fillUnitForm(unit);
+      el('editingUnitId').value = unit.id;
+      el('formUf').value = unit.uf;
+      el('formNomeUnidade').value = unit.unidade;
+      el('formCloudNvr').value = unit.cloudNvr;
+      el('formLogin').value = unit.login;
+      el('formSenha').value = unit.senha;
+      el('formSenhaCameras').value = unit.senhaCameras;
+      el('formIp').value = unit.ip;
+      el('formHd').value = unit.hd;
+      el('formQuantidadeCameras').value = unit.cameras;
+      el('formAlarmeMac').value = unit.alarmeMac;
+      el('formSensores').value = unit.sensores;
+      el('formSenhaAlarme').value = unit.senhaAlarme;
+      el('formCentral').value = unit.central;
+      el('formObservacoes').value = unit.observacoes;
+      el('formStatus').value = unit.status;
 
-      el('formTitle').textContent = 'Editar unidade';
-      el('formSubtitle').textContent = 'Altere as informações e salve as mudanças.';
-      el('editingBox').innerHTML = `Editando a unidade: <strong>${escapeHtml(unit.unidade)}</strong> | ID: <strong>${escapeHtml(unit.id)}</strong>`;
-      el('editingBox').classList.remove('hidden');
-
+      el('formTitle').textContent = 'Editando Unidade';
       el('createActions').classList.add('hidden');
       el('editActions').classList.remove('hidden');
-
+      
       setFormPermissions();
-      renderUnits();
 
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // CORREÇÃO DO BUG DE ROLAGEM: Leva o usuário para o formulário
+      el('unitFormContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     function exitEditMode() {
       editingUnitId = null;
       el('editingUnitId').value = '';
-      el('editingBox').classList.add('hidden');
-      el('editingBox').textContent = '';
       el('formTitle').textContent = 'Cadastro de unidade';
-      el('formSubtitle').textContent = 'Somente com permissão de inclusão.';
       el('createActions').classList.remove('hidden');
       el('editActions').classList.add('hidden');
+      resetUnitForm();
       setFormPermissions();
       renderUnits();
     }
 
-    function collectUnitFormData() {
-      return {
-        id: el('editingUnitId').value.trim(),
-        uf: el('formUf').value.trim().toUpperCase(),
-        nomeUnidade: el('formNomeUnidade').value.trim(),
-        cloudNvr: el('formCloudNvr').value.trim(),
-        login: el('formLogin').value.trim(),
-        senha: el('formSenha').value.trim(),
-        senhaCameras: el('formSenhaCameras').value.trim(),
-        ip: el('formIp').value.trim(),
-        hd: el('formHd').value.trim(),
-        quantidadeCameras: Number(el('formQuantidadeCameras').value || 0),
-        alarmeMac: el('formAlarmeMac').value.trim(),
-        sensores: el('formSensores').value.trim(),
-        senhaAlarme: el('formSenhaAlarme').value.trim(),
-        central: el('formCentral').value.trim(),
-        observacoes: el('formObservacoes').value.trim(),
-        status: el('formStatus').value
-      };
-    }
-
-    async function saveUnit() {
-      if (!userCanInclude()) {
-        showMessage('Você não tem permissão para cadastrar unidades.');
-        return;
-      }
-
-      const payload = {
-        action: 'criarUnidade',
-        usuario: currentUser,
-        ...collectUnitFormData()
-      };
-
-      if (!payload.uf || !payload.nomeUnidade || !payload.login || !payload.ip) {
-        showMessage('Preencha UF, nome da unidade, login e IP.');
-        return;
-      }
-
-      try {
-        const result = await apiPost(payload);
-        showMessage(result.message || 'Processado');
-
-        if (result.success) {
-          resetUnitForm();
-          exitEditMode();
-          await loadUnits();
-        }
-      } catch (e) {
-        showMessage('Erro ao cadastrar unidade.');
-      }
-    }
-
-    async function updateUnit() {
-      if (!userCanEdit()) {
-        showMessage('Você não tem permissão para editar unidades.');
-        return;
-      }
-
-      const payload = {
-        action: 'editarUnidade',
-        usuario: currentUser,
-        ...collectUnitFormData()
-      };
-
-      if (!payload.id) {
-        showMessage('Nenhuma unidade selecionada para edição.');
-        return;
-      }
-
-      if (!payload.uf || !payload.nomeUnidade || !payload.login || !payload.ip) {
-        showMessage('Preencha UF, nome da unidade, login e IP.');
-        return;
-      }
-
-      try {
-        const result = await apiPost(payload);
-        showMessage(result.message || 'Processado');
-
-        if (result.success) {
-          resetUnitForm();
-          exitEditMode();
-          await loadUnits();
-        }
-      } catch (e) {
-        showMessage('Erro ao editar unidade.');
-      }
-    }
-
-    async function deleteUnit(id) {
-      if (!userCanDelete()) {
-        showMessage('Você não tem permissão para excluir unidades.');
-        return;
-      }
-
-      if (!window.confirm('Tem certeza que deseja excluir este cadastro?')) return;
-
-      try {
-        const result = await apiPost({
-          action: 'excluirUnidade',
-          id,
-          usuario: currentUser
-        });
-
-        showMessage(result.message || 'Processado');
-
-        if (result.success) {
-          if (editingUnitId === String(id)) {
-            resetUnitForm();
-            exitEditMode();
-          }
-          await loadUnits();
-        }
-      } catch (e) {
-        showMessage('Erro ao excluir unidade.');
-      }
-    }
-
     function resetUnitForm() {
-      [
-        'editingUnitId','formUf','formNomeUnidade','formCloudNvr','formLogin','formSenha','formSenhaCameras','formIp',
-        'formHd','formQuantidadeCameras','formAlarmeMac','formSensores',
-        'formSenhaAlarme','formCentral','formObservacoes'
-      ].forEach(id => el(id).value = '');
-
+      const ids = ['formUf','formNomeUnidade','formCloudNvr','formLogin','formSenha','formSenhaCameras','formIp','formHd','formQuantidadeCameras','formAlarmeMac','formSensores','formSenhaAlarme','formCentral','formObservacoes'];
+      ids.forEach(id => el(id).value = '');
       el('formStatus').value = 'Ativa';
     }
 
-    function downloadExcelFromFiltered() {
-      const filtered = getFilteredUnits();
-
-      if (!filtered.length) {
-        showMessage('Não há dados para exportar no filtro atual.');
-        return;
-      }
-
-      const headers = [
-        'ID','UF','Nome da unidade','Cloud NVR','Login','Senha','Senha câmeras','IP','HD',
-        'Quantidade de câmeras','MAC do alarme','Sensores','Senha do alarme',
-        'Acesso da central','Observações','Status','Última atualização','Atualizado por'
-      ];
-
-      const rows = filtered.map(u => [
-        u.id,u.uf,u.unidade,u.cloudNvr,u.login,u.senha,u.senhaCameras,u.ip,u.hd,u.cameras,
-        u.alarmeMac,u.sensores,u.senhaAlarme,u.central,u.observacoes,u.status,
-        u.updatedAt,u.updatedBy
-      ]);
-
-      const tableHtml = `
-        <table>
-          <tr>
-            ${headers.map(h => `<th style="background:#0f172a;color:#fff;border:1px solid #cbd5e1;padding:8px;">${h}</th>`).join('')}
-          </tr>
-          ${rows.map(r => `<tr>${r.map(c => `<td style="border:1px solid #cbd5e1;padding:8px;">${escapeHtml(c)}</td>`).join('')}</tr>`).join('')}
-        </table>
-      `;
-
-      const blob = new Blob([tableHtml], { type: 'application/vnd.ms-excel;charset=utf-8;' });
-      const link = document.createElement('a');
-      const url = URL.createObjectURL(blob);
-      link.href = url;
-      link.download = 'vtal_unidades.xls';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+    async function saveUnit() {
+      const payload = { action: 'criarUnidade', usuario: currentUser, ...collectData() };
+      const res = await apiPost(payload);
+      showMessage(res.message);
+      if(res.success) { resetUnitForm(); await loadUnits(); }
     }
 
-    async function createUser() {
-      const payload = {
-        action: 'criarUsuario',
-        usuario: currentUser,
-        nome: el('userNome').value.trim(),
-        email: el('userEmail').value.trim(),
-        senha: el('userSenha').value.trim(),
-        perfil: el('userPerfil').value,
-        ufsPermitidas: el('userUfs').value.trim(),
-        podeVisualizar: el('permVisualizar').value,
-        podeIncluir: el('permIncluir').value,
-        podeEditar: el('permEditar').value,
-        podeExcluir: el('permExcluir').value,
-        status: el('userStatus').value
+    async function updateUnit() {
+      const payload = { action: 'editarUnidade', usuario: currentUser, ...collectData(), id: el('editingUnitId').value };
+      const res = await apiPost(payload);
+      showMessage(res.message);
+      if(res.success) exitEditMode(); await loadUnits();
+    }
+
+    function collectData() {
+      return {
+        uf: el('formUf').value,
+        nomeUnidade: el('formNomeUnidade').value,
+        cloudNvr: el('formCloudNvr').value,
+        login: el('formLogin').value,
+        senha: el('formSenha').value,
+        senhaCameras: el('formSenhaCameras').value,
+        ip: el('formIp').value,
+        hd: el('formHd').value,
+        quantidadeCameras: el('formQuantidadeCameras').value,
+        alarmeMac: el('formAlarmeMac').value,
+        sensores: el('formSensores').value,
+        senhaAlarme: el('formSenhaAlarme').value,
+        central: el('formCentral').value,
+        observacoes: el('formObservacoes').value,
+        status: el('formStatus').value
       };
-
-      try {
-        const result = await apiPost(payload);
-        showMessage(result.message || 'Processado');
-
-        if (result.success) {
-          ['userNome','userEmail','userSenha','userUfs'].forEach(id => el(id).value = '');
-          await loadUsers();
-        }
-      } catch (e) {
-        showMessage('Erro ao criar usuário.');
-      }
-    }
-
-    function renderUsers() {
-      const list = el('userList');
-
-      if (!users.length) {
-        list.innerHTML = '<div class="user-card"><div class="muted">Nenhum usuário cadastrado.</div></div>';
-        return;
-      }
-
-      list.innerHTML = users.map(user => `
-        <div class="user-card">
-          <div class="user-top">
-            <div style="flex:1; min-width:280px;">
-              <div class="badges">
-                <span style="font-size:20px; font-weight:700; margin-right:6px;">${escapeHtml(user['Nome'] || '-')}</span>
-                <span class="badge active">${escapeHtml(user['Perfil'] || '-')}</span>
-                <span class="badge">${escapeHtml(user['Status'] || '-')}</span>
-              </div>
-
-              <div class="info-grid">
-                <div class="info-item"><strong>Email</strong><div>${escapeHtml(user['Email'] || '-')}</div></div>
-                <div class="info-item"><strong>UFs permitidas</strong><div>${escapeHtml(user['UFs permitidas'] || '-')}</div></div>
-                <div class="info-item"><strong>Pode visualizar</strong><div>${escapeHtml(user['Pode visualizar'] || '-')}</div></div>
-                <div class="info-item"><strong>Pode incluir</strong><div>${escapeHtml(user['Pode incluir'] || '-')}</div></div>
-                <div class="info-item"><strong>Pode editar</strong><div>${escapeHtml(user['Pode editar'] || '-')}</div></div>
-                <div class="info-item"><strong>Pode excluir</strong><div>${escapeHtml(user['Pode excluir'] || '-')}</div></div>
-              </div>
-            </div>
-
-            <div class="actions-box">
-              <div class="muted" style="font-weight:700; margin-bottom:8px;">Ações do usuário</div>
-
-              <div class="admin-actions">
-                <button class="secondary" data-reset-email="${escapeHtml(user['Email'] || '')}">Preencher reset</button>
-                <button class="danger" data-delete-user-id="${escapeHtml(user['ID'] || '')}">Excluir usuário</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      `).join('');
-
-      list.querySelectorAll('button[data-reset-email]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          el('resetEmail').value = btn.getAttribute('data-reset-email');
-          showMessage('Email carregado no campo de reset de senha.');
-        });
-      });
-
-      list.querySelectorAll('button[data-delete-user-id]').forEach(btn => {
-        btn.addEventListener('click', () => deleteUser(btn.getAttribute('data-delete-user-id')));
-      });
-    }
-
-    async function deleteUser(id) {
-      if (!window.confirm('Tem certeza que deseja excluir este usuário?')) return;
-
-      try {
-        const result = await apiPost({
-          action: 'excluirUsuario',
-          id,
-          usuario: currentUser
-        });
-
-        showMessage(result.message || 'Processado');
-
-        if (result.success) {
-          await loadUsers();
-        }
-      } catch (e) {
-        showMessage('Erro ao excluir usuário.');
-      }
-    }
-
-    async function resetPasswordAdmin() {
-      const email = el('resetEmail').value.trim();
-      const novaSenha = el('resetNovaSenha').value.trim();
-
-      if (!email || !novaSenha) {
-        showMessage('Informe email e nova senha.');
-        return;
-      }
-
-      try {
-        const result = await apiPost({
-          action: 'resetSenha',
-          email,
-          novaSenha,
-          usuario: currentUser
-        });
-
-        showMessage(result.message || 'Processado');
-
-        if (result.success) {
-          el('resetNovaSenha').value = '';
-        }
-      } catch (e) {
-        showMessage('Erro ao resetar senha.');
-      }
     }
 
     function showTab(tab) {
@@ -1558,55 +1130,26 @@
       el('tabUsuarios').classList.toggle('active', !unitsTab);
     }
 
+    // Eventos
     el('loginBtn').addEventListener('click', login);
-    el('forgotBtn').addEventListener('click', () => el('forgotBox').classList.toggle('hidden'));
-    el('forgotSubmit').addEventListener('click', resetOwnPassword);
     el('logoutBtn').addEventListener('click', logout);
-
-    el('refreshBtn').addEventListener('click', async () => {
-      await loadUnits();
-      if (currentUser.perfil === 'admin') {
-        await loadUsers();
-      }
-    });
-
-    el('searchBtn').addEventListener('click', renderUnits);
-    el('searchInput').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') renderUnits();
-    });
-    el('ufFilter').addEventListener('change', renderUnits);
-
-    el('saveBtn').addEventListener('click', saveUnit);
-    el('updateBtn').addEventListener('click', updateUnit);
-    el('cancelEditBtn').addEventListener('click', () => {
-      resetUnitForm();
-      exitEditMode();
-      showMessage('Edição cancelada.');
-    });
-
-    el('exportBtn').addEventListener('click', downloadExcelFromFiltered);
-
+    el('themeBtn').addEventListener('click', () => applyTheme(document.body.classList.contains('dark') ? 'light' : 'dark'));
     el('tabUnidades').addEventListener('click', () => showTab('unidades'));
     el('tabUsuarios').addEventListener('click', () => showTab('usuarios'));
-    el('createUserBtn').addEventListener('click', createUser);
-    el('reloadUsersBtn').addEventListener('click', loadUsers);
-    el('resetBtn').addEventListener('click', resetPasswordAdmin);
-
-    el('themeBtn').addEventListener('click', () => {
-      applyTheme(document.body.classList.contains('dark') ? 'light' : 'dark');
-    });
+    el('saveBtn').addEventListener('click', saveUnit);
+    el('updateBtn').addEventListener('click', updateUnit);
+    el('cancelEditBtn').addEventListener('click', exitEditMode);
+    el('searchBtn').addEventListener('click', renderUnits);
+    el('refreshBtn').addEventListener('click', loadUnits);
 
     window.addEventListener('load', async () => {
       applyTheme(localStorage.getItem('vtal_theme') || 'light');
-
       const saved = localStorage.getItem('vtal_user');
       if (saved) {
         currentUser = JSON.parse(saved);
         updateScreen();
         await loadUnits();
-        if (currentUser.perfil === 'admin') {
-          await loadUsers();
-        }
+        if (currentUser.perfil === 'admin') await loadUsers();
       }
     });
   </script>
