@@ -58,7 +58,6 @@
       z-index: 20;
       box-shadow: 0 2px 10px rgba(0,0,0,.03);
     }
-    .header-inner { position: relative; }
 
     .header-inner {
       max-width: 1400px;
@@ -272,82 +271,20 @@
     .right-column::-webkit-scrollbar-track { background: transparent; }
     .right-column::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
-    /* Botão hambúrguer — escondido no desktop */
-    .mobile-menu-btn {
-      display: none; align-items: center; justify-content: center;
-      width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
-      background: var(--bg-muted); border: 1px solid var(--border);
-      font-size: 20px; cursor: pointer; color: var(--text);
-      width: auto; min-width: unset; padding: 8px 12px;
-    }
-
     @media (max-width: 1180px) {
       .grid-stats { grid-template-columns: repeat(2, 1fr); }
       .main-grid { grid-template-columns: 1fr; }
       .right-column { position: static; max-height: none; overflow-y: visible; }
-      .top-menu { display: flex !important; justify-content: flex-start; }
+      .top-menu { justify-content: flex-start; }
     }
 
-    /* ── MOBILE ─────────────────────────────────────────── */
     @media (max-width: 768px) {
-      .container { padding: 12px; }
-
-      /* Header compacto */
-      .header-inner { padding: 10px 12px; gap: 8px; }
-      .brand-area { min-width: unset; gap: 8px; }
-      .brand-icon { width: 36px; height: 36px; font-size: 15px; border-radius: 10px; }
-      .brand-text small { display: none; }
-      .brand-text strong { font-size: 15px; }
-
-      /* Menu hambúrguer */
-      .mobile-menu-btn { display: flex; }
-      #mobileMenuWrap {
-        position: fixed;
-        top: 60px;
-        left: 0;
-        right: 0;
-        z-index: 999;
-        padding: 0 12px;
-      }
-      .top-menu {
-        display: none; flex-direction: column; gap: 6px;
-        padding: 12px; background: var(--bg-soft);
-        border: 1px solid var(--border); border-radius: 16px;
-        box-shadow: 0 8px 32px rgba(0,0,0,.25);
-        width: 100%;
-      }
-      .top-menu.mobile-open { display: flex; }
-      .top-chip { width: 100%; min-width: unset; padding: 10px 14px; font-size: 13px; border-radius: 12px; }
-      .compact-btn { width: 100%; min-width: unset; }
-
-      /* Stats — 2 colunas */
-      .grid-stats { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
-      .stat-card h2 { font-size: 24px; }
-      .card-body { padding: 14px; }
-      .icon-box { width: 36px; height: 36px; font-size: 15px; }
-
-      /* Tabs */
-      .section-tabs { gap: 6px; margin-bottom: 12px; }
-      .section-tabs button { padding: 8px 14px; font-size: 13px; }
-
-      /* Unit card — empilha info e ações */
-      .unit-card { padding: 14px; border-radius: 16px; }
-      .unit-top { flex-direction: column; gap: 14px; }
-      .actions-box { min-width: unset; width: 100%; }
-
-      /* Info grid — 2 colunas */
-      .unit-info-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-      .info-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-      .form-grid { grid-template-columns: 1fr; gap: 8px; }
-      .info-item { padding: 10px; }
-
-      /* Ações */
-      .action-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-      .admin-actions { grid-template-columns: 1fr 1fr; }
-      .edit-actions { grid-template-columns: 1fr; }
-
-      .unit-title-btn { font-size: 16px; }
-      textarea { min-height: 80px; }
+      .grid-stats, .form-grid, .unit-info-grid, .info-grid { grid-template-columns: 1fr; }
+      .container, .header-inner { padding: 16px; }
+      .filters input, .filters select, .filters button { width: 100% !important; min-width: 100% !important; }
+      .action-grid, .edit-actions { grid-template-columns: 1fr; }
+      .brand-text strong { font-size: 20px; }
+      .top-chip, .compact-btn { width: 100%; }
     }
   </style>
 </head>
@@ -390,10 +327,7 @@
           </div>
         </div>
 
-        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">☰</button>
-      </div>
-      <div id="mobileMenuWrap">
-        <div class="top-menu" id="topMenu">
+        <div class="top-menu">
           <div class="top-chip">Perfil: <strong id="perfilAtual"></strong></div>
           <div class="top-chip">Usuário: <strong id="nomeUsuario"></strong></div>
           <div class="top-chip">UFs: <strong id="ufsUsuario"></strong></div>
@@ -428,12 +362,14 @@
             <div class="card-body">
               <div style="margin-bottom:18px;">
                 <h3 style="margin-bottom:4px;">Consulta das unidades</h3>
-                <p class="muted" style="margin-bottom:14px;">Busca por unidade, login, IP, alarme e filtro por UF.</p>
+                <p class="muted" style="margin-bottom:14px;">Filtros por OS, estado/UF, nome da unidade e busca geral.</p>
                 <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-                  <input id="searchInput" placeholder="Pesquisar unidade, IP, login, alarme..." style="flex:1; min-width:200px;" />
+                  <input id="osFilter" placeholder="Filtrar por OS" style="width:170px; flex-shrink:0;" />
                   <select id="ufFilter" style="width:160px; flex-shrink:0;">
                     <option value="all">Todas as UFs</option>
                   </select>
+                  <input id="unitNameFilter" placeholder="Filtrar por nome da unidade" style="flex:1; min-width:220px;" />
+                  <input id="searchInput" placeholder="Busca geral: IP, login, alarme..." style="flex:1; min-width:200px;" />
                   <button id="searchBtn" class="compact-btn" style="flex-shrink:0;">Consultar</button>
                   <button id="exportBtn" class="success compact-btn" style="flex-shrink:0;">Gerar Excel</button>
                 </div>
@@ -472,6 +408,16 @@
                 <div class="form-grid">
                   <input id="formUf" placeholder="UF" />
                   <input id="formNomeUnidade" placeholder="Nome da unidade" />
+                  <input id="formOs" placeholder="OS" />
+                  <input id="formDataAberturaOs" type="date" title="Data da abertura da OS" />
+                  <select id="formStatusOs">
+                    <option value="">Status da OS</option>
+                    <option value="Aberta">Aberta</option>
+                    <option value="Em andamento">Em andamento</option>
+                    <option value="Aguardando">Aguardando</option>
+                    <option value="Concluída">Concluída</option>
+                    <option value="Cancelada">Cancelada</option>
+                  </select>
                   <input id="formCloudNvr" placeholder="Cloud NVR" />
                   <input id="formLogin" placeholder="Login" />
                   <input id="formSenha" placeholder="Senha" />
@@ -589,7 +535,7 @@
   </section>
 
   <script>
-    const API_BASE = 'https://script.google.com/macros/s/AKfycbyFi7PxyruXvWqFJG_MtW8UnlTKpE2BJiy7wGrkxu-pWLzEzGqdDJlTCGzF5eLvn4-B/exec';
+    const API_BASE = 'https://script.google.com/macros/s/AKfycbzfQE1f9A9g5cNY_XFwSnTTel4T_3HQTIhgtqcHpffvz1Le9XpJRPCCghVG9bqIcwEM/exec';
 
     let currentUser = null;
     let units = [];
@@ -629,6 +575,9 @@
         id: String(item['ID'] || ''),
         uf: item['UF'] || '',
         unidade: item['Nome da unidade'] || '',
+        os: item['OS'] || item['Nº OS'] || item['Numero OS'] || '',
+        dataAberturaOs: item['Data da abertura da OS'] || item['Data da Abertura'] || '',
+        statusOs: item['Status da OS'] || '',
         cloudNvr: item['Cloud NVR'] || '',
         login: item['Login'] || '',
         senha: item['Senha'] || '',
@@ -738,7 +687,8 @@
       [
         'formUf','formNomeUnidade','formCloudNvr','formLogin','formSenha','formSenhaCameras','formIp',
         'formHd','formQuantidadeCameras','formAlarmeMac','formSensores',
-        'formSenhaAlarme','formCentral','formObservacoes','formStatus'
+        'formSenhaAlarme','formCentral','formObservacoes','formStatus',
+        'formOs','formDataAberturaOs','formStatusOs'
       ].forEach(id => { el(id).disabled = !enabled; });
       el('saveBtn').disabled = !canCreate;
       el('updateBtn').disabled = !canEdit;
@@ -781,22 +731,37 @@
 
     function getFilteredUnits() {
       const term = el('searchInput').value.trim().toLowerCase();
+      const osTerm = el('osFilter').value.trim().toLowerCase();
+      const unitNameTerm = el('unitNameFilter').value.trim().toLowerCase();
       const uf = el('ufFilter').value;
       return units.filter(unit => {
         const text = [
           unit.uf, unit.unidade, unit.cloudNvr, unit.login, unit.ip, unit.hd,
           unit.senhaCameras, unit.alarmeMac, unit.sensores, unit.central,
-          unit.observacoes, unit.status, String(unit.cameras)
+          unit.observacoes, unit.status, unit.os, unit.dataAberturaOs,
+          unit.statusOs, String(unit.cameras)
         ].join(' ').toLowerCase();
-        return (!term || text.includes(term)) && (uf === 'all' || unit.uf === uf);
+        const matchesOs = !osTerm || String(unit.os || '').toLowerCase().includes(osTerm);
+        const matchesUnitName = !unitNameTerm || String(unit.unidade || '').toLowerCase().includes(unitNameTerm);
+        return (!term || text.includes(term)) &&
+          matchesOs &&
+          matchesUnitName &&
+          (uf === 'all' || unit.uf === uf);
       });
     }
 
     function renderSearchSummary(filtered) {
       const box = el('searchSummary');
       const term = el('searchInput').value.trim();
+      const osTerm = el('osFilter').value.trim();
+      const unitNameTerm = el('unitNameFilter').value.trim();
       const uf = el('ufFilter').value === 'all' ? 'todas as UFs liberadas' : el('ufFilter').value;
-      box.innerHTML = `Consulta atual: <strong>${filtered.length}</strong> resultado(s) em <strong>${escapeHtml(uf)}</strong>${term ? ` para o termo <strong>${escapeHtml(term)}</strong>` : ''}.`;
+      const details = [
+        osTerm ? `OS <strong>${escapeHtml(osTerm)}</strong>` : '',
+        unitNameTerm ? `unidade <strong>${escapeHtml(unitNameTerm)}</strong>` : '',
+        term ? `termo geral <strong>${escapeHtml(term)}</strong>` : ''
+      ].filter(Boolean).join(', ');
+      box.innerHTML = `Consulta atual: <strong>${filtered.length}</strong> resultado(s) em <strong>${escapeHtml(uf)}</strong>${details ? ` para ${details}` : ''}.`;
       box.classList.remove('hidden');
     }
 
@@ -835,11 +800,16 @@
                 </button>
                 <span class="${getStatusBadgeClass(unit.status)}">${escapeHtml(unit.status)}</span>
                 <span class="badge">${escapeHtml(unit.uf)}</span>
+                ${unit.os ? `<span class="badge info">OS: ${escapeHtml(unit.os)}</span>` : ''}
+                ${unit.statusOs ? `<span class="badge secondary">Status OS: ${escapeHtml(unit.statusOs)}</span>` : ''}
                 ${unit.alarmeMac ? `<span class="badge success">MAC alarme: ${escapeHtml(unit.alarmeMac)}</span>` : ''}
               </div>
 
               <div class="unit-info-grid">
                 <div class="info-item"><strong>UF</strong><div>${escapeHtml(unit.uf)}</div></div>
+                <div class="info-item"><strong>OS</strong><div>${escapeHtml(unit.os || '-')}</div></div>
+                <div class="info-item"><strong>Data da abertura</strong><div>${escapeHtml(unit.dataAberturaOs || '-')}</div></div>
+                <div class="info-item"><strong>Status da OS</strong><div>${escapeHtml(unit.statusOs || '-')}</div></div>
                 <div class="info-item"><strong>IP</strong><div>${escapeHtml(unit.ip)}</div></div>
                 <div class="info-item"><strong>HD</strong><div>${escapeHtml(unit.hd)}</div></div>
                 <div class="info-item"><strong>Login</strong><div>${escapeHtml(unit.login)}</div></div>
@@ -872,10 +842,9 @@
                 ${userCanDelete() ? `<button class="danger" data-delete-id="${escapeHtml(unit.id)}">Excluir cadastro</button>` : ''}
               </div>
 
-              <div style="margin-top:12px; font-size:12px; color:var(--text-soft); line-height:1.6; border-top:1px solid var(--border); padding-top:10px;">
-                <div style="font-weight:700; color:var(--text); margin-bottom:6px;">📋 Histórico</div>
-                <div>🕐 Última atualização: <strong style="color:var(--text);">${escapeHtml(unit.updatedAt || '-')}</strong></div>
-                <div>👤 Atualizado por: <strong style="color:var(--text);">${escapeHtml(unit.updatedBy || '-')}</strong></div>
+              <div style="margin-top:12px; font-size:12px; color:var(--text-soft); line-height:1.6;">
+                <div>Atualização: ${escapeHtml(unit.updatedAt || '-')}</div>
+                <div>Atualizado por: ${escapeHtml(unit.updatedBy || '-')}</div>
               </div>
             </div>
           </div>
@@ -897,6 +866,9 @@
       el('editingUnitId').value      = unit.id || '';
       el('formUf').value             = unit.uf || '';
       el('formNomeUnidade').value    = unit.unidade || '';
+      el('formOs').value             = unit.os || '';
+      el('formDataAberturaOs').value = unit.dataAberturaOs || '';
+      el('formStatusOs').value       = unit.statusOs || '';
       el('formCloudNvr').value       = unit.cloudNvr || '';
       el('formLogin').value          = unit.login || '';
       el('formSenha').value          = unit.senha || '';
@@ -950,6 +922,9 @@
         id: el('editingUnitId').value.trim(),
         uf: el('formUf').value.trim().toUpperCase(),
         nomeUnidade: el('formNomeUnidade').value.trim(),
+        os: el('formOs').value.trim(),
+        dataAberturaOs: el('formDataAberturaOs').value,
+        statusOs: el('formStatusOs').value,
         cloudNvr: el('formCloudNvr').value.trim(),
         login: el('formLogin').value.trim(),
         senha: el('formSenha').value.trim(),
@@ -1009,7 +984,8 @@
     function resetUnitForm() {
       [
         'editingUnitId','formUf','formNomeUnidade','formCloudNvr','formLogin','formSenha','formSenhaCameras','formIp',
-        'formHd','formQuantidadeCameras','formAlarmeMac','formSensores','formSenhaAlarme','formCentral','formObservacoes'
+        'formHd','formQuantidadeCameras','formAlarmeMac','formSensores','formSenhaAlarme','formCentral','formObservacoes',
+        'formOs','formDataAberturaOs','formStatusOs'
       ].forEach(id => el(id).value = '');
       el('formStatus').value = 'Ativa';
     }
@@ -1019,12 +995,12 @@
       if (!filtered.length) { showMessage('Não há dados para exportar no filtro atual.'); return; }
 
       const headers = [
-        'ID','UF','Nome da unidade','Cloud NVR','Login','Senha','Senha câmeras','IP','HD',
+        'ID','UF','Nome da unidade','OS','Data da abertura da OS','Status da OS','Cloud NVR','Login','Senha','Senha câmeras','IP','HD',
         'Quantidade de câmeras','MAC do alarme','Sensores','Senha do alarme',
         'Acesso da central','Observações','Status','Última atualização','Atualizado por'
       ];
       const rows = filtered.map(u => [
-        u.id,u.uf,u.unidade,u.cloudNvr,u.login,u.senha,u.senhaCameras,u.ip,u.hd,u.cameras,
+        u.id,u.uf,u.unidade,u.os,u.dataAberturaOs,u.statusOs,u.cloudNvr,u.login,u.senha,u.senhaCameras,u.ip,u.hd,u.cameras,
         u.alarmeMac,u.sensores,u.senhaAlarme,u.central,u.observacoes,u.status,u.updatedAt,u.updatedBy
       ]);
 
@@ -1239,6 +1215,8 @@
     });
     el('searchBtn').addEventListener('click', renderUnits);
     el('searchInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') renderUnits(); });
+    el('osFilter').addEventListener('keydown', (e) => { if (e.key === 'Enter') renderUnits(); });
+    el('unitNameFilter').addEventListener('keydown', (e) => { if (e.key === 'Enter') renderUnits(); });
     el('ufFilter').addEventListener('change', renderUnits);
     el('saveBtn').addEventListener('click', saveUnit);
     el('updateBtn').addEventListener('click', updateUnit);
@@ -1251,32 +1229,6 @@
     el('resetBtn').addEventListener('click', resetPasswordAdmin);
     el('themeBtn').addEventListener('click', () => { applyTheme(document.body.classList.contains('dark') ? 'light' : 'dark'); });
     el('senha').addEventListener('keydown', (e) => { if (e.key === 'Enter') login(); });
-
-    // Menu hambúrguer mobile
-    el('mobileMenuBtn').addEventListener('click', () => {
-      const menu = el('topMenu');
-      menu.classList.toggle('mobile-open');
-      el('mobileMenuBtn').textContent = menu.classList.contains('mobile-open') ? '✕' : '☰';
-    });
-
-    // Fechar menu ao clicar em botão dentro dele
-    ['themeBtn','refreshBtn','logoutBtn'].forEach(id => {
-      const btn = el(id);
-      if (btn) btn.addEventListener('click', () => {
-        el('topMenu').classList.remove('mobile-open');
-        el('mobileMenuBtn').textContent = '☰';
-      }, true);
-    });
-
-    // Fechar menu ao clicar fora
-    document.addEventListener('click', (e) => {
-      const menu = el('topMenu');
-      const btn = el('mobileMenuBtn');
-      if (menu && btn && !menu.contains(e.target) && !btn.contains(e.target)) {
-        menu.classList.remove('mobile-open');
-        btn.textContent = '☰';
-      }
-    });
 
     window.addEventListener('load', async () => {
       applyTheme(localStorage.getItem('vtal_theme') || 'light');
