@@ -299,12 +299,13 @@
       border-radius: 16px; font-size: 14px; margin-top: 10px;
     }
 
-    .obs-box, .summary-box, .editing-box {
+    .obs-box, .summary-box, .editing-box, .historico-box {
       margin-top: 12px; background: var(--bg-muted); border-radius: 16px;
       padding: 12px; font-size: 14px; color: var(--text-soft);
       border: 1px dashed var(--border);
     }
     .editing-box { border-style: solid; color: var(--text); }
+    .historico-box { max-height: 160px; overflow-y: auto; white-space: pre-wrap; line-height: 1.5; font-size: 13px; }
 
     .section-tabs { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
     .section-tabs button { width: auto; padding: 10px 16px; }
@@ -445,9 +446,8 @@
             <div class="card-body">
               <div style="margin-bottom:18px;">
                 <h3 style="margin-bottom:4px;">Consulta das unidades</h3>
-                <p class="muted" style="margin-bottom:14px;">Filtros por OS, estado/UF, nome da unidade e busca geral.</p>
+                <p class="muted" style="margin-bottom:14px;">Filtros por estado/UF, nome da unidade e busca geral.</p>
                 <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-                  <input id="osFilter" placeholder="Filtrar por OS" style="width:170px; flex-shrink:0;" />
                   <select id="ufFilter" style="width:160px; flex-shrink:0;">
                     <option value="all">Todas as UFs</option>
                   </select>
@@ -485,27 +485,18 @@
 
                 <div id="editingBox" class="editing-box hidden"></div>
                 <input id="editingUnitId" type="hidden" />
+                <input id="formHistorico" type="hidden" />
 
                 <div class="form-grid">
                   <input id="formUf" placeholder="UF" />
                   <input id="formNomeUnidade" placeholder="Nome da unidade" />
-                  <input id="formOs" placeholder="OS" />
-                  <input id="formDataAberturaOs" type="date" title="Data da abertura da OS" />
-                  <select id="formStatusOs">
-                    <option value="">Status da OS</option>
-                    <option value="Aberta">Aberta</option>
-                    <option value="Em andamento">Em andamento</option>
-                    <option value="Aguardando">Aguardando</option>
-                    <option value="Concluída">Concluída</option>
-                    <option value="Cancelada">Cancelada</option>
-                  </select>
                   <input id="formCloudNvr" placeholder="Cloud NVR" />
                   <input id="formLogin" placeholder="Login" />
                   <input id="formSenha" placeholder="Senha" />
                   <input id="formSenhaCameras" placeholder="Senha câmeras" />
-                  <input id="formIp" placeholder="IP" />
+                  <input id="formIp" placeholder="IP (ex: 192.168.0.1)" />
                   <input id="formHd" placeholder="HD" />
-                  <input id="formQuantidadeCameras" placeholder="Qtd. de câmeras" />
+                  <input id="formQuantidadeCameras" type="number" min="0" placeholder="Qtd. de câmeras" />
                   <input id="formAlarmeMac" placeholder="MAC do alarme" />
                   <input id="formSensores" placeholder="Sensores do alarme" />
                   <input id="formSenhaAlarme" placeholder="Senha do alarme" />
@@ -522,6 +513,11 @@
                   <option value="Pendente">Pendente</option>
                   <option value="Inativa">Inativa</option>
                 </select>
+
+                <div style="margin-top:12px;">
+                  <strong style="font-size:13px;">Histórico da unidade</strong>
+                  <div id="formHistoricoView" class="historico-box">Nenhum registro ainda.</div>
+                </div>
 
                 <div id="createActions" style="margin-top:12px;">
                   <button id="saveBtn">Cadastrar unidade</button>
@@ -654,9 +650,6 @@
         id: String(item['ID'] || ''),
         uf: item['UF'] || '',
         unidade: item['Nome da unidade'] || '',
-        os: item['OS'] || item['Nº OS'] || item['Numero OS'] || '',
-        dataAberturaOs: item['Data da abertura da OS'] || item['Data da Abertura'] || '',
-        statusOs: item['Status da OS'] || '',
         cloudNvr: item['Cloud NVR'] || '',
         login: item['Login'] || '',
         senha: item['Senha'] || '',
@@ -670,6 +663,7 @@
         central: item['Acesso da central'] || '',
         observacoes: item['Observações'] || '',
         status: item['Status'] || 'Ativa',
+        historico: item['Histórico'] || '',
         updatedAt: item['Última atualização'] || '',
         updatedBy: item['Atualizado por'] || ''
       }));
@@ -692,6 +686,27 @@
     function userCanEdit()    { return !!(currentUser && (currentUser.perfil === 'admin' || normalizePermissionValue(currentUser.podeEditar))); }
     function userCanDelete()  { return !!(currentUser && (currentUser.perfil === 'admin' || normalizePermissionValue(currentUser.podeExcluir))); }
     function userCanView()    { return !!(currentUser && (currentUser.perfil === 'admin' || normalizePermissionValue(currentUser.podeVisualizar))); }
+
+    /* ── REGRA PADRÃO DE IP ── */
+    // Mesmo padrão aplicado no Apps Script: 4 octetos separados por ponto, 0-255 cada.
+    function isValidIp(ip) {
+      const texto = String(ip || '').trim();
+      const match = texto.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+      if (!match) return false;
+      return match.slice(1).every(octeto => Number(octeto) >= 0 && Number(octeto) <= 255);
+    }
+
+    /* ── HISTÓRICO ── */
+    function appendHistorico(existing, acao) {
+      const timestamp = new Date().toLocaleString('pt-BR');
+      const usuario = (currentUser && currentUser.nome) || 'Desconhecido';
+      const entrada = `[${timestamp}] ${usuario} - ${acao}`;
+      return existing ? `${existing}\n${entrada}` : entrada;
+    }
+
+    function renderHistoricoView(historico) {
+      el('formHistoricoView').textContent = historico ? historico : 'Nenhum registro ainda.';
+    }
 
     /* ── LOGIN / LOGOUT ── */
     async function login() {
@@ -816,8 +831,7 @@
       [
         'formUf','formNomeUnidade','formCloudNvr','formLogin','formSenha','formSenhaCameras','formIp',
         'formHd','formQuantidadeCameras','formAlarmeMac','formSensores',
-        'formSenhaAlarme','formCentral','formObservacoes','formStatus',
-        'formOs','formDataAberturaOs','formStatusOs'
+        'formSenhaAlarme','formCentral','formObservacoes','formStatus'
       ].forEach(id => { el(id).disabled = !enabled; });
       el('saveBtn').disabled   = !canCreate;
       el('updateBtn').disabled = !canEdit;
@@ -831,7 +845,7 @@
         if (!result.success) { showMessage(result.message || 'Erro ao carregar unidades.'); return; }
         units = normalizeUnits(result.data);
         renderStats(); renderUfFilter(); renderUnits();
-      } catch (e) { showMessage('Erro ao carregar unidades.'); }
+      } catch (e) { console.error(e); showMessage('Erro ao carregar unidades.'); }
     }
 
     async function loadUsers() {
@@ -840,7 +854,7 @@
         if (!result.success) { showMessage(result.message || 'Erro ao carregar usuários.'); return; }
         users = result.data || [];
         renderUsers();
-      } catch (e) { showMessage('Erro ao carregar usuários.'); }
+      } catch (e) { console.error(e); showMessage('Erro ao carregar usuários.'); }
     }
 
     /* ── STATS ── */
@@ -863,18 +877,15 @@
 
     function getFilteredUnits() {
       const term         = el('searchInput').value.trim().toLowerCase();
-      const osTerm       = el('osFilter').value.trim().toLowerCase();
       const unitNameTerm = el('unitNameFilter').value.trim().toLowerCase();
       const uf           = el('ufFilter').value;
       return units.filter(unit => {
         const text = [
           unit.uf, unit.unidade, unit.cloudNvr, unit.login, unit.ip, unit.hd,
           unit.senhaCameras, unit.alarmeMac, unit.sensores, unit.central,
-          unit.observacoes, unit.status, unit.os, unit.dataAberturaOs,
-          unit.statusOs, String(unit.cameras)
+          unit.observacoes, unit.status, String(unit.cameras)
         ].join(' ').toLowerCase();
         return (!term         || text.includes(term)) &&
-               (!osTerm       || String(unit.os || '').toLowerCase().includes(osTerm)) &&
                (!unitNameTerm || String(unit.unidade || '').toLowerCase().includes(unitNameTerm)) &&
                (uf === 'all'  || unit.uf === uf);
       });
@@ -883,11 +894,9 @@
     function renderSearchSummary(filtered) {
       const box          = el('searchSummary');
       const term         = el('searchInput').value.trim();
-      const osTerm       = el('osFilter').value.trim();
       const unitNameTerm = el('unitNameFilter').value.trim();
       const uf           = el('ufFilter').value === 'all' ? 'todas as UFs liberadas' : el('ufFilter').value;
       const details = [
-        osTerm       ? `OS <strong>${escapeHtml(osTerm)}</strong>`       : '',
         unitNameTerm ? `unidade <strong>${escapeHtml(unitNameTerm)}</strong>` : '',
         term         ? `termo geral <strong>${escapeHtml(term)}</strong>` : ''
       ].filter(Boolean).join(', ');
@@ -931,16 +940,11 @@
                 </button>
                 <span class="${getStatusBadgeClass(unit.status)}">${escapeHtml(unit.status)}</span>
                 <span class="badge">${escapeHtml(unit.uf)}</span>
-                ${unit.os      ? `<span class="badge info">OS: ${escapeHtml(unit.os)}</span>` : ''}
-                ${unit.statusOs ? `<span class="badge secondary">Status OS: ${escapeHtml(unit.statusOs)}</span>` : ''}
                 ${unit.alarmeMac ? `<span class="badge success">MAC alarme: ${escapeHtml(unit.alarmeMac)}</span>` : ''}
               </div>
 
               <div class="unit-info-grid">
                 <div class="info-item"><strong>UF</strong><div>${escapeHtml(unit.uf)}</div></div>
-                <div class="info-item"><strong>OS</strong><div>${escapeHtml(unit.os || '-')}</div></div>
-                <div class="info-item"><strong>Data da abertura</strong><div>${escapeHtml(unit.dataAberturaOs || '-')}</div></div>
-                <div class="info-item"><strong>Status da OS</strong><div>${escapeHtml(unit.statusOs || '-')}</div></div>
                 <div class="info-item"><strong>IP</strong><div>${escapeHtml(unit.ip)}</div></div>
                 <div class="info-item"><strong>HD</strong><div>${escapeHtml(unit.hd)}</div></div>
                 <div class="info-item"><strong>Login</strong><div>${escapeHtml(unit.login)}</div></div>
@@ -955,6 +959,7 @@
               </div>
 
               ${unit.observacoes ? `<div class="obs-box"><strong style="color:var(--text)">Observações:</strong> ${escapeHtml(unit.observacoes)}</div>` : ''}
+              ${unit.historico ? `<div class="historico-box"><strong style="color:var(--text)">Histórico:</strong><br>${escapeHtml(unit.historico).replace(/\n/g, '<br>')}</div>` : ''}
             </div>
 
             <div class="actions-box">
@@ -995,9 +1000,6 @@
       el('editingUnitId').value         = unit.id || '';
       el('formUf').value                = unit.uf || '';
       el('formNomeUnidade').value       = unit.unidade || '';
-      el('formOs').value                = unit.os || '';
-      el('formDataAberturaOs').value    = unit.dataAberturaOs || '';
-      el('formStatusOs').value          = unit.statusOs || '';
       el('formCloudNvr').value          = unit.cloudNvr || '';
       el('formLogin').value             = unit.login || '';
       el('formSenha').value             = unit.senha || '';
@@ -1011,6 +1013,8 @@
       el('formCentral').value           = unit.central || '';
       el('formObservacoes').value       = unit.observacoes || '';
       el('formStatus').value            = unit.status || 'Ativa';
+      el('formHistorico').value         = unit.historico || '';
+      renderHistoricoView(unit.historico || '');
     }
 
     function startEditUnit(id) {
@@ -1050,9 +1054,6 @@
         id: el('editingUnitId').value.trim(),
         uf: el('formUf').value.trim().toUpperCase(),
         nomeUnidade: el('formNomeUnidade').value.trim(),
-        os: el('formOs').value.trim(),
-        dataAberturaOs: el('formDataAberturaOs').value,
-        statusOs: el('formStatusOs').value,
         cloudNvr: el('formCloudNvr').value.trim(),
         login: el('formLogin').value.trim(),
         senha: el('formSenha').value.trim(),
@@ -1065,40 +1066,117 @@
         senhaAlarme: el('formSenhaAlarme').value.trim(),
         central: el('formCentral').value.trim(),
         observacoes: el('formObservacoes').value.trim(),
-        status: el('formStatus').value
+        status: el('formStatus').value,
+        historico: el('formHistorico').value
       };
+    }
+
+    function findDuplicateUnit(payload, ignoreId) {
+      const ip     = payload.ip.trim().toLowerCase();
+      const nome   = payload.nomeUnidade.trim().toLowerCase();
+      const uf     = payload.uf;
+      return units.find(u =>
+        u.id !== ignoreId && (
+          u.ip.trim().toLowerCase() === ip ||
+          (u.unidade.trim().toLowerCase() === nome && u.uf === uf)
+        )
+      );
     }
 
     async function saveUnit() {
       if (!userCanInclude()) { showMessage('Você não tem permissão para cadastrar unidades.'); return; }
+
       const payload = { action: 'criarUnidade', usuario: currentUser, ...collectUnitFormData() };
+
       if (!payload.uf || !payload.nomeUnidade || !payload.login || !payload.ip) {
         showMessage('Preencha UF, nome da unidade, login e IP.'); return;
       }
+
+      if (!isValidIp(payload.ip)) {
+        showMessage('IP inválido. Use o padrão 000.000.000.000 (ex: 192.168.0.1), cada número entre 0 e 255.');
+        return;
+      }
+
+      // Verificação de duplicidade (mesmo IP, ou mesmo nome dentro da mesma UF)
+      const duplicado = findDuplicateUnit(payload, null);
+      if (duplicado) {
+        const confirmar = window.confirm(
+          `Já existe uma unidade com esse IP ou nome (${duplicado.unidade} - ${duplicado.uf}, ID ${duplicado.id}). Deseja cadastrar mesmo assim?`
+        );
+        if (!confirmar) return;
+      }
+
+      // Registra a primeira entrada do histórico
+      payload.historico = appendHistorico('', 'Cadastro inicial da unidade');
+
+      const btn = el('saveBtn');
+      const textoOriginal = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Salvando...';
+
       try {
         const result = await apiPost(payload);
         showMessage(result.message || 'Processado');
         if (result.success) { resetUnitForm(); exitEditMode(); await loadUnits(); }
-      } catch (e) { showMessage('Erro ao cadastrar unidade.'); }
+      } catch (e) {
+        console.error(e);
+        showMessage('Erro ao cadastrar unidade.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = textoOriginal;
+      }
     }
 
     async function updateUnit() {
       if (!userCanEdit()) { showMessage('Você não tem permissão para editar unidades.'); return; }
+
       const payload = { action: 'editarUnidade', usuario: currentUser, ...collectUnitFormData() };
+
       if (!payload.id) { showMessage('Nenhuma unidade selecionada para edição.'); return; }
       if (!payload.uf || !payload.nomeUnidade || !payload.login || !payload.ip) {
         showMessage('Preencha UF, nome da unidade, login e IP.'); return;
       }
+
+      if (!isValidIp(payload.ip)) {
+        showMessage('IP inválido. Use o padrão 000.000.000.000 (ex: 192.168.0.1), cada número entre 0 e 255.');
+        return;
+      }
+
+      // Verificação de duplicidade, ignorando a própria unidade em edição
+      const duplicado = findDuplicateUnit(payload, payload.id);
+      if (duplicado) {
+        const confirmar = window.confirm(
+          `Já existe outra unidade com esse IP ou nome (${duplicado.unidade} - ${duplicado.uf}, ID ${duplicado.id}). Deseja salvar mesmo assim?`
+        );
+        if (!confirmar) return;
+      }
+
+      // Acrescenta uma nova entrada ao histórico existente
+      payload.historico = appendHistorico(payload.historico, 'Edição de dados da unidade');
+
+      const btn = el('updateBtn');
+      const textoOriginal = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Salvando...';
+
       try {
         const result = await apiPost(payload);
         showMessage(result.message || 'Processado');
         if (result.success) { resetUnitForm(); exitEditMode(); await loadUnits(); }
-      } catch (e) { showMessage('Erro ao editar unidade.'); }
+      } catch (e) {
+        console.error(e);
+        showMessage('Erro ao editar unidade.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = textoOriginal;
+      }
     }
 
     async function deleteUnit(id) {
       if (!userCanDelete()) { showMessage('Você não tem permissão para excluir unidades.'); return; }
-      if (!window.confirm('Tem certeza que deseja excluir este cadastro?')) return;
+      const unit = units.find(u => u.id === String(id));
+      const nomeUnidade = unit ? unit.unidade : id;
+      if (!window.confirm(`Tem certeza que deseja excluir o cadastro de "${nomeUnidade}"?`)) return;
       try {
         const result = await apiPost({ action: 'excluirUnidade', id, usuario: currentUser });
         showMessage(result.message || 'Processado');
@@ -1106,17 +1184,17 @@
           if (editingUnitId === String(id)) { resetUnitForm(); exitEditMode(); }
           await loadUnits();
         }
-      } catch (e) { showMessage('Erro ao excluir unidade.'); }
+      } catch (e) { console.error(e); showMessage('Erro ao excluir unidade.'); }
     }
 
     function resetUnitForm() {
       [
         'editingUnitId','formUf','formNomeUnidade','formCloudNvr','formLogin','formSenha',
         'formSenhaCameras','formIp','formHd','formQuantidadeCameras','formAlarmeMac',
-        'formSensores','formSenhaAlarme','formCentral','formObservacoes',
-        'formOs','formDataAberturaOs','formStatusOs'
+        'formSensores','formSenhaAlarme','formCentral','formObservacoes','formHistorico'
       ].forEach(id => el(id).value = '');
       el('formStatus').value = 'Ativa';
+      renderHistoricoView('');
     }
 
     /* ── EXPORT EXCEL (SheetJS — gera .xlsx real, sem corrupção) ── */
@@ -1128,9 +1206,6 @@
         'ID':                     u.id,
         'UF':                     u.uf,
         'Nome da unidade':        u.unidade,
-        'OS':                     u.os,
-        'Data da abertura da OS': u.dataAberturaOs,
-        'Status da OS':           u.statusOs,
         'Cloud NVR':              u.cloudNvr,
         'Login':                  u.login,
         'Senha':                  u.senha,
@@ -1144,6 +1219,7 @@
         'Acesso da central':      u.central,
         'Observações':            u.observacoes,
         'Status':                 u.status,
+        'Histórico':              u.historico,
         'Última atualização':     u.updatedAt,
         'Atualizado por':         u.updatedBy
       }));
@@ -1175,7 +1251,7 @@
         const result = await apiPost(payload);
         showMessage(result.message || 'Processado');
         if (result.success) { ['userNome','userEmail','userSenha','userUfs'].forEach(id => el(id).value = ''); await loadUsers(); }
-      } catch (e) { showMessage('Erro ao criar usuário.'); }
+      } catch (e) { console.error(e); showMessage('Erro ao criar usuário.'); }
     }
 
     let editingUserId = null;
@@ -1285,7 +1361,7 @@
             const result = await apiPost(payload);
             showMessage(result.message || 'Processado');
             if (result.success) { editingUserId = null; await loadUsers(); }
-          } catch (e) { showMessage('Erro ao editar usuário.'); }
+          } catch (e) { console.error(e); showMessage('Erro ao editar usuário.'); }
         });
       }
 
@@ -1311,7 +1387,7 @@
         const result = await apiPost({ action: 'excluirUsuario', id, usuario: currentUser });
         showMessage(result.message || 'Processado');
         if (result.success) await loadUsers();
-      } catch (e) { showMessage('Erro ao excluir usuário.'); }
+      } catch (e) { console.error(e); showMessage('Erro ao excluir usuário.'); }
     }
 
     async function resetPasswordAdmin() {
@@ -1322,7 +1398,7 @@
         const result = await apiPost({ action: 'resetSenha', email, novaSenha, usuario: currentUser });
         showMessage(result.message || 'Processado');
         if (result.success) el('resetNovaSenha').value = '';
-      } catch (e) { showMessage('Erro ao resetar senha.'); }
+      } catch (e) { console.error(e); showMessage('Erro ao resetar senha.'); }
     }
 
     /* ── TABS ── */
@@ -1346,7 +1422,6 @@
     });
     el('searchBtn').addEventListener('click', renderUnits);
     el('searchInput').addEventListener('keydown',   (e) => { if (e.key === 'Enter') renderUnits(); });
-    el('osFilter').addEventListener('keydown',       (e) => { if (e.key === 'Enter') renderUnits(); });
     el('unitNameFilter').addEventListener('keydown', (e) => { if (e.key === 'Enter') renderUnits(); });
     el('ufFilter').addEventListener('change', renderUnits);
     el('saveBtn').addEventListener('click', saveUnit);
