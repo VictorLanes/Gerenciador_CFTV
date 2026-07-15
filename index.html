@@ -503,6 +503,10 @@
                   <input id="formSensores" placeholder="Sensores do alarme" />
                   <input id="formSenhaAlarme" placeholder="Senha do alarme" />
                   <input id="formCentral" placeholder="Acesso da central" />
+                  <select id="formCadeadoBluetooth">
+                    <option value="NÃO">Cadeado bluetooth: NÃO</option>
+                    <option value="SIM">Cadeado bluetooth: SIM</option>
+                  </select>
                 </div>
 
                 <textarea id="formObservacoes" placeholder="Observações" style="margin-top:12px;"></textarea>
@@ -717,6 +721,7 @@
         sensores: item['Sensores'] || '',
         senhaAlarme: item['Senha do alarme'] || '',
         central: item['Acesso da central'] || '',
+        cadeadoBluetooth: item['Cadeado bluetooth'] || 'NÃO',
         observacoes: item['Observações'] || '',
         status: item['Status'] || 'Ativa',
         historico: item['Histórico'] || '',
@@ -997,6 +1002,7 @@
                 <span class="${getStatusBadgeClass(unit.status)}">${escapeHtml(unit.status)}</span>
                 <span class="badge">${escapeHtml(unit.uf)}</span>
                 ${unit.alarmeMac ? `<span class="badge success">MAC alarme: ${escapeHtml(unit.alarmeMac)}</span>` : ''}
+                <span class="badge ${unit.cadeadoBluetooth === 'SIM' ? 'info' : 'secondary'}">Cadeado bluetooth: ${escapeHtml(unit.cadeadoBluetooth || 'NÃO')}</span>
               </div>
 
               <div class="unit-info-grid">
@@ -1067,6 +1073,7 @@
       el('formSensores').value          = unit.sensores || '';
       el('formSenhaAlarme').value       = unit.senhaAlarme || '';
       el('formCentral').value           = unit.central || '';
+      el('formCadeadoBluetooth').value  = unit.cadeadoBluetooth || 'NÃO';
       el('formObservacoes').value       = unit.observacoes || '';
       el('formStatus').value            = unit.status || 'Ativa';
       el('formHistorico').value         = unit.historico || '';
@@ -1121,6 +1128,7 @@
         sensores: el('formSensores').value.trim(),
         senhaAlarme: el('formSenhaAlarme').value.trim(),
         central: el('formCentral').value.trim(),
+        cadeadoBluetooth: el('formCadeadoBluetooth').value,
         observacoes: el('formObservacoes').value.trim(),
         status: el('formStatus').value,
         historico: el('formHistorico').value
@@ -1172,8 +1180,8 @@
 
       try {
         const result = await apiPost(payload);
-        showMessage(result.message || 'Processado');
         if (result.success) { resetUnitForm(); exitEditMode(); await loadUnits(); }
+        showMessage(result.message || 'Processado');
       } catch (e) {
         console.error(e);
         showMessage('Erro ao cadastrar unidade.');
@@ -1217,8 +1225,8 @@
 
       try {
         const result = await apiPost(payload);
-        showMessage(result.message || 'Processado');
         if (result.success) { resetUnitForm(); exitEditMode(); await loadUnits(); }
+        showMessage(result.message || 'Processado');
       } catch (e) {
         console.error(e);
         showMessage('Erro ao editar unidade.');
@@ -1235,11 +1243,11 @@
       if (!window.confirm(`Tem certeza que deseja excluir o cadastro de "${nomeUnidade}"?`)) return;
       try {
         const result = await apiPost({ action: 'excluirUnidade', id, usuario: currentUser });
-        showMessage(result.message || 'Processado');
         if (result.success) {
           if (editingUnitId === String(id)) { resetUnitForm(); exitEditMode(); }
           await loadUnits();
         }
+        showMessage(result.message || 'Processado');
       } catch (e) { console.error(e); showMessage('Erro ao excluir unidade.'); }
     }
 
@@ -1250,6 +1258,7 @@
         'formSensores','formSenhaAlarme','formCentral','formObservacoes','formHistorico'
       ].forEach(id => el(id).value = '');
       el('formStatus').value = 'Ativa';
+      el('formCadeadoBluetooth').value = 'NÃO';
       renderHistoricoView('');
     }
 
@@ -1270,6 +1279,7 @@
         'Sensores':               u.sensores,
         'Senha do alarme':        u.senhaAlarme,
         'Acesso da central':      u.central,
+        'Cadeado bluetooth':      u.cadeadoBluetooth,
         'Observações':            u.observacoes,
         'Status':                 u.status,
         'Histórico':              u.historico,
@@ -1318,6 +1328,7 @@
       'Sensores': 'sensores',
       'Senha do alarme': 'senhaAlarme',
       'Acesso da central': 'central',
+      'Cadeado bluetooth': 'cadeadoBluetooth',
       'Observações': 'observacoes',
       'Status': 'status'
       // 'Histórico', 'Última atualização' e 'Atualizado por' são gerados pelo próprio
@@ -1329,7 +1340,8 @@
       uf: 'UF', unidade: 'Nome da unidade', cloudNvr: 'Cloud NVR', login: 'Login', senha: 'Senha',
       senhaCameras: 'Senha câmeras', ip: 'IP', hd: 'HD', cameras: 'Quantidade de câmeras',
       alarmeMac: 'MAC do alarme', sensores: 'Sensores', senhaAlarme: 'Senha do alarme',
-      central: 'Acesso da central', observacoes: 'Observações', status: 'Status'
+      central: 'Acesso da central', cadeadoBluetooth: 'Cadeado bluetooth',
+      observacoes: 'Observações', status: 'Status'
     };
 
     function openImportModal() {
@@ -1543,7 +1555,7 @@
               login: plan.row.login, senha: plan.row.senha, senhaCameras: plan.row.senhaCameras,
               ip: plan.row.ip, hd: plan.row.hd, quantidadeCameras: Number(plan.row.cameras || 0),
               alarmeMac: plan.row.alarmeMac, sensores: plan.row.sensores, senhaAlarme: plan.row.senhaAlarme,
-              central: plan.row.central, observacoes: plan.row.observacoes, status: plan.row.status || 'Ativa',
+              central: plan.row.central, cadeadoBluetooth: plan.row.cadeadoBluetooth, observacoes: plan.row.observacoes, status: plan.row.status || 'Ativa',
               historico: appendHistorico('', 'Cadastro criado via importação de planilha')
             };
             const result = await apiPost(payload);
@@ -1557,7 +1569,7 @@
               cloudNvr: plan.row.cloudNvr, login: plan.row.login, senha: plan.row.senha, senhaCameras: plan.row.senhaCameras,
               ip: plan.row.ip, hd: plan.row.hd, quantidadeCameras: Number(plan.row.cameras || 0),
               alarmeMac: plan.row.alarmeMac, sensores: plan.row.sensores, senhaAlarme: plan.row.senhaAlarme,
-              central: plan.row.central, observacoes: plan.row.observacoes, status: plan.row.status || plan.existing.status,
+              central: plan.row.central, cadeadoBluetooth: plan.row.cadeadoBluetooth, observacoes: plan.row.observacoes, status: plan.row.status || plan.existing.status,
               historico: appendHistorico(plan.existing.historico, `Atualização via importação de planilha (${resumoAlteracoes})`)
             };
             const result = await apiPost(payload);
