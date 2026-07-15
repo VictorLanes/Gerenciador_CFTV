@@ -299,13 +299,12 @@
       border-radius: 16px; font-size: 14px; margin-top: 10px;
     }
 
-    .obs-box, .summary-box, .editing-box, .historico-box {
+    .obs-box, .summary-box, .editing-box {
       margin-top: 12px; background: var(--bg-muted); border-radius: 16px;
       padding: 12px; font-size: 14px; color: var(--text-soft);
       border: 1px dashed var(--border);
     }
     .editing-box { border-style: solid; color: var(--text); }
-    .historico-box { max-height: 160px; overflow-y: auto; white-space: pre-wrap; line-height: 1.5; font-size: 13px; }
 
     .section-tabs { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
     .section-tabs button { width: auto; padding: 10px 16px; }
@@ -455,8 +454,6 @@
                   <input id="searchInput" placeholder="Busca geral: IP, login, alarme..." style="flex:1; min-width:200px;" />
                   <button id="searchBtn" class="compact-btn" style="flex-shrink:0;">Consultar</button>
                   <button id="exportBtn" class="success compact-btn" style="flex-shrink:0;">Gerar Excel</button>
-                  <button id="importBtn" class="info compact-btn" style="flex-shrink:0;">Importar planilha</button>
-                  <input id="importFileInput" type="file" accept=".xlsx,.xls" class="hidden" />
                 </div>
               </div>
 
@@ -487,7 +484,6 @@
 
                 <div id="editingBox" class="editing-box hidden"></div>
                 <input id="editingUnitId" type="hidden" />
-                <input id="formHistorico" type="hidden" />
 
                 <div class="form-grid">
                   <input id="formUf" placeholder="UF" />
@@ -519,11 +515,6 @@
                   <option value="Pendente">Pendente</option>
                   <option value="Inativa">Inativa</option>
                 </select>
-
-                <div style="margin-top:12px;">
-                  <strong style="font-size:13px;">Histórico da unidade</strong>
-                  <div id="formHistoricoView" class="historico-box">Nenhum registro ainda.</div>
-                </div>
 
                 <div id="createActions" style="margin-top:12px;">
                   <button id="saveBtn">Cadastrar unidade</button>
@@ -617,62 +608,8 @@
     </main>
   </section>
 
-  <!-- ══════════════ MODAL DE IMPORTAÇÃO ══════════════ -->
-  <div id="importModalOverlay" class="hidden" style="position:fixed; inset:0; background:rgba(2,6,23,.55); z-index:500; display:flex; align-items:flex-start; justify-content:center; padding:30px 16px; overflow-y:auto;">
-    <div style="background:var(--bg-soft); border:1px solid var(--border); border-radius:24px; box-shadow:var(--shadow); max-width:960px; width:100%; padding:24px; margin-bottom:40px;">
-
-      <div class="section-head">
-        <div>
-          <h3>Importar planilha de backup</h3>
-          <p class="muted" id="importStepLabel">Passo 1 de 3 — Gerar backup de segurança</p>
-        </div>
-        <button class="secondary compact-btn" id="closeImportModalBtn">Fechar</button>
-      </div>
-
-      <!-- PASSO 1: BACKUP -->
-      <div id="importStepBackup">
-        <div class="message" style="margin-bottom:16px;">
-          Antes de importar, gere um backup completo dos dados atuais do sistema. Esse arquivo permite restaurar tudo caso a importação traga alguma informação incorreta.
-        </div>
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <button class="success" id="generateBackupBtn" style="width:auto; min-width:220px;">1. Gerar backup agora (.xlsx)</button>
-        </div>
-        <p id="backupStatus" class="small-note"></p>
-        <div style="margin-top:20px; display:flex; gap:10px; justify-content:flex-end;">
-          <button class="secondary compact-btn" id="cancelImportStep1Btn">Cancelar</button>
-          <button class="info compact-btn" id="goToStep2Btn" disabled>Avançar para seleção do arquivo</button>
-        </div>
-      </div>
-
-      <!-- PASSO 2: SELEÇÃO DO ARQUIVO -->
-      <div id="importStepFile" class="hidden">
-        <div class="message" style="margin-bottom:16px;">
-          Selecione a planilha (.xlsx) que será usada para atualizar o sistema. As colunas devem seguir o mesmo padrão do arquivo exportado pelo botão "Gerar Excel".
-        </div>
-        <input id="importFileInput2" type="file" accept=".xlsx,.xls" />
-        <p id="fileReadStatus" class="small-note"></p>
-        <div style="margin-top:20px; display:flex; gap:10px; justify-content:flex-end;">
-          <button class="secondary compact-btn" id="backToStep1Btn">Voltar</button>
-          <button class="info compact-btn" id="goToStep3Btn" disabled>Analisar alterações</button>
-        </div>
-      </div>
-
-      <!-- PASSO 3: PRÉVIA E CONFIRMAÇÃO -->
-      <div id="importStepPreview" class="hidden">
-        <div id="importSummaryBox" class="summary-box" style="margin-bottom:16px;"></div>
-        <div id="importPreviewList" style="display:grid; gap:12px; max-height:420px; overflow-y:auto;"></div>
-        <div style="margin-top:20px; display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap;">
-          <button class="secondary compact-btn" id="backToStep2Btn">Voltar</button>
-          <button class="danger compact-btn" id="confirmImportBtn">Confirmar e aplicar alterações</button>
-        </div>
-        <p id="importProgressStatus" class="small-note"></p>
-      </div>
-
-    </div>
-  </div>
-
   <script>
-    const API_BASE = 'https://script.google.com/macros/s/AKfycbyDhOMBc486QtS3JZPG7OQPPZZDQ6GRJEa4gvhvClOmYupDWHZAvkjmam-Mou_PjD17/exec';
+    const API_BASE = 'https://script.google.com/macros/s/AKfycbzZoVwZ3cEOP6mgy65S649XtkWM3mIwbay5ujgR1OL9XCA2nPvOYIgZuhPDDdLgApHL/exec';
 
     let currentUser = null;
     let units = [];
@@ -724,7 +661,6 @@
         cadeadoBluetooth: item['Cadeado bluetooth'] || 'NÃO',
         observacoes: item['Observações'] || '',
         status: item['Status'] || 'Ativa',
-        historico: item['Histórico'] || '',
         updatedAt: item['Última atualização'] || '',
         updatedBy: item['Atualizado por'] || ''
       }));
@@ -758,17 +694,6 @@
     }
 
     /* ── HISTÓRICO ── */
-    function appendHistorico(existing, acao) {
-      const timestamp = new Date().toLocaleString('pt-BR');
-      const usuario = (currentUser && currentUser.nome) || 'Desconhecido';
-      const entrada = `[${timestamp}] ${usuario} - ${acao}`;
-      return existing ? `${existing}\n${entrada}` : entrada;
-    }
-
-    function renderHistoricoView(historico) {
-      el('formHistoricoView').textContent = historico ? historico : 'Nenhum registro ainda.';
-    }
-
     /* ── LOGIN / LOGOUT ── */
     async function login() {
       const email = el('email').value.trim();
@@ -1021,7 +946,6 @@
               </div>
 
               ${unit.observacoes ? `<div class="obs-box"><strong style="color:var(--text)">Observações:</strong> ${escapeHtml(unit.observacoes)}</div>` : ''}
-              ${unit.historico ? `<div class="historico-box"><strong style="color:var(--text)">Histórico:</strong><br>${escapeHtml(unit.historico).replace(/\n/g, '<br>')}</div>` : ''}
             </div>
 
             <div class="actions-box">
@@ -1076,8 +1000,6 @@
       el('formCadeadoBluetooth').value  = unit.cadeadoBluetooth || 'NÃO';
       el('formObservacoes').value       = unit.observacoes || '';
       el('formStatus').value            = unit.status || 'Ativa';
-      el('formHistorico').value         = unit.historico || '';
-      renderHistoricoView(unit.historico || '');
     }
 
     function startEditUnit(id) {
@@ -1130,8 +1052,7 @@
         central: el('formCentral').value.trim(),
         cadeadoBluetooth: el('formCadeadoBluetooth').value,
         observacoes: el('formObservacoes').value.trim(),
-        status: el('formStatus').value,
-        historico: el('formHistorico').value
+        status: el('formStatus').value
       };
     }
 
@@ -1169,9 +1090,6 @@
         );
         if (!confirmar) return;
       }
-
-      // Registra a primeira entrada do histórico
-      payload.historico = appendHistorico('', 'Cadastro inicial da unidade');
 
       const btn = el('saveBtn');
       const textoOriginal = btn.textContent;
@@ -1215,9 +1133,6 @@
         if (!confirmar) return;
       }
 
-      // Acrescenta uma nova entrada ao histórico existente
-      payload.historico = appendHistorico(payload.historico, 'Edição de dados da unidade');
-
       const btn = el('updateBtn');
       const textoOriginal = btn.textContent;
       btn.disabled = true;
@@ -1255,11 +1170,10 @@
       [
         'editingUnitId','formUf','formNomeUnidade','formCloudNvr','formLogin','formSenha',
         'formSenhaCameras','formIp','formHd','formQuantidadeCameras','formAlarmeMac',
-        'formSensores','formSenhaAlarme','formCentral','formObservacoes','formHistorico'
+        'formSensores','formSenhaAlarme','formCentral','formObservacoes'
       ].forEach(id => el(id).value = '');
       el('formStatus').value = 'Ativa';
       el('formCadeadoBluetooth').value = 'NÃO';
-      renderHistoricoView('');
     }
 
     /* ── EXPORT EXCEL (SheetJS — gera .xlsx real, sem corrupção) ── */
@@ -1282,7 +1196,6 @@
         'Cadeado bluetooth':      u.cadeadoBluetooth,
         'Observações':            u.observacoes,
         'Status':                 u.status,
-        'Histórico':              u.historico,
         'Última atualização':     u.updatedAt,
         'Atualizado por':         u.updatedBy
       }));
@@ -1306,286 +1219,6 @@
       XLSX.writeFile(wb, 'vtal_unidades.xlsx');
     }
 
-    /* ── IMPORTAÇÃO DE PLANILHA (BACKUP → SELEÇÃO → PRÉVIA → CONFIRMAÇÃO) ── */
-    let importParsedRows = [];   // linhas lidas do arquivo, já normalizadas
-    let importPlan = [];         // plano de ação calculado (criar/atualizar/sem alteração)
-    let backupGeneratedOk = false;
-
-    // Mapeamento das colunas da planilha exportada para os campos internos do sistema.
-    // Se algum dia o cabeçalho da planilha mudar, basta ajustar aqui.
-    const IMPORT_COLUMN_MAP = {
-      'ID': 'id',
-      'UF': 'uf',
-      'Nome da unidade': 'unidade',
-      'Cloud NVR': 'cloudNvr',
-      'Login': 'login',
-      'Senha': 'senha',
-      'Senha câmeras': 'senhaCameras',
-      'IP': 'ip',
-      'HD': 'hd',
-      'Quantidade de câmeras': 'cameras',
-      'MAC do alarme': 'alarmeMac',
-      'Sensores': 'sensores',
-      'Senha do alarme': 'senhaAlarme',
-      'Acesso da central': 'central',
-      'Cadeado bluetooth': 'cadeadoBluetooth',
-      'Observações': 'observacoes',
-      'Status': 'status'
-      // 'Histórico', 'Última atualização' e 'Atualizado por' são gerados pelo próprio
-      // sistema e não são sobrescritos pela importação.
-    };
-
-    // Rótulos amigáveis para exibir na tela de prévia.
-    const FIELD_LABELS = {
-      uf: 'UF', unidade: 'Nome da unidade', cloudNvr: 'Cloud NVR', login: 'Login', senha: 'Senha',
-      senhaCameras: 'Senha câmeras', ip: 'IP', hd: 'HD', cameras: 'Quantidade de câmeras',
-      alarmeMac: 'MAC do alarme', sensores: 'Sensores', senhaAlarme: 'Senha do alarme',
-      central: 'Acesso da central', cadeadoBluetooth: 'Cadeado bluetooth',
-      observacoes: 'Observações', status: 'Status'
-    };
-
-    function openImportModal() {
-      if (!userCanInclude() && !userCanEdit()) {
-        showMessage('Você não tem permissão para incluir ou editar unidades, portanto não pode importar planilhas.');
-        return;
-      }
-      importParsedRows = [];
-      importPlan = [];
-      backupGeneratedOk = false;
-      el('backupStatus').textContent = '';
-      el('fileReadStatus').textContent = '';
-      el('importProgressStatus').textContent = '';
-      el('goToStep2Btn').disabled = true;
-      el('goToStep3Btn').disabled = true;
-      el('importFileInput2').value = '';
-      showImportStep(1);
-      el('importModalOverlay').classList.remove('hidden');
-    }
-
-    function closeImportModal() {
-      el('importModalOverlay').classList.add('hidden');
-    }
-
-    function showImportStep(step) {
-      el('importStepBackup').classList.toggle('hidden', step !== 1);
-      el('importStepFile').classList.toggle('hidden', step !== 2);
-      el('importStepPreview').classList.toggle('hidden', step !== 3);
-      const labels = {
-        1: 'Passo 1 de 3 — Gerar backup de segurança',
-        2: 'Passo 2 de 3 — Selecionar a planilha',
-        3: 'Passo 3 de 3 — Conferir e confirmar as alterações'
-      };
-      el('importStepLabel').textContent = labels[step];
-    }
-
-    function generateBackupNow() {
-      if (!units.length) {
-        el('backupStatus').textContent = 'Não há unidades carregadas no sistema para gerar backup.';
-        return;
-      }
-      const agora = new Date();
-      const carimbo = agora.toISOString().slice(0, 19).replace(/[:T]/g, '-');
-      const wb = buildUnitsWorkbook(units);
-      XLSX.writeFile(wb, `vtal_backup_${carimbo}.xlsx`);
-      backupGeneratedOk = true;
-      el('backupStatus').textContent = `Backup gerado com sucesso: vtal_backup_${carimbo}.xlsx (${units.length} unidades). Guarde este arquivo para restaurar se necessário.`;
-      el('goToStep2Btn').disabled = false;
-    }
-
-    function readImportFile(file) {
-      el('fileReadStatus').textContent = 'Lendo arquivo...';
-      el('goToStep3Btn').disabled = true;
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const data = new Uint8Array(e.target.result);
-          const wb = XLSX.read(data, { type: 'array' });
-          const sheetName = wb.SheetNames[0];
-          const rows = XLSX.utils.sheet_to_json(wb.Sheets[sheetName], { defval: '' });
-
-          if (!rows.length) {
-            el('fileReadStatus').textContent = 'A planilha está vazia ou não foi possível ler nenhuma linha.';
-            return;
-          }
-
-          importParsedRows = rows.map(row => {
-            const normalized = {};
-            Object.keys(IMPORT_COLUMN_MAP).forEach(colName => {
-              const campo = IMPORT_COLUMN_MAP[colName];
-              let valor = row[colName] !== undefined ? row[colName] : '';
-              if (campo === 'cameras') valor = Number(valor || 0);
-              if (campo === 'uf') valor = String(valor || '').trim().toUpperCase();
-              if (typeof valor === 'string') valor = valor.trim();
-              normalized[campo] = valor;
-            });
-            normalized.id = String(row['ID'] !== undefined ? row['ID'] : '').trim();
-            return normalized;
-          });
-
-          el('fileReadStatus').textContent = `Arquivo lido com sucesso: ${importParsedRows.length} linha(s) encontrada(s) na aba "${sheetName}".`;
-          el('goToStep3Btn').disabled = false;
-        } catch (err) {
-          console.error(err);
-          el('fileReadStatus').textContent = 'Erro ao ler o arquivo. Confirme que é um .xlsx válido, no mesmo formato exportado pelo sistema.';
-        }
-      };
-      reader.onerror = () => { el('fileReadStatus').textContent = 'Erro ao ler o arquivo selecionado.'; };
-      reader.readAsArrayBuffer(file);
-    }
-
-    // Mesma regra de correspondência usada no cadastro manual: por ID, senão por IP, senão por nome+UF.
-    function matchExistingUnit(row) {
-      if (row.id) {
-        const byId = units.find(u => u.id === row.id);
-        if (byId) return byId;
-      }
-      const ip = String(row.ip || '').trim().toLowerCase();
-      if (ip) {
-        const byIp = units.find(u => u.ip.trim().toLowerCase() === ip);
-        if (byIp) return byIp;
-      }
-      const nome = String(row.unidade || '').trim().toLowerCase();
-      if (nome && row.uf) {
-        const byNomeUf = units.find(u => u.unidade.trim().toLowerCase() === nome && u.uf === row.uf);
-        if (byNomeUf) return byNomeUf;
-      }
-      return null;
-    }
-
-    function buildImportPlan() {
-      importPlan = importParsedRows.map(row => {
-        const existing = matchExistingUnit(row);
-        if (!existing) {
-          return { tipo: 'novo', row, existing: null, changes: [] };
-        }
-        const changes = [];
-        Object.keys(FIELD_LABELS).forEach(campo => {
-          const novo   = row[campo];
-          const antigo = existing[campo];
-          const novoComparavel   = campo === 'cameras' ? Number(novo || 0)   : String(novo || '');
-          const antigoComparavel = campo === 'cameras' ? Number(antigo || 0) : String(antigo || '');
-          if (novoComparavel !== antigoComparavel) {
-            changes.push({ campo, label: FIELD_LABELS[campo], de: antigo, para: novo });
-          }
-        });
-        return { tipo: changes.length ? 'atualizar' : 'sememalteracao', row, existing, changes };
-      });
-      renderImportPreview();
-    }
-
-    function renderImportPreview() {
-      const novos       = importPlan.filter(p => p.tipo === 'novo');
-      const atualizados = importPlan.filter(p => p.tipo === 'atualizar');
-      const semAlteracao = importPlan.filter(p => p.tipo === 'sememalteracao');
-
-      el('importSummaryBox').innerHTML = `
-        Foram lidas <strong>${importPlan.length}</strong> linha(s) da planilha:
-        <strong>${novos.length}</strong> nova(s) unidade(s) a cadastrar,
-        <strong>${atualizados.length}</strong> unidade(s) com campos a atualizar,
-        <strong>${semAlteracao.length}</strong> sem nenhuma alteração.
-        Nada será salvo até você clicar em "Confirmar e aplicar alterações".
-      `;
-
-      const list = el('importPreviewList');
-      if (!importPlan.length) {
-        list.innerHTML = '<div class="unit-card">Nenhuma linha para processar.</div>';
-        return;
-      }
-
-      list.innerHTML = importPlan.map((plan, idx) => {
-        const nomeExibicao = plan.row.unidade || (plan.existing ? plan.existing.unidade : `Linha ${idx + 1}`);
-        let badge = '';
-        let corpo = '';
-
-        if (plan.tipo === 'novo') {
-          badge = '<span class="badge success">Nova unidade</span>';
-          corpo = `<div class="muted" style="margin-top:8px;">UF: ${escapeHtml(plan.row.uf)} · IP: ${escapeHtml(plan.row.ip)} · Login: ${escapeHtml(plan.row.login)}</div>`;
-        } else if (plan.tipo === 'atualizar') {
-          badge = `<span class="badge warning">${plan.changes.length} campo(s) a atualizar</span>`;
-          corpo = plan.changes.map(c => `
-            <div class="info-item" style="margin-top:8px;">
-              <strong>${escapeHtml(c.label)}</strong>
-              <div><span style="color:var(--danger); text-decoration:line-through;">${escapeHtml(c.de) || '(vazio)'}</span> → <span style="color:var(--success); font-weight:700;">${escapeHtml(c.para) || '(vazio)'}</span></div>
-            </div>
-          `).join('');
-        } else {
-          badge = '<span class="badge secondary">Sem alteração</span>';
-          corpo = '<div class="muted" style="margin-top:8px;">Todos os campos já estão iguais aos da planilha.</div>';
-        }
-
-        return `
-          <div class="unit-card">
-            <div class="badges">
-              <strong style="font-size:16px;">${escapeHtml(nomeExibicao)}</strong>
-              ${badge}
-            </div>
-            ${corpo}
-          </div>
-        `;
-      }).join('');
-    }
-
-    async function confirmImport() {
-      const acoes = importPlan.filter(p => p.tipo === 'novo' || p.tipo === 'atualizar');
-      if (!acoes.length) { el('importProgressStatus').textContent = 'Não há nenhuma alteração para aplicar.'; return; }
-
-      if (!backupGeneratedOk) {
-        const seguirSemBackup = window.confirm('Você ainda não gerou o backup nesta sessão de importação. Recomendamos fortemente gerar o backup antes. Deseja continuar mesmo assim?');
-        if (!seguirSemBackup) return;
-      }
-
-      const confirmarFinal = window.confirm(`Confirma a aplicação de ${acoes.length} alteração(ões) no sistema? Esta ação grava direto na planilha do Google Sheets.`);
-      if (!confirmarFinal) return;
-
-      const btn = el('confirmImportBtn');
-      btn.disabled = true;
-
-      let sucesso = 0, falha = 0;
-
-      for (let i = 0; i < acoes.length; i++) {
-        const plan = acoes[i];
-        el('importProgressStatus').textContent = `Aplicando ${i + 1} de ${acoes.length}...`;
-
-        try {
-          if (plan.tipo === 'novo') {
-            if (!userCanInclude()) { falha++; continue; }
-            const payload = {
-              action: 'criarUnidade', usuario: currentUser,
-              uf: plan.row.uf, nomeUnidade: plan.row.unidade, cloudNvr: plan.row.cloudNvr,
-              login: plan.row.login, senha: plan.row.senha, senhaCameras: plan.row.senhaCameras,
-              ip: plan.row.ip, hd: plan.row.hd, quantidadeCameras: Number(plan.row.cameras || 0),
-              alarmeMac: plan.row.alarmeMac, sensores: plan.row.sensores, senhaAlarme: plan.row.senhaAlarme,
-              central: plan.row.central, cadeadoBluetooth: plan.row.cadeadoBluetooth, observacoes: plan.row.observacoes, status: plan.row.status || 'Ativa',
-              historico: appendHistorico('', 'Cadastro criado via importação de planilha')
-            };
-            const result = await apiPost(payload);
-            if (result.success) sucesso++; else falha++;
-          } else if (plan.tipo === 'atualizar') {
-            if (!userCanEdit()) { falha++; continue; }
-            const resumoAlteracoes = plan.changes.map(c => `${c.label}: "${c.de || '(vazio)'}" → "${c.para || '(vazio)'}"`).join('; ');
-            const payload = {
-              action: 'editarUnidade', usuario: currentUser, id: plan.existing.id,
-              uf: plan.row.uf || plan.existing.uf, nomeUnidade: plan.row.unidade || plan.existing.unidade,
-              cloudNvr: plan.row.cloudNvr, login: plan.row.login, senha: plan.row.senha, senhaCameras: plan.row.senhaCameras,
-              ip: plan.row.ip, hd: plan.row.hd, quantidadeCameras: Number(plan.row.cameras || 0),
-              alarmeMac: plan.row.alarmeMac, sensores: plan.row.sensores, senhaAlarme: plan.row.senhaAlarme,
-              central: plan.row.central, cadeadoBluetooth: plan.row.cadeadoBluetooth, observacoes: plan.row.observacoes, status: plan.row.status || plan.existing.status,
-              historico: appendHistorico(plan.existing.historico, `Atualização via importação de planilha (${resumoAlteracoes})`)
-            };
-            const result = await apiPost(payload);
-            if (result.success) sucesso++; else falha++;
-          }
-        } catch (err) {
-          console.error(err);
-          falha++;
-        }
-      }
-
-      el('importProgressStatus').textContent = `Importação concluída: ${sucesso} aplicada(s) com sucesso, ${falha} com falha.`;
-      btn.disabled = false;
-      await loadUnits();
-      showMessage(`Importação concluída: ${sucesso} alteração(ões) aplicada(s), ${falha} falha(s).`);
-    }
 
     /* ── USUÁRIOS ── */
     async function createUser() {
@@ -1786,20 +1419,6 @@
     el('resetBtn').addEventListener('click', resetPasswordAdmin);
     el('senha').addEventListener('keydown', (e) => { if (e.key === 'Enter') login(); });
 
-    // Eventos do fluxo de importação
-    el('importBtn').addEventListener('click', openImportModal);
-    el('closeImportModalBtn').addEventListener('click', closeImportModal);
-    el('cancelImportStep1Btn').addEventListener('click', closeImportModal);
-    el('generateBackupBtn').addEventListener('click', generateBackupNow);
-    el('goToStep2Btn').addEventListener('click', () => showImportStep(2));
-    el('backToStep1Btn').addEventListener('click', () => showImportStep(1));
-    el('importFileInput2').addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) readImportFile(file);
-    });
-    el('goToStep3Btn').addEventListener('click', () => { buildImportPlan(); showImportStep(3); });
-    el('backToStep2Btn').addEventListener('click', () => showImportStep(2));
-    el('confirmImportBtn').addEventListener('click', confirmImport);
 
     /* ── INIT ── */
     window.addEventListener('load', async () => {
