@@ -429,6 +429,10 @@
                   <input id="formSensores" placeholder="Sensores do alarme" />
                   <input id="formSenhaAlarme" placeholder="Senha do alarme" />
                   <input id="formCentral" placeholder="Acesso da central" />
+                  <select id="formCadeadoBluetooth">
+                    <option value="NÃO">Cadeado bluetooth: NÃO</option>
+                    <option value="SIM">Cadeado bluetooth: SIM</option>
+                  </select>
                 </div>
 
                 <textarea id="formObservacoes" placeholder="Observações" style="margin-top:12px;"></textarea>
@@ -589,6 +593,7 @@
         sensores: item['Sensores'] || '',
         senhaAlarme: item['Senha do alarme'] || '',
         central: item['Acesso da central'] || '',
+        cadeadoBluetooth: item['Cadeado bluetooth'] || 'NÃO',
         observacoes: item['Observações'] || '',
         status: item['Status'] || 'Ativa',
         updatedAt: item['Última atualização'] || '',
@@ -688,7 +693,7 @@
         'formUf','formNomeUnidade','formCloudNvr','formLogin','formSenha','formSenhaCameras','formIp',
         'formHd','formQuantidadeCameras','formAlarmeMac','formSensores',
         'formSenhaAlarme','formCentral','formObservacoes','formStatus',
-        'formOs','formDataAberturaOs','formStatusOs'
+        'formOs','formDataAberturaOs','formStatusOs','formCadeadoBluetooth'
       ].forEach(id => { el(id).disabled = !enabled; });
       el('saveBtn').disabled = !canCreate;
       el('updateBtn').disabled = !canEdit;
@@ -803,6 +808,7 @@
                 ${unit.os ? `<span class="badge info">OS: ${escapeHtml(unit.os)}</span>` : ''}
                 ${unit.statusOs ? `<span class="badge secondary">Status OS: ${escapeHtml(unit.statusOs)}</span>` : ''}
                 ${unit.alarmeMac ? `<span class="badge success">MAC alarme: ${escapeHtml(unit.alarmeMac)}</span>` : ''}
+                <span class="badge ${unit.cadeadoBluetooth === 'SIM' ? 'info' : 'secondary'}">Cadeado bluetooth: ${escapeHtml(unit.cadeadoBluetooth || 'NÃO')}</span>
               </div>
 
               <div class="unit-info-grid">
@@ -821,6 +827,7 @@
                 <div class="info-item"><strong>Sensores</strong><div>${escapeHtml(unit.sensores)}</div></div>
                 <div class="info-item"><strong>Senha alarme</strong><div>${escapeHtml(unit.senhaAlarme)}</div></div>
                 <div class="info-item"><strong>Central</strong><div>${escapeHtml(unit.central)}</div></div>
+                <div class="info-item"><strong>Cadeado bluetooth</strong><div>${escapeHtml(unit.cadeadoBluetooth || 'NÃO')}</div></div>
               </div>
 
               ${unit.observacoes ? `<div class="obs-box"><strong style="color:var(--text)">Observações:</strong> ${escapeHtml(unit.observacoes)}</div>` : ''}
@@ -880,6 +887,7 @@
       el('formSensores').value       = unit.sensores || '';
       el('formSenhaAlarme').value    = unit.senhaAlarme || '';
       el('formCentral').value        = unit.central || '';
+      el('formCadeadoBluetooth').value = unit.cadeadoBluetooth || 'NÃO';
       el('formObservacoes').value    = unit.observacoes || '';
       el('formStatus').value         = unit.status || 'Ativa';
     }
@@ -936,6 +944,7 @@
         sensores: el('formSensores').value.trim(),
         senhaAlarme: el('formSenhaAlarme').value.trim(),
         central: el('formCentral').value.trim(),
+        cadeadoBluetooth: el('formCadeadoBluetooth').value,
         observacoes: el('formObservacoes').value.trim(),
         status: el('formStatus').value
       };
@@ -949,8 +958,8 @@
       }
       try {
         const result = await apiPost(payload);
-        showMessage(result.message || 'Processado');
         if (result.success) { resetUnitForm(); exitEditMode(); await loadUnits(); }
+        showMessage(result.message || 'Processado');
       } catch (e) { showMessage('Erro ao cadastrar unidade.'); }
     }
 
@@ -963,8 +972,8 @@
       }
       try {
         const result = await apiPost(payload);
-        showMessage(result.message || 'Processado');
         if (result.success) { resetUnitForm(); exitEditMode(); await loadUnits(); }
+        showMessage(result.message || 'Processado');
       } catch (e) { showMessage('Erro ao editar unidade.'); }
     }
 
@@ -973,11 +982,11 @@
       if (!window.confirm('Tem certeza que deseja excluir este cadastro?')) return;
       try {
         const result = await apiPost({ action: 'excluirUnidade', id, usuario: currentUser });
-        showMessage(result.message || 'Processado');
         if (result.success) {
           if (editingUnitId === String(id)) { resetUnitForm(); exitEditMode(); }
           await loadUnits();
         }
+        showMessage(result.message || 'Processado');
       } catch (e) { showMessage('Erro ao excluir unidade.'); }
     }
 
@@ -988,6 +997,7 @@
         'formOs','formDataAberturaOs','formStatusOs'
       ].forEach(id => el(id).value = '');
       el('formStatus').value = 'Ativa';
+      el('formCadeadoBluetooth').value = 'NÃO';
     }
 
     function downloadExcelFromFiltered() {
@@ -997,11 +1007,11 @@
       const headers = [
         'ID','UF','Nome da unidade','OS','Data da abertura da OS','Status da OS','Cloud NVR','Login','Senha','Senha câmeras','IP','HD',
         'Quantidade de câmeras','MAC do alarme','Sensores','Senha do alarme',
-        'Acesso da central','Observações','Status','Última atualização','Atualizado por'
+        'Acesso da central','Cadeado bluetooth','Observações','Status','Última atualização','Atualizado por'
       ];
       const rows = filtered.map(u => [
         u.id,u.uf,u.unidade,u.os,u.dataAberturaOs,u.statusOs,u.cloudNvr,u.login,u.senha,u.senhaCameras,u.ip,u.hd,u.cameras,
-        u.alarmeMac,u.sensores,u.senhaAlarme,u.central,u.observacoes,u.status,u.updatedAt,u.updatedBy
+        u.alarmeMac,u.sensores,u.senhaAlarme,u.central,u.cadeadoBluetooth,u.observacoes,u.status,u.updatedAt,u.updatedBy
       ]);
 
       const tableHtml = `
