@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VTAL Manutenção de Unidades</title>
+  
+  <!-- Supabase JS Client via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     :root {
       --bg: #f8fafc;
@@ -139,18 +143,16 @@
       justify-content: center; font-size: 20px;
     }
 
-    /* LAYOUT PRINCIPAL — lista rola, coluna direita fica fixa */
     .main-grid {
       display: grid;
       grid-template-columns: 1.65fr .95fr;
       gap: 20px;
-      align-items: start; /* CRÍTICO: permite sticky funcionar */
+      align-items: start;
     }
 
-    /* Coluna da direita fica grudada no topo */
     .right-column {
       position: sticky;
-      top: 80px; /* altura do header */
+      top: 80px;
       display: grid;
       gap: 20px;
       max-height: calc(100vh - 100px);
@@ -210,14 +212,12 @@
     .badge.danger  { background: rgba(239,68,68,.12);  color: var(--danger);  border-color: rgba(239,68,68,.25); }
     .badge.info    { background: rgba(37,99,235,.12);  color: var(--info);    border-color: rgba(37,99,235,.25); }
 
-    /* Badge das permissões — pill maior igual à imagem */
     .perm-badge {
       padding: 8px 20px; border-radius: 999px; font-size: 13px; font-weight: 700;
       background: var(--bg-muted); border: 1px solid var(--border); white-space: nowrap;
     }
 
     .info-grid, .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-
     .unit-info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
 
     .info-item { border: 1px solid var(--border); background: var(--bg-muted); border-radius: 16px; padding: 12px; }
@@ -266,7 +266,6 @@
 
     .small-note { font-size: 12px; color: var(--text-soft); margin-top: 8px; line-height: 1.5; }
 
-    /* Scrollbar sutil na coluna direita */
     .right-column::-webkit-scrollbar { width: 4px; }
     .right-column::-webkit-scrollbar-track { background: transparent; }
     .right-column::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
@@ -295,7 +294,7 @@
       <div class="text-center">
         <div class="brand-icon" style="margin:0 auto;">VT</div>
         <h1>VTAL Manutenção</h1>
-        <p class="muted">Painel com acesso por perfil, UF e permissões.</p>
+        <p class="muted">Painel com acesso integrado ao Supabase.</p>
       </div>
 
       <div style="margin-top: 20px; display: grid; gap: 12px;">
@@ -357,7 +356,7 @@
 
         <section class="main-grid">
 
-          <!-- COLUNA ESQUERDA — lista rola normalmente -->
+          <!-- COLUNA ESQUERDA -->
           <div class="card">
             <div class="card-body">
               <div style="margin-bottom:18px;">
@@ -380,14 +379,14 @@
             </div>
           </div>
 
-          <!-- COLUNA DIREITA — fica FIXA enquanto a lista rola -->
+          <!-- COLUNA DIREITA -->
           <div class="right-column">
 
             <!-- PERMISSÕES -->
             <div class="card">
               <div class="card-body">
                 <h3 style="margin-bottom:6px;">Permissões do perfil</h3>
-                <p class="muted">Acesso carregado da aba USUARIOS.</p>
+                <p class="muted">Acesso carregado do Supabase.</p>
                 <div id="permissionList" class="permission-list"></div>
               </div>
             </div>
@@ -424,7 +423,7 @@
                   <input id="formSenhaCameras" placeholder="Senha câmeras" />
                   <input id="formIp" placeholder="IP" />
                   <input id="formHd" placeholder="HD" />
-                  <input id="formQuantidadeCameras" placeholder="Qtd. de câmeras" />
+                  <input id="formQuantidadeCameras" placeholder="Qtd. de câmeras" type="number" />
                   <input id="formAlarmeMac" placeholder="MAC do alarme" />
                   <input id="formSensores" placeholder="Sensores do alarme" />
                   <input id="formSenhaAlarme" placeholder="Senha do alarme" />
@@ -460,7 +459,7 @@
               </div>
             </div>
 
-          </div><!-- fim .right-column -->
+          </div>
         </section>
       </section>
 
@@ -489,7 +488,7 @@
                 <div class="form-grid">
                   <input id="userNome" placeholder="Nome" />
                   <input id="userEmail" placeholder="Email" />
-                  <input id="userSenha" placeholder="Senha" />
+                  <input id="userSenha" placeholder="Senha" type="password" />
                   <select id="userPerfil">
                     <option value="tecnico">Técnico</option>
                     <option value="admin">Administrador</option>
@@ -527,7 +526,7 @@
                 <p class="muted" style="margin-bottom:14px;">Admin pode resetar qualquer usuário. Usuário pode resetar a própria.</p>
                 <div style="display:grid; gap:12px;">
                   <input id="resetEmail" placeholder="Email do usuário" />
-                  <input id="resetNovaSenha" placeholder="Nova senha" />
+                  <input id="resetNovaSenha" placeholder="Nova senha" type="password" />
                   <button id="resetBtn" class="secondary">Resetar senha</button>
                 </div>
               </div>
@@ -539,7 +538,12 @@
   </section>
 
   <script>
-    const API_BASE = 'https://script.google.com/macros/s/AKfycbzZoVwZ3cEOP6mgy65S649XtkWM3mIwbay5ujgR1OL9XCA2nPvOYIgZuhPDDdLgApHL/exec';
+    // Configuração do Client Supabase (Corrigido)
+const SUPABASE_URL = 'https://zipnsdlqehfwrbzqhotc.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_oce5WUHXfuH_eZIDBV5IfQ_5smcJGcS';
+
+const { createClient } = window.supabase;
+const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let currentUser = null;
     let units = [];
@@ -559,28 +563,13 @@
       el('messageBox').textContent = '';
     }
 
-    async function apiGet(params) {
-      const query = new URLSearchParams(params).toString();
-      const response = await fetch(`${API_BASE}?${query}`);
-      return response.json();
-    }
-
-    async function apiPost(payload) {
-      const response = await fetch(API_BASE, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(payload)
-      });
-      return response.json();
-    }
-
     function normalizeUnits(data) {
       return (data || []).map(item => ({
         id: String(item['ID'] || ''),
         uf: item['UF'] || '',
         unidade: item['Nome da unidade'] || '',
-        os: item['OS'] || item['Nº OS'] || item['Numero OS'] || '',
-        dataAberturaOs: item['Data da abertura da OS'] || item['Data da Abertura'] || '',
+        os: item['OS'] || '',
+        dataAberturaOs: item['Data da abertura da OS'] || '',
         statusOs: item['Status da OS'] || '',
         cloudNvr: item['Cloud NVR'] || '',
         login: item['Login'] || '',
@@ -623,25 +612,68 @@
       const email = el('email').value.trim();
       const senha = el('senha').value.trim();
       el('loginError').textContent = '';
+
+      if (!email || !senha) {
+        el('loginError').textContent = 'Preencha email e senha.';
+        return;
+      }
+
       try {
-        const result = await apiGet({ action: 'login', email, senha });
-        if (!result.success) { el('loginError').textContent = result.message || 'Falha no login.'; return; }
-        currentUser = result.user;
+        const { data, error } = await _supabase
+          .from('usuarios')
+          .select('*')
+          .eq('email', email)
+          .eq('senha', senha)
+          .single();
+
+        if (error || !data) {
+          el('loginError').textContent = 'Usuário ou senha inválidos.';
+          return;
+        }
+
+        if (String(data.status).toUpperCase() === 'INATIVO') {
+          el('loginError').textContent = 'Usuário inativo no sistema.';
+          return;
+        }
+
+        currentUser = {
+          id: data.id,
+          nome: data.nome,
+          email: data.email,
+          perfil: (data.perfil || 'tecnico').toLowerCase(),
+          ufsPermitidas: (data.ufs_permitidas || 'TODAS').split(',').map(s => s.trim()),
+          podeVisualizar: data.pode_visualizar || 'SIM',
+          podeIncluir: data.pode_incluir || 'SIM',
+          podeEditar: data.pode_editar || 'SIM',
+          podeExcluir: data.pode_excluir || 'NÃO'
+        };
+
         localStorage.setItem('vtal_user', JSON.stringify(currentUser));
         updateScreen();
         await loadUnits();
         if (currentUser.perfil === 'admin') await loadUsers();
-      } catch (error) { el('loginError').textContent = 'Não foi possível fazer login.'; }
+      } catch (error) {
+        el('loginError').textContent = 'Erro ao realizar login no Supabase.';
+      }
     }
 
     async function resetOwnPassword() {
       const email = el('forgotEmail').value.trim();
       const novaSenha = el('forgotSenha').value.trim();
       if (!email || !novaSenha) { el('loginError').textContent = 'Informe email e nova senha.'; return; }
+
       try {
-        const result = await apiPost({ action: 'resetSenha', email, novaSenha, usuario: { email } });
-        el('loginError').textContent = result.message || 'Processado';
-      } catch (e) { el('loginError').textContent = 'Erro ao resetar senha.'; }
+        const { error } = await _supabase
+          .from('usuarios')
+          .update({ senha: novaSenha })
+          .eq('email', email);
+
+        if (error) {
+          el('loginError').textContent = 'Erro ao atualizar senha.';
+        } else {
+          el('loginError').textContent = 'Senha atualizada com sucesso!';
+        }
+      } catch (e) { el('loginError').textContent = 'Erro ao conectar ao banco.'; }
     }
 
     function logout() {
@@ -702,27 +734,35 @@
     async function loadUnits() {
       hideMessage();
       try {
-        const result = await apiGet({ action: 'listar', email: currentUser.email });
-        if (!result.success) { showMessage(result.message || 'Erro ao carregar unidades.'); return; }
-        units = normalizeUnits(result.data);
+        let query = _supabase.from('unidades').select('*');
+        
+        // Aplica filtro por UFs do usuário
+        if (currentUser.perfil !== 'admin' && !currentUser.ufsPermitidas.includes('TODAS')) {
+          query = query.in('UF', currentUser.ufsPermitidas);
+        }
+
+        const { data, error } = await query.order('Nome da unidade', { ascending: true });
+
+        if (error) { showMessage('Erro ao carregar unidades: ' + error.message); return; }
+        units = normalizeUnits(data);
         renderStats(); renderUfFilter(); renderUnits();
-      } catch (e) { showMessage('Erro ao carregar unidades.'); }
+      } catch (e) { showMessage('Erro ao conectar com o Supabase.'); }
     }
 
     async function loadUsers() {
       try {
-        const result = await apiGet({ action: 'listarUsuarios', email: currentUser.email });
-        if (!result.success) { showMessage(result.message || 'Erro ao carregar usuários.'); return; }
-        users = result.data || [];
+        const { data, error } = await _supabase.from('usuarios').select('*').order('nome', { ascending: true });
+        if (error) { showMessage('Erro ao carregar usuários: ' + error.message); return; }
+        users = data || [];
         renderUsers();
       } catch (e) { showMessage('Erro ao carregar usuários.'); }
     }
 
     function renderStats() {
-      el('statTotal').textContent     = units.length;
-      el('statAtivas').textContent    = units.filter(u => u.status === 'Ativa').length;
+      el('statTotal').textContent      = units.length;
+      el('statAtivas').textContent     = units.filter(u => u.status === 'Ativa').length;
       el('statManutencao').textContent = units.filter(u => u.status === 'Manutenção').length;
-      el('statCameras').textContent   = units.reduce((a, u) => a + Number(u.cameras || 0), 0);
+      el('statCameras').textContent    = units.reduce((a, u) => a + Number(u.cameras || 0), 0);
     }
 
     function renderUfFilter() {
@@ -909,7 +949,6 @@
 
       setFormPermissions();
       renderUnits();
-      // Formulário já está fixo no topo — sem necessidade de scroll
     }
 
     function exitEditMode() {
@@ -927,66 +966,77 @@
 
     function collectUnitFormData() {
       return {
-        id: el('editingUnitId').value.trim(),
-        uf: el('formUf').value.trim().toUpperCase(),
-        nomeUnidade: el('formNomeUnidade').value.trim(),
-        os: el('formOs').value.trim(),
-        dataAberturaOs: el('formDataAberturaOs').value,
-        statusOs: el('formStatusOs').value,
-        cloudNvr: el('formCloudNvr').value.trim(),
-        login: el('formLogin').value.trim(),
-        senha: el('formSenha').value.trim(),
-        senhaCameras: el('formSenhaCameras').value.trim(),
-        ip: el('formIp').value.trim(),
-        hd: el('formHd').value.trim(),
-        quantidadeCameras: Number(el('formQuantidadeCameras').value || 0),
-        alarmeMac: el('formAlarmeMac').value.trim(),
-        sensores: el('formSensores').value.trim(),
-        senhaAlarme: el('formSenhaAlarme').value.trim(),
-        central: el('formCentral').value.trim(),
-        cadeadoBluetooth: el('formCadeadoBluetooth').value,
-        observacoes: el('formObservacoes').value.trim(),
-        status: el('formStatus').value
+        'UF': el('formUf').value.trim().toUpperCase(),
+        'Nome da unidade': el('formNomeUnidade').value.trim(),
+        'OS': el('formOs').value.trim(),
+        'Data da abertura da OS': el('formDataAberturaOs').value || null,
+        'Status da OS': el('formStatusOs').value,
+        'Cloud NVR': el('formCloudNvr').value.trim(),
+        'Login': el('formLogin').value.trim(),
+        'Senha': el('formSenha').value.trim(),
+        'Senha câmeras': el('formSenhaCameras').value.trim(),
+        'IP': el('formIp').value.trim(),
+        'HD': el('formHd').value.trim(),
+        'Quantidade de câmeras': Number(el('formQuantidadeCameras').value || 0),
+        'MAC do alarme': el('formAlarmeMac').value.trim(),
+        'Sensores': el('formSensores').value.trim(),
+        'Senha do alarme': el('formSenhaAlarme').value.trim(),
+        'Acesso da central': el('formCentral').value.trim(),
+        'Cadeado bluetooth': el('formCadeadoBluetooth').value,
+        'Observações': el('formObservacoes').value.trim(),
+        'Status': el('formStatus').value,
+        'Atualizado por': currentUser ? currentUser.nome : 'Sistema'
       };
     }
 
     async function saveUnit() {
       if (!userCanInclude()) { showMessage('Você não tem permissão para cadastrar unidades.'); return; }
-      const payload = { action: 'criarUnidade', usuario: currentUser, ...collectUnitFormData() };
-      if (!payload.uf || !payload.nomeUnidade || !payload.login || !payload.ip) {
+      const payload = collectUnitFormData();
+
+      if (!payload['UF'] || !payload['Nome da unidade'] || !payload['Login'] || !payload['IP']) {
         showMessage('Preencha UF, nome da unidade, login e IP.'); return;
       }
+
       try {
-        const result = await apiPost(payload);
-        if (result.success) { resetUnitForm(); exitEditMode(); await loadUnits(); }
-        showMessage(result.message || 'Processado');
-      } catch (e) { showMessage('Erro ao cadastrar unidade.'); }
+        const { error } = await _supabase.from('unidades').insert([payload]);
+        if (error) { showMessage('Erro ao cadastrar: ' + error.message); return; }
+
+        resetUnitForm(); exitEditMode(); await loadUnits();
+        showMessage('Unidade cadastrada com sucesso!');
+      } catch (e) { showMessage('Erro ao cadastrar unidade no Supabase.'); }
     }
 
     async function updateUnit() {
       if (!userCanEdit()) { showMessage('Você não tem permissão para editar unidades.'); return; }
-      const payload = { action: 'editarUnidade', usuario: currentUser, ...collectUnitFormData() };
-      if (!payload.id) { showMessage('Nenhuma unidade selecionada para edição.'); return; }
-      if (!payload.uf || !payload.nomeUnidade || !payload.login || !payload.ip) {
+      const id = el('editingUnitId').value.trim();
+      if (!id) { showMessage('Nenhuma unidade selecionada para edição.'); return; }
+
+      const payload = collectUnitFormData();
+
+      if (!payload['UF'] || !payload['Nome da unidade'] || !payload['Login'] || !payload['IP']) {
         showMessage('Preencha UF, nome da unidade, login e IP.'); return;
       }
+
       try {
-        const result = await apiPost(payload);
-        if (result.success) { resetUnitForm(); exitEditMode(); await loadUnits(); }
-        showMessage(result.message || 'Processado');
-      } catch (e) { showMessage('Erro ao editar unidade.'); }
+        const { error } = await _supabase.from('unidades').update(payload).eq('ID', id);
+        if (error) { showMessage('Erro ao atualizar: ' + error.message); return; }
+
+        resetUnitForm(); exitEditMode(); await loadUnits();
+        showMessage('Unidade atualizada com sucesso!');
+      } catch (e) { showMessage('Erro ao editar unidade no Supabase.'); }
     }
 
     async function deleteUnit(id) {
       if (!userCanDelete()) { showMessage('Você não tem permissão para excluir unidades.'); return; }
       if (!window.confirm('Tem certeza que deseja excluir este cadastro?')) return;
+
       try {
-        const result = await apiPost({ action: 'excluirUnidade', id, usuario: currentUser });
-        if (result.success) {
-          if (editingUnitId === String(id)) { resetUnitForm(); exitEditMode(); }
-          await loadUnits();
-        }
-        showMessage(result.message || 'Processado');
+        const { error } = await _supabase.from('unidades').delete().eq('ID', id);
+        if (error) { showMessage('Erro ao excluir: ' + error.message); return; }
+
+        if (editingUnitId === String(id)) { resetUnitForm(); exitEditMode(); }
+        await loadUnits();
+        showMessage('Unidade excluída com sucesso!');
       } catch (e) { showMessage('Erro ao excluir unidade.'); }
     }
 
@@ -1033,19 +1083,30 @@
 
     async function createUser() {
       const payload = {
-        action: 'criarUsuario', usuario: currentUser,
-        nome: el('userNome').value.trim(), email: el('userEmail').value.trim(),
-        senha: el('userSenha').value.trim(), perfil: el('userPerfil').value,
-        ufsPermitidas: el('userUfs').value.trim(),
-        podeVisualizar: el('permVisualizar').value, podeIncluir: el('permIncluir').value,
-        podeEditar: el('permEditar').value, podeExcluir: el('permExcluir').value,
+        nome: el('userNome').value.trim(),
+        email: el('userEmail').value.trim(),
+        senha: el('userSenha').value.trim(),
+        perfil: el('userPerfil').value,
+        ufs_permitidas: el('userUfs').value.trim() || 'TODAS',
+        pode_visualizar: el('permVisualizar').value,
+        pode_incluir: el('permIncluir').value,
+        pode_editar: el('permEditar').value,
+        pode_excluir: el('permExcluir').value,
         status: el('userStatus').value
       };
+
+      if (!payload.nome || !payload.email || !payload.senha) {
+        showMessage('Preencha nome, email e senha para o novo usuário.'); return;
+      }
+
       try {
-        const result = await apiPost(payload);
-        showMessage(result.message || 'Processado');
-        if (result.success) { ['userNome','userEmail','userSenha','userUfs'].forEach(id => el(id).value = ''); await loadUsers(); }
-      } catch (e) { showMessage('Erro ao criar usuário.'); }
+        const { error } = await _supabase.from('usuarios').insert([payload]);
+        if (error) { showMessage('Erro ao criar usuário: ' + error.message); return; }
+
+        showMessage('Usuário criado com sucesso!');
+        ['userNome','userEmail','userSenha','userUfs'].forEach(id => el(id).value = '');
+        await loadUsers();
+      } catch (e) { showMessage('Erro ao criar usuário no Supabase.'); }
     }
 
     let editingUserId = null;
@@ -1057,58 +1118,58 @@
       const isAdmin = currentUser && currentUser.perfil === 'admin';
 
       list.innerHTML = users.map(user => {
-        const uid = escapeHtml(user['ID'] || '');
-        const isEditing = editingUserId === String(user['ID'] || '');
+        const uid = escapeHtml(user.id || '');
+        const isEditing = editingUserId === String(user.id || '');
 
         return `
         <div class="user-card ${isEditing ? 'selected' : ''}" data-user-card="${uid}">
           <div class="user-top">
             <div style="flex:1; min-width:280px;">
               <div class="badges">
-                <span style="font-size:20px; font-weight:700; margin-right:6px;">${escapeHtml(user['Nome'] || '-')}</span>
-                <span class="badge active">${escapeHtml(user['Perfil'] || '-')}</span>
-                <span class="badge">${escapeHtml(user['Status'] || '-')}</span>
+                <span style="font-size:20px; font-weight:700; margin-right:6px;">${escapeHtml(user.nome || '-')}</span>
+                <span class="badge active">${escapeHtml(user.perfil || '-')}</span>
+                <span class="badge">${escapeHtml(user.status || '-')}</span>
               </div>
               <div class="info-grid">
-                <div class="info-item"><strong>Email</strong><div>${escapeHtml(user['Email'] || '-')}</div></div>
-                <div class="info-item"><strong>UFs permitidas</strong><div>${escapeHtml(user['UFs permitidas'] || '-')}</div></div>
-                <div class="info-item"><strong>Pode visualizar</strong><div>${escapeHtml(user['Pode visualizar'] || '-')}</div></div>
-                <div class="info-item"><strong>Pode incluir</strong><div>${escapeHtml(user['Pode incluir'] || '-')}</div></div>
-                <div class="info-item"><strong>Pode editar</strong><div>${escapeHtml(user['Pode editar'] || '-')}</div></div>
-                <div class="info-item"><strong>Pode excluir</strong><div>${escapeHtml(user['Pode excluir'] || '-')}</div></div>
+                <div class="info-item"><strong>Email</strong><div>${escapeHtml(user.email || '-')}</div></div>
+                <div class="info-item"><strong>UFs permitidas</strong><div>${escapeHtml(user.ufs_permitidas || '-')}</div></div>
+                <div class="info-item"><strong>Pode visualizar</strong><div>${escapeHtml(user.pode_visualizar || '-')}</div></div>
+                <div class="info-item"><strong>Pode incluir</strong><div>${escapeHtml(user.pode_incluir || '-')}</div></div>
+                <div class="info-item"><strong>Pode editar</strong><div>${escapeHtml(user.pode_editar || '-')}</div></div>
+                <div class="info-item"><strong>Pode excluir</strong><div>${escapeHtml(user.pode_excluir || '-')}</div></div>
               </div>
 
               ${isEditing ? `
               <div style="margin-top:16px; padding:16px; background:var(--bg-muted); border-radius:16px; border:1px solid var(--border);">
                 <div style="font-weight:700; margin-bottom:12px; font-size:14px;">✏️ Editando usuário</div>
                 <div class="form-grid">
-                  <input id="editUserNome"  placeholder="Nome" value="${escapeHtml(user['Nome'] || '')}" />
-                  <input id="editUserEmail" placeholder="Email" value="${escapeHtml(user['Email'] || '')}" />
+                  <input id="editUserNome"  placeholder="Nome" value="${escapeHtml(user.nome || '')}" />
+                  <input id="editUserEmail" placeholder="Email" value="${escapeHtml(user.email || '')}" />
                   <input id="editUserSenha" placeholder="Nova senha (deixe em branco para manter)" type="password" />
                   <select id="editUserPerfil">
-                    <option value="tecnico"       ${(user['Perfil']||'').toLowerCase()==='tecnico'       ? 'selected':''}>Técnico</option>
-                    <option value="admin"         ${(user['Perfil']||'').toLowerCase()==='admin'         ? 'selected':''}>Administrador</option>
+                    <option value="tecnico"       ${(user.perfil||'').toLowerCase()==='tecnico'       ? 'selected':''}>Técnico</option>
+                    <option value="admin"         ${(user.perfil||'').toLowerCase()==='admin'         ? 'selected':''}>Administrador</option>
                   </select>
-                  <input id="editUserUfs" placeholder="UFs (ex: SP,RJ ou TODAS)" value="${escapeHtml(user['UFs permitidas'] || '')}" />
+                  <input id="editUserUfs" placeholder="UFs (ex: SP,RJ ou TODAS)" value="${escapeHtml(user.ufs_permitidas || '')}" />
                   <select id="editUserStatus">
-                    <option value="ATIVO"   ${(user['Status']||'').toUpperCase()==='ATIVO'   ? 'selected':''}>ATIVO</option>
-                    <option value="INATIVO" ${(user['Status']||'').toUpperCase()==='INATIVO' ? 'selected':''}>INATIVO</option>
+                    <option value="ATIVO"   ${(user.status||'').toUpperCase()==='ATIVO'   ? 'selected':''}>ATIVO</option>
+                    <option value="INATIVO" ${(user.status||'').toUpperCase()==='INATIVO' ? 'selected':''}>INATIVO</option>
                   </select>
                   <select id="editPermVisualizar">
-                    <option value="SIM" ${(user['Pode visualizar']||'').toUpperCase()==='SIM' ? 'selected':''}>Pode visualizar: SIM</option>
-                    <option value="NÃO" ${(user['Pode visualizar']||'').toUpperCase()==='NÃO' ? 'selected':''}>Pode visualizar: NÃO</option>
+                    <option value="SIM" ${(user.pode_visualizar||'').toUpperCase()==='SIM' ? 'selected':''}>Pode visualizar: SIM</option>
+                    <option value="NÃO" ${(user.pode_visualizar||'').toUpperCase()==='NÃO' ? 'selected':''}>Pode visualizar: NÃO</option>
                   </select>
                   <select id="editPermIncluir">
-                    <option value="SIM" ${(user['Pode incluir']||'').toUpperCase()==='SIM' ? 'selected':''}>Pode incluir: SIM</option>
-                    <option value="NÃO" ${(user['Pode incluir']||'').toUpperCase()==='NÃO' ? 'selected':''}>Pode incluir: NÃO</option>
+                    <option value="SIM" ${(user.pode_incluir||'').toUpperCase()==='SIM' ? 'selected':''}>Pode incluir: SIM</option>
+                    <option value="NÃO" ${(user.pode_incluir||'').toUpperCase()==='NÃO' ? 'selected':''}>Pode incluir: NÃO</option>
                   </select>
                   <select id="editPermEditar">
-                    <option value="SIM" ${(user['Pode editar']||'').toUpperCase()==='SIM' ? 'selected':''}>Pode editar: SIM</option>
-                    <option value="NÃO" ${(user['Pode editar']||'').toUpperCase()==='NÃO' ? 'selected':''}>Pode editar: NÃO</option>
+                    <option value="SIM" ${(user.pode_editar||'').toUpperCase()==='SIM' ? 'selected':''}>Pode editar: SIM</option>
+                    <option value="NÃO" ${(user.pode_editar||'').toUpperCase()==='NÃO' ? 'selected':''}>Pode editar: NÃO</option>
                   </select>
                   <select id="editPermExcluir">
-                    <option value="SIM" ${(user['Pode excluir']||'').toUpperCase()==='SIM' ? 'selected':''}>Pode excluir: SIM</option>
-                    <option value="NÃO" ${(user['Pode excluir']||'').toUpperCase()==='NÃO' ? 'selected':''}>Pode excluir: NÃO</option>
+                    <option value="SIM" ${(user.pode_excluir||'').toUpperCase()==='SIM' ? 'selected':''}>Pode excluir: SIM</option>
+                    <option value="NÃO" ${(user.pode_excluir||'').toUpperCase()==='NÃO' ? 'selected':''}>Pode excluir: NÃO</option>
                   </select>
                 </div>
                 <div class="edit-actions" style="margin-top:14px;">
@@ -1122,7 +1183,7 @@
               <div class="muted" style="font-weight:700; margin-bottom:8px;">Ações do usuário</div>
               <div class="admin-actions">
                 ${isAdmin && !isEditing ? `<button class="info" data-edit-user-id="${uid}">✏️ Editar usuário</button>` : ''}
-                <button class="secondary" data-reset-email="${escapeHtml(user['Email'] || '')}">Preencher reset</button>
+                <button class="secondary" data-reset-email="${escapeHtml(user.email || '')}">Preencher reset</button>
                 <button class="danger" data-delete-user-id="${uid}">Excluir usuário</button>
               </div>
             </div>
@@ -1130,7 +1191,6 @@
         </div>`;
       }).join('');
 
-      // Botão editar — abre o painel inline
       list.querySelectorAll('button[data-edit-user-id]').forEach(btn => {
         btn.addEventListener('click', () => {
           editingUserId = btn.getAttribute('data-edit-user-id');
@@ -1138,41 +1198,42 @@
         });
       });
 
-      // Salvar edição de usuário
       const saveBtn = el('saveEditUserBtn');
       if (saveBtn) {
         saveBtn.addEventListener('click', async () => {
           const payload = {
-            action: 'editarUsuario',
-            usuario: currentUser,
-            id: editingUserId,
             nome: el('editUserNome').value.trim(),
             email: el('editUserEmail').value.trim(),
-            novaSenha: el('editUserSenha').value.trim(),
             perfil: el('editUserPerfil').value,
-            ufsPermitidas: el('editUserUfs').value.trim(),
+            ufs_permitidas: el('editUserUfs').value.trim(),
             status: el('editUserStatus').value,
-            podeVisualizar: el('editPermVisualizar').value,
-            podeIncluir: el('editPermIncluir').value,
-            podeEditar: el('editPermEditar').value,
-            podeExcluir: el('editPermExcluir').value,
+            pode_visualizar: el('editPermVisualizar').value,
+            pode_incluir: el('editPermIncluir').value,
+            pode_editar: el('editPermEditar').value,
+            pode_excluir: el('editPermExcluir').value,
           };
+
+          const novaSenha = el('editUserSenha').value.trim();
+          if (novaSenha) payload.senha = novaSenha;
+
           if (!payload.nome || !payload.email) { showMessage('Nome e email são obrigatórios.'); return; }
+
           try {
-            const result = await apiPost(payload);
-            showMessage(result.message || 'Processado');
-            if (result.success) { editingUserId = null; await loadUsers(); }
+            const { error } = await _supabase.from('usuarios').update(payload).eq('id', editingUserId);
+            if (error) { showMessage('Erro ao editar usuário: ' + error.message); return; }
+
+            editingUserId = null;
+            await loadUsers();
+            showMessage('Usuário atualizado com sucesso!');
           } catch (e) { showMessage('Erro ao editar usuário.'); }
         });
       }
 
-      // Cancelar edição
       const cancelBtn = el('cancelEditUserBtn');
       if (cancelBtn) {
         cancelBtn.addEventListener('click', () => { editingUserId = null; renderUsers(); });
       }
 
-      // Preencher reset
       list.querySelectorAll('button[data-reset-email]').forEach(btn => {
         btn.addEventListener('click', () => {
           el('resetEmail').value = btn.getAttribute('data-reset-email');
@@ -1180,7 +1241,6 @@
         });
       });
 
-      // Excluir
       list.querySelectorAll('button[data-delete-user-id]').forEach(btn => {
         btn.addEventListener('click', () => deleteUser(btn.getAttribute('data-delete-user-id')));
       });
@@ -1189,9 +1249,10 @@
     async function deleteUser(id) {
       if (!window.confirm('Tem certeza que deseja excluir este usuário?')) return;
       try {
-        const result = await apiPost({ action: 'excluirUsuario', id, usuario: currentUser });
-        showMessage(result.message || 'Processado');
-        if (result.success) await loadUsers();
+        const { error } = await _supabase.from('usuarios').delete().eq('id', id);
+        if (error) { showMessage('Erro ao excluir: ' + error.message); return; }
+        showMessage('Usuário excluído com sucesso!');
+        await loadUsers();
       } catch (e) { showMessage('Erro ao excluir usuário.'); }
     }
 
@@ -1200,9 +1261,11 @@
       const novaSenha = el('resetNovaSenha').value.trim();
       if (!email || !novaSenha) { showMessage('Informe email e nova senha.'); return; }
       try {
-        const result = await apiPost({ action: 'resetSenha', email, novaSenha, usuario: currentUser });
-        showMessage(result.message || 'Processado');
-        if (result.success) el('resetNovaSenha').value = '';
+        const { error } = await _supabase.from('usuarios').update({ senha: novaSenha }).eq('email', email);
+        if (error) { showMessage('Erro ao resetar senha: ' + error.message); return; }
+
+        showMessage('Senha resetada com sucesso!');
+        el('resetNovaSenha').value = '';
       } catch (e) { showMessage('Erro ao resetar senha.'); }
     }
 
