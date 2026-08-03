@@ -234,6 +234,7 @@
     .info-item strong { display: block; font-size: 12px; color: var(--text-soft); margin-bottom: 6px; }
 
     .actions-box { min-width: 290px; background: var(--bg-muted); border-radius: 18px; padding: 14px; }
+    .card-info-col { flex: 1; min-width: 280px; }
 
     .action-grid, .admin-actions, .edit-actions {
       display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px;
@@ -306,6 +307,16 @@
         margin-top: 6px;
       }
       .top-menu.mobile-open { display: flex; }
+
+      .card-body { padding: 16px; }
+      .unit-card, .user-card { padding: 14px; }
+      .actions-box, .card-info-col { min-width: 0; width: 100%; }
+      .unit-top, .user-top { gap: 12px; }
+      .info-item { padding: 10px; }
+      .stat-card h2 { font-size: 26px; }
+      .icon-box { width: 40px; height: 40px; font-size: 16px; }
+      .badges { gap: 6px; }
+      .badge, .perm-badge { font-size: 11px; padding: 5px 8px; }
     }
   </style>
 </head>
@@ -578,6 +589,8 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
     let units = [];
     let users = [];
     let editingUnitId = null;
+    let expandedHistoryIds = new Set();
+    let historyDataById = {};
 
     const el = (id) => document.getElementById(id);
 
@@ -870,7 +883,7 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       list.innerHTML = filtered.map(unit => `
         <div class="unit-card ${editingUnitId === unit.id ? 'selected' : ''}" data-card-id="${escapeHtml(unit.id)}">
           <div class="unit-top">
-            <div style="flex:1; min-width:280px;">
+            <div class="card-info-col">
               <div class="badges">
                 <button class="unit-title-btn" data-edit-id="${escapeHtml(unit.id)}" title="Clique para editar">
                   ${escapeHtml(unit.unidade)}
@@ -921,6 +934,7 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
               <div class="admin-actions">
                 ${userCanEdit()   ? `<button class="info"   data-edit-id="${escapeHtml(unit.id)}">Editar unidade</button>` : ''}
                 ${userCanDelete() ? `<button class="danger" data-delete-id="${escapeHtml(unit.id)}">Excluir cadastro</button>` : ''}
+                <button class="secondary" data-history-id="${escapeHtml(unit.id)}">${expandedHistoryIds.has(unit.id) ? 'Ocultar histórico de OS' : 'Histórico de OS'}</button>
               </div>
 
               <div style="margin-top:12px; font-size:12px; color:var(--text-soft); line-height:1.6;">
@@ -929,6 +943,7 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
               </div>
             </div>
           </div>
+          ${expandedHistoryIds.has(unit.id) ? renderHistoryPanel(unit.id) : ''}
         </div>
       `).join('');
 
@@ -941,6 +956,84 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       list.querySelectorAll('button[data-edit-id]').forEach(btn => {
         btn.addEventListener('click', () => startEditUnit(btn.getAttribute('data-edit-id')));
       });
+      list.querySelectorAll('button[data-history-id]').forEach(btn => {
+        btn.addEventListener('click', () => toggleUnitHistory(btn.getAttribute('data-history-id')));
+      });
+    }
+
+    // ===== HISTÓRICO DE OS (tabela historico_os no Supabase) =====
+
+    async function toggleUnitHistory(id) {
+      if (expandedHistoryIds.has(id)) {
+        expandedHistoryIds.delete(id);
+        renderUnits();
+        return;
+      }
+      expandedHistoryIds.add(id);
+      renderUnits();
+
+      try {
+        const { data, error } = await _supabase
+          .from('historico_os')
+          .select('*')
+          .eq('Unidade ID', id)
+          .order('Registrado em', { ascending: false });
+        historyDataById[id] = error ? [] : (data || []);
+      } catch (e) {
+        historyDataById[id] = [];
+      }
+      renderUnits();
+    }
+
+    function formatHistoryTimestamp(value) {
+      if (!value) return '-';
+      try { return new Date(value).toLocaleString('pt-BR'); } catch (e) { return String(value); }
+    }
+
+    function renderHistoryPanel(id) {
+      const history = historyDataById[id];
+
+      if (history === undefined) {
+        return `<div class="obs-box" style="margin-top:14px;">Carregando histórico de OS...</div>`;
+      }
+      if (!history.length) {
+        return `<div class="obs-box" style="margin-top:14px;"><strong style="color:var(--text);">Histórico de OS</strong><br><span class="muted">Nenhum histórico registrado ainda para esta unidade.</span></div>`;
+      }
+
+      return `
+        <div class="obs-box" style="margin-top:14px;">
+          <strong style="color:var(--text);">Histórico de OS (${history.length})</strong>
+          <div style="margin-top:8px; display:grid; gap:6px;">
+            ${history.map(h => `
+              <div style="border:1px solid var(--border); border-radius:10px; padding:8px 10px; font-size:12px; background:var(--bg-soft);">
+                <strong>OS ${escapeHtml(h['OS'] || '-')}</strong> — ${escapeHtml(h['Status da OS'] || '-')} · Abertura: ${escapeHtml(h['Data da abertura da OS'] || '-')}<br>
+                ${h['Criador'] ? `Criador: ${escapeHtml(h['Criador'])}<br>` : ''}
+                ${h['RESUMO OS'] ? `Resumo: ${escapeHtml(h['RESUMO OS'])}<br>` : ''}
+                <span class="muted">Substituída em: ${escapeHtml(formatHistoryTimestamp(h['Registrado em']))}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    // Guarda no histórico o registro ANTERIOR de uma unidade antes de sobrescrever a OS atual.
+    // Só grava quando já existia uma OS anterior — não polui o histórico em cadastros novos.
+    async function archiveOsHistoryEntry(entry) {
+      if (!entry || !entry.os) return;
+      try {
+        await _supabase.from('historico_os').insert([{
+          'Unidade ID': entry.id,
+          'Nome da unidade': entry.unidade,
+          'OS': entry.os,
+          'Data da abertura da OS': entry.dataAberturaOs || null,
+          'Status da OS': entry.statusOs,
+          'Criador': entry.criador,
+          'RESUMO OS': entry.resumoOs
+        }]);
+      } catch (e) {
+        // não bloqueia o fluxo principal (cadastro/importação) se o histórico falhar
+      }
     }
 
     function fillUnitForm(unit) {
@@ -1055,7 +1148,22 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         showMessage('Preencha UF, nome da unidade, login e IP.'); return;
       }
 
+      const existingUnit = units.find(u => u.id === id);
+      const osChanged = existingUnit && existingUnit.os && existingUnit.os !== payload['OS'];
+
       try {
+        if (osChanged) {
+          await archiveOsHistoryEntry({
+            id,
+            unidade: existingUnit.unidade,
+            os: existingUnit.os,
+            dataAberturaOs: existingUnit.dataAberturaOs,
+            statusOs: existingUnit.statusOs,
+            criador: existingUnit.criador,
+            resumoOs: existingUnit.resumoOs
+          });
+        }
+
         const { error } = await _supabase.from('unidades').update(payload).eq('ID', id);
         if (error) { showMessage('Erro ao atualizar: ' + error.message); return; }
 
@@ -1333,7 +1441,22 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         };
         if (hasCriador) payload['Criador'] = item.criadorNovo;
         if (hasResumo) payload['RESUMO OS'] = item.resumoNovo;
+
+        const osChanged = item.osAtual && item.osAtual !== item.osNovo;
+
         try {
+          if (osChanged) {
+            await archiveOsHistoryEntry({
+              id: item.id,
+              unidade: item.unidade,
+              os: item.osAtual,
+              dataAberturaOs: item.dataAtual,
+              statusOs: item.statusAtual,
+              criador: item.criadorAtual,
+              resumoOs: item.resumoAtual
+            });
+          }
+
           const { error } = await _supabase.from('unidades').update(payload).eq('ID', item.id);
           if (error) { falhas++; } else { sucesso++; }
         } catch (e) { falhas++; }
@@ -1449,7 +1572,7 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         return `
         <div class="user-card ${isEditing ? 'selected' : ''}" data-user-card="${uid}">
           <div class="user-top">
-            <div style="flex:1; min-width:280px;">
+            <div class="card-info-col">
               <div class="badges">
                 <span style="font-size:20px; font-weight:700; margin-right:6px;">${escapeHtml(user.nome || '-')}</span>
                 <span class="badge active">${escapeHtml(user.perfil || '-')}</span>
