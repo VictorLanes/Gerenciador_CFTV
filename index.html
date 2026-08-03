@@ -91,6 +91,16 @@
       flex-wrap: wrap; justify-content: flex-end; flex: 1;
     }
 
+    .hamburger-btn {
+      display: none;
+      width: 44px; height: 44px; flex-shrink: 0;
+      align-items: center; justify-content: center;
+      font-size: 22px; line-height: 1;
+      background: var(--bg-soft); color: var(--text);
+      border: 1px solid var(--border); border-radius: 12px;
+      cursor: pointer;
+    }
+
     .top-chip, input, select, button, textarea {
       border: 1px solid var(--border);
       background: var(--bg-soft);
@@ -259,6 +269,7 @@
       border: 1px dashed var(--border);
     }
     .editing-box { border-style: solid; color: var(--text); }
+    .summary-box { margin-top: 22px; margin-bottom: 22px; }
 
     .section-tabs { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
     .section-tabs button { width: auto; padding: 10px 16px; }
@@ -284,6 +295,17 @@
       .action-grid, .edit-actions { grid-template-columns: 1fr; }
       .brand-text strong { font-size: 20px; }
       .top-chip, .compact-btn { width: 100%; }
+
+      .header-inner { flex-wrap: wrap; }
+      .hamburger-btn { display: flex; }
+      .top-menu {
+        display: none;
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        margin-top: 6px;
+      }
+      .top-menu.mobile-open { display: flex; }
     }
   </style>
 </head>
@@ -326,7 +348,9 @@
           </div>
         </div>
 
-        <div class="top-menu">
+        <button class="hamburger-btn" id="mobileMenuBtn" aria-label="Abrir menu" aria-expanded="false">☰</button>
+
+        <div class="top-menu" id="topMenu">
           <div class="top-chip">Perfil: <strong id="perfilAtual"></strong></div>
           <div class="top-chip">Usuário: <strong id="nomeUsuario"></strong></div>
           <div class="top-chip">UFs: <strong id="ufsUsuario"></strong></div>
@@ -385,8 +409,8 @@
           <!-- COLUNA DIREITA -->
           <div class="right-column">
 
-            <!-- PERMISSÕES -->
-            <div class="card">
+            <!-- PERMISSÕES (oculto a pedido do usuário; lógica de permissões continua ativa) -->
+            <div class="card hidden">
               <div class="card-body">
                 <h3 style="margin-bottom:6px;">Permissões do perfil</h3>
                 <p class="muted">Acesso carregado do Supabase.</p>
@@ -1608,6 +1632,21 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
     el('reloadUsersBtn').addEventListener('click', loadUsers);
     el('resetBtn').addEventListener('click', resetPasswordAdmin);
     el('themeBtn').addEventListener('click', () => { applyTheme(document.body.classList.contains('dark') ? 'light' : 'dark'); });
+
+    // Menu mobile (hambúrguer)
+    el('mobileMenuBtn').addEventListener('click', () => {
+      const menu = el('topMenu');
+      const isOpen = menu.classList.toggle('mobile-open');
+      el('mobileMenuBtn').textContent = isOpen ? '✕' : '☰';
+      el('mobileMenuBtn').setAttribute('aria-expanded', String(isOpen));
+    });
+    el('topMenu').addEventListener('click', (e) => {
+      if (e.target.tagName === 'BUTTON') {
+        el('topMenu').classList.remove('mobile-open');
+        el('mobileMenuBtn').textContent = '☰';
+        el('mobileMenuBtn').setAttribute('aria-expanded', 'false');
+      }
+    });
     el('senha').addEventListener('keydown', (e) => { if (e.key === 'Enter') login(); });
 
     window.addEventListener('load', async () => {
