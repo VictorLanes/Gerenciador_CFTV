@@ -435,8 +435,10 @@
                     <option value="NÃO">Cadeado bluetooth: NÃO</option>
                     <option value="SIM">Cadeado bluetooth: SIM</option>
                   </select>
+                  <input id="formCriador" placeholder="Criador da OS" />
                 </div>
 
+                <textarea id="formResumoOs" placeholder="Resumo da OS" style="margin-top:12px;"></textarea>
                 <textarea id="formObservacoes" placeholder="Observações" style="margin-top:12px;"></textarea>
 
                 <select id="formStatus" style="margin-top:12px;">
@@ -587,6 +589,8 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         central: item['Acesso da central'] || '',
         cadeadoBluetooth: item['Cadeado bluetooth'] || 'NÃO',
         observacoes: item['Observações'] || '',
+        criador: item['Criador'] || '',
+        resumoOs: item['RESUMO OS'] || '',
         status: item['Status'] || 'Ativa',
         updatedAt: item['Última atualização'] || '',
         updatedBy: item['Atualizado por'] || ''
@@ -728,7 +732,8 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         'formUf','formNomeUnidade','formCloudNvr','formLogin','formSenha','formSenhaCameras','formIp',
         'formHd','formQuantidadeCameras','formAlarmeMac','formSensores',
         'formSenhaAlarme','formCentral','formObservacoes','formStatus',
-        'formOs','formDataAberturaOs','formStatusOs','formCadeadoBluetooth'
+        'formOs','formDataAberturaOs','formStatusOs','formCadeadoBluetooth',
+        'formCriador','formResumoOs'
       ].forEach(id => { el(id).disabled = !enabled; });
       el('saveBtn').disabled = !canCreate;
       el('updateBtn').disabled = !canEdit;
@@ -871,8 +876,10 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
                 <div class="info-item"><strong>Senha alarme</strong><div>${escapeHtml(unit.senhaAlarme)}</div></div>
                 <div class="info-item"><strong>Central</strong><div>${escapeHtml(unit.central)}</div></div>
                 <div class="info-item"><strong>Cadeado bluetooth</strong><div>${escapeHtml(unit.cadeadoBluetooth || 'NÃO')}</div></div>
+                <div class="info-item"><strong>Criador</strong><div>${escapeHtml(unit.criador || '-')}</div></div>
               </div>
 
+              ${unit.resumoOs ? `<div class="obs-box"><strong style="color:var(--text)">Resumo da OS:</strong> ${escapeHtml(unit.resumoOs)}</div>` : ''}
               ${unit.observacoes ? `<div class="obs-box"><strong style="color:var(--text)">Observações:</strong> ${escapeHtml(unit.observacoes)}</div>` : ''}
             </div>
 
@@ -931,6 +938,8 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       el('formSenhaAlarme').value    = unit.senhaAlarme || '';
       el('formCentral').value        = unit.central || '';
       el('formCadeadoBluetooth').value = unit.cadeadoBluetooth || 'NÃO';
+      el('formCriador').value        = unit.criador || '';
+      el('formResumoOs').value       = unit.resumoOs || '';
       el('formObservacoes').value    = unit.observacoes || '';
       el('formStatus').value         = unit.status || 'Ativa';
     }
@@ -986,6 +995,8 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         'Senha do alarme': el('formSenhaAlarme').value.trim(),
         'Acesso da central': el('formCentral').value.trim(),
         'Cadeado bluetooth': el('formCadeadoBluetooth').value,
+        'Criador': el('formCriador').value.trim(),
+        'RESUMO OS': el('formResumoOs').value.trim(),
         'Observações': el('formObservacoes').value.trim(),
         'Status': el('formStatus').value,
         'Atualizado por': currentUser ? currentUser.nome : 'Sistema'
@@ -1047,7 +1058,7 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       [
         'editingUnitId','formUf','formNomeUnidade','formCloudNvr','formLogin','formSenha','formSenhaCameras','formIp',
         'formHd','formQuantidadeCameras','formAlarmeMac','formSensores','formSenhaAlarme','formCentral','formObservacoes',
-        'formOs','formDataAberturaOs','formStatusOs'
+        'formOs','formDataAberturaOs','formStatusOs','formCriador','formResumoOs'
       ].forEach(id => el(id).value = '');
       el('formStatus').value = 'Ativa';
       el('formCadeadoBluetooth').value = 'NÃO';
@@ -1112,7 +1123,9 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         data: normalized.indexOf('data'),
         status: normalized.indexOf('status'),
         site: normalized.indexOf('site'),
-        uf: normalized.indexOf('uf')
+        uf: normalized.indexOf('uf'),
+        resumo: normalized.indexOf('resumo'),
+        criador: normalized.indexOf('criador')
       };
     }
 
@@ -1134,9 +1147,12 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
           data: colIndex.data >= 0 ? (cells[colIndex.data] || '').trim() : '',
           status: colIndex.status >= 0 ? (cells[colIndex.status] || '').trim() : '',
           site,
-          uf: colIndex.uf >= 0 ? (cells[colIndex.uf] || '').trim() : ''
+          uf: colIndex.uf >= 0 ? (cells[colIndex.uf] || '').trim() : '',
+          resumo: colIndex.resumo >= 0 ? (cells[colIndex.resumo] || '').trim() : '',
+          criador: colIndex.criador >= 0 ? (cells[colIndex.criador] || '').trim() : ''
         });
       }
+      rows.meta = { hasResumo: colIndex.resumo >= 0, hasCriador: colIndex.criador >= 0 };
       return rows;
     }
 
@@ -1155,9 +1171,12 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
           data: colIndex.data >= 0 ? String(cells[colIndex.data] || '').trim() : '',
           status: colIndex.status >= 0 ? String(cells[colIndex.status] || '').trim() : '',
           site,
-          uf: colIndex.uf >= 0 ? String(cells[colIndex.uf] || '').trim() : ''
+          uf: colIndex.uf >= 0 ? String(cells[colIndex.uf] || '').trim() : '',
+          resumo: colIndex.resumo >= 0 ? String(cells[colIndex.resumo] || '').trim() : '',
+          criador: colIndex.criador >= 0 ? String(cells[colIndex.criador] || '').trim() : ''
         });
       }
+      rows.meta = { hasResumo: colIndex.resumo >= 0, hasCriador: colIndex.criador >= 0 };
       return rows;
     }
 
@@ -1201,6 +1220,7 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       const bestPerSite = pickBestRowPerSite(rows);
       const matched = [];
       const unmatched = [];
+      const meta = rows.meta || { hasResumo: false, hasCriador: false };
 
       bestPerSite.forEach((row, key) => {
         const unit = units.find(u => normalizeSiteName(u.unidade) === key);
@@ -1213,14 +1233,18 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
             statusAtual: unit.statusOs,
             statusNovo: mapStatusOs(row.status),
             dataAtual: unit.dataAberturaOs,
-            dataNova: parseBrDateToIso(row.data)
+            dataNova: parseBrDateToIso(row.data),
+            resumoAtual: unit.resumoOs,
+            resumoNovo: row.resumo,
+            criadorAtual: unit.criador,
+            criadorNovo: row.criador
           });
         } else {
           unmatched.push(row.site);
         }
       });
 
-      return { matched, unmatched };
+      return { matched, unmatched, hasResumo: meta.hasResumo, hasCriador: meta.hasCriador };
     }
 
     function renderImportPreview(plan) {
@@ -1230,7 +1254,8 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
       box.innerHTML = `
         <div style="margin-bottom:10px;">
-          <strong>${matched.length}</strong> unidade(s) encontrada(s) para atualizar OS / Status da OS / Data de abertura.
+          <strong>${matched.length}</strong> unidade(s) encontrada(s) para atualizar OS / Status da OS / Data de abertura${plan.hasResumo || plan.hasCriador ? ' / ' + [plan.hasCriador ? 'Criador' : '', plan.hasResumo ? 'Resumo da OS' : ''].filter(Boolean).join(' / ') : ''}.
+          ${(!plan.hasResumo || !plan.hasCriador) ? `<br><span class="muted">${!plan.hasCriador ? 'Coluna "Criador" não encontrada na planilha — esse campo não será alterado.' : ''} ${!plan.hasResumo ? 'Coluna "Resumo" não encontrada na planilha — o campo Resumo da OS não será alterado.' : ''}</span>` : ''}
           ${unmatched.length ? `<br><span style="color:var(--warning);"><strong>${unmatched.length}</strong> site(s) da planilha não bateram com nenhuma unidade cadastrada:</span> ${unmatched.map(escapeHtml).join(', ')}` : ''}
         </div>
         ${matched.length ? `
@@ -1241,6 +1266,8 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
               OS: ${escapeHtml(m.osAtual || '-')} → ${escapeHtml(m.osNovo || '-')} &nbsp;|&nbsp;
               Status da OS: ${escapeHtml(m.statusAtual || '-')} → ${escapeHtml(m.statusNovo || '-')} &nbsp;|&nbsp;
               Data abertura: ${escapeHtml(m.dataAtual || '-')} → ${escapeHtml(m.dataNova || '-')}
+              ${plan.hasCriador ? `<br>Criador: ${escapeHtml(m.criadorAtual || '-')} → ${escapeHtml(m.criadorNovo || '-')}` : ''}
+              ${plan.hasResumo ? `<br>Resumo da OS: ${escapeHtml(m.resumoAtual || '-')} → ${escapeHtml(m.resumoNovo || '-')}` : ''}
             </div>
           `).join('')}
         </div>
@@ -1270,7 +1297,7 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       if (!pendingImportPlan || !pendingImportPlan.matched.length) return;
       if (!userCanEdit()) { showMessage('Você não tem permissão para editar unidades.'); return; }
 
-      const { matched } = pendingImportPlan;
+      const { matched, hasResumo, hasCriador } = pendingImportPlan;
       let sucesso = 0, falhas = 0;
 
       for (const item of matched) {
@@ -1280,6 +1307,8 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
           'Status da OS': item.statusNovo,
           'Atualizado por': currentUser ? currentUser.nome : 'Sistema'
         };
+        if (hasCriador) payload['Criador'] = item.criadorNovo;
+        if (hasResumo) payload['RESUMO OS'] = item.resumoNovo;
         try {
           const { error } = await _supabase.from('unidades').update(payload).eq('ID', item.id);
           if (error) { falhas++; } else { sucesso++; }
@@ -1329,11 +1358,11 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       const headers = [
         'ID','UF','Nome da unidade','OS','Data da abertura da OS','Status da OS','Cloud NVR','Login','Senha','Senha câmeras','IP','HD',
         'Quantidade de câmeras','MAC do alarme','Sensores','Senha do alarme',
-        'Acesso da central','Cadeado bluetooth','Observações','Status','Última atualização','Atualizado por'
+        'Acesso da central','Cadeado bluetooth','Criador','RESUMO OS','Observações','Status','Última atualização','Atualizado por'
       ];
       const rows = filtered.map(u => [
         u.id,u.uf,u.unidade,u.os,u.dataAberturaOs,u.statusOs,u.cloudNvr,u.login,u.senha,u.senhaCameras,u.ip,u.hd,u.cameras,
-        u.alarmeMac,u.sensores,u.senhaAlarme,u.central,u.cadeadoBluetooth,u.observacoes,u.status,u.updatedAt,u.updatedBy
+        u.alarmeMac,u.sensores,u.senhaAlarme,u.central,u.cadeadoBluetooth,u.criador,u.resumoOs,u.observacoes,u.status,u.updatedAt,u.updatedBy
       ]);
 
       const tableHtml = `
