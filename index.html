@@ -371,10 +371,13 @@
                   <input id="searchInput" placeholder="Busca geral: IP, login, alarme..." style="flex:1; min-width:200px;" />
                   <button id="searchBtn" class="compact-btn" style="flex-shrink:0;">Consultar</button>
                   <button id="exportBtn" class="success compact-btn" style="flex-shrink:0;">Gerar Excel</button>
+                  <button id="importOsBtn" class="info compact-btn" style="flex-shrink:0;">Importar OS (planilha)</button>
+                  <input type="file" id="importOsFile" accept=".csv,.txt,.xls,.xlsx" class="hidden" />
                 </div>
               </div>
 
               <div id="searchSummary" class="summary-box hidden"></div>
+              <div id="importPreviewBox" class="summary-box hidden"></div>
               <div id="unitList" class="unit-list"></div>
             </div>
           </div>
@@ -1050,6 +1053,275 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       el('formCadeadoBluetooth').value = 'NÃO';
     }
 
+    // ===== IMPORTAÇÃO DE PLANILHA DE OS (associa por Nome da unidade / Site) =====
+
+    let pendingImportPlan = null;
+
+    function normalizeSiteName(value) {
+      return String(value || '').trim().toUpperCase().replace(/\s+/g, ' ');
+    }
+
+    function normalizeHeader(value) {
+      return String(value || '')
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .trim().toLowerCase();
+    }
+
+    function parseBrDateToIso(value) {
+      if (!value) return '';
+      const datePart = String(value).split(' ')[0].trim();
+      const m = datePart.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+      if (!m) return '';
+      const [, dd, mm, yyyy] = m;
+      return `${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`;
+    }
+
+    function parseBrDateTimeToDate(value) {
+      if (!value) return null;
+      const [datePart, timePart] = String(value).split(' ');
+      const m = (datePart || '').match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+      if (!m) return null;
+      const [, dd, mm, yyyy] = m;
+      const [hh = '00', mi = '00', ss = '00'] = (timePart || '').split(':');
+      return new Date(Number(yyyy), Number(mm) - 1, Number(dd), Number(hh), Number(mi), Number(ss));
+    }
+
+    function mapStatusOs(rawStatus) {
+      const s = normalizeHeader(rawStatus);
+      if (s === 'concluida' || s === 'concluído' || s === 'concluida.') return 'Concluída';
+      if (s === 'andamento') return 'Em andamento';
+      if (s === 'pendencia') return 'Aguardando';
+      if (s === 'cancelada') return 'Cancelada';
+      if (s === 'aberta') return 'Aberta';
+      return rawStatus || '';
+    }
+
+    function detectDelimiter(line) {
+      const tabs = (line.match(/\t/g) || []).length;
+      const commas = (line.match(/,/g) || []).length;
+      const semicolons = (line.match(/;/g) || []).length;
+      if (tabs >= commas && tabs >= semicolons) return '\t';
+      if (semicolons >= commas) return ';';
+      return ',';
+    }
+
+    function findColumnIndexes(headerCells) {
+      const normalized = headerCells.map(normalizeHeader);
+      return {
+        os: normalized.indexOf('os'),
+        data: normalized.indexOf('data'),
+        status: normalized.indexOf('status'),
+        site: normalized.indexOf('site'),
+        uf: normalized.indexOf('uf')
+      };
+    }
+
+    function parseDelimitedText(text) {
+      const lines = text.split(/\r\n|\r|\n/).filter(l => l.trim() !== '');
+      if (!lines.length) return [];
+      const delimiter = detectDelimiter(lines[0]);
+      const headerCells = lines[0].split(delimiter);
+      const colIndex = findColumnIndexes(headerCells);
+      if (colIndex.site < 0) return [];
+
+      const rows = [];
+      for (let i = 1; i < lines.length; i++) {
+        const cells = lines[i].split(delimiter);
+        const site = (cells[colIndex.site] || '').trim();
+        if (!site) continue;
+        rows.push({
+          os: colIndex.os >= 0 ? (cells[colIndex.os] || '').trim() : '',
+          data: colIndex.data >= 0 ? (cells[colIndex.data] || '').trim() : '',
+          status: colIndex.status >= 0 ? (cells[colIndex.status] || '').trim() : '',
+          site,
+          uf: colIndex.uf >= 0 ? (cells[colIndex.uf] || '').trim() : ''
+        });
+      }
+      return rows;
+    }
+
+    function parseSheetRows(rawRows) {
+      if (!rawRows.length) return [];
+      const colIndex = findColumnIndexes(rawRows[0]);
+      if (colIndex.site < 0) return [];
+
+      const rows = [];
+      for (let i = 1; i < rawRows.length; i++) {
+        const cells = rawRows[i] || [];
+        const site = String(cells[colIndex.site] || '').trim();
+        if (!site) continue;
+        rows.push({
+          os: colIndex.os >= 0 ? String(cells[colIndex.os] || '').trim() : '',
+          data: colIndex.data >= 0 ? String(cells[colIndex.data] || '').trim() : '',
+          status: colIndex.status >= 0 ? String(cells[colIndex.status] || '').trim() : '',
+          site,
+          uf: colIndex.uf >= 0 ? String(cells[colIndex.uf] || '').trim() : ''
+        });
+      }
+      return rows;
+    }
+
+    function loadSheetJs() {
+      return new Promise((resolve, reject) => {
+        if (window.XLSX) { resolve(); return; }
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error('Não foi possível carregar o leitor de planilhas Excel.'));
+        document.head.appendChild(script);
+      });
+    }
+
+    // Para cada unidade (Site) presente na planilha, escolhe a OS "atual":
+    // prioriza a mais recente em aberto (Andamento/Pendencia/Aberta); se não houver
+    // nenhuma em aberto, usa a mais recente concluída/cancelada.
+    function pickBestRowPerSite(rows) {
+      const bySite = new Map();
+      rows.forEach(row => {
+        const key = normalizeSiteName(row.site);
+        if (!bySite.has(key)) bySite.set(key, []);
+        bySite.get(key).push(row);
+      });
+
+      const result = new Map();
+      bySite.forEach((siteRows, key) => {
+        const withDates = siteRows.map(r => ({ ...r, _date: parseBrDateTimeToDate(r.data) }));
+        const open = withDates.filter(r => {
+          const s = normalizeHeader(r.status);
+          return s === 'andamento' || s === 'pendencia' || s === 'aberta';
+        });
+        const pool = open.length ? open : withDates;
+        pool.sort((a, b) => (b._date ? b._date.getTime() : 0) - (a._date ? a._date.getTime() : 0));
+        result.set(key, pool[0]);
+      });
+      return result;
+    }
+
+    function buildImportPlan(rows) {
+      const bestPerSite = pickBestRowPerSite(rows);
+      const matched = [];
+      const unmatched = [];
+
+      bestPerSite.forEach((row, key) => {
+        const unit = units.find(u => normalizeSiteName(u.unidade) === key);
+        if (unit) {
+          matched.push({
+            id: unit.id,
+            unidade: unit.unidade,
+            osAtual: unit.os,
+            osNovo: row.os,
+            statusAtual: unit.statusOs,
+            statusNovo: mapStatusOs(row.status),
+            dataAtual: unit.dataAberturaOs,
+            dataNova: parseBrDateToIso(row.data)
+          });
+        } else {
+          unmatched.push(row.site);
+        }
+      });
+
+      return { matched, unmatched };
+    }
+
+    function renderImportPreview(plan) {
+      pendingImportPlan = plan;
+      const { matched, unmatched } = plan;
+      const box = el('importPreviewBox');
+
+      box.innerHTML = `
+        <div style="margin-bottom:10px;">
+          <strong>${matched.length}</strong> unidade(s) encontrada(s) para atualizar OS / Status da OS / Data de abertura.
+          ${unmatched.length ? `<br><span style="color:var(--warning);"><strong>${unmatched.length}</strong> site(s) da planilha não bateram com nenhuma unidade cadastrada:</span> ${unmatched.map(escapeHtml).join(', ')}` : ''}
+        </div>
+        ${matched.length ? `
+        <div style="max-height:260px; overflow-y:auto; margin-bottom:12px; display:grid; gap:6px;">
+          ${matched.map(m => `
+            <div style="border:1px solid var(--border); border-radius:10px; padding:8px 10px; font-size:13px;">
+              <strong>${escapeHtml(m.unidade)}</strong><br>
+              OS: ${escapeHtml(m.osAtual || '-')} → ${escapeHtml(m.osNovo || '-')} &nbsp;|&nbsp;
+              Status da OS: ${escapeHtml(m.statusAtual || '-')} → ${escapeHtml(m.statusNovo || '-')} &nbsp;|&nbsp;
+              Data abertura: ${escapeHtml(m.dataAtual || '-')} → ${escapeHtml(m.dataNova || '-')}
+            </div>
+          `).join('')}
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button class="info" id="confirmImportBtn" style="width:auto;">Confirmar atualização</button>
+          <button class="secondary" id="cancelImportBtn" style="width:auto;">Cancelar</button>
+        </div>` : `
+        <div style="display:flex; gap:10px;">
+          <button class="secondary" id="cancelImportBtn" style="width:auto;">Fechar</button>
+        </div>`}
+      `;
+      box.classList.remove('hidden');
+
+      const confirmBtn = el('confirmImportBtn');
+      if (confirmBtn) confirmBtn.addEventListener('click', confirmImportOs);
+      el('cancelImportBtn').addEventListener('click', cancelImportOs);
+    }
+
+    function cancelImportOs() {
+      pendingImportPlan = null;
+      el('importPreviewBox').classList.add('hidden');
+      el('importPreviewBox').innerHTML = '';
+      el('importOsFile').value = '';
+    }
+
+    async function confirmImportOs() {
+      if (!pendingImportPlan || !pendingImportPlan.matched.length) return;
+      if (!userCanEdit()) { showMessage('Você não tem permissão para editar unidades.'); return; }
+
+      const { matched } = pendingImportPlan;
+      let sucesso = 0, falhas = 0;
+
+      for (const item of matched) {
+        const payload = {
+          'OS': item.osNovo,
+          'Data da abertura da OS': item.dataNova || null,
+          'Status da OS': item.statusNovo,
+          'Atualizado por': currentUser ? currentUser.nome : 'Sistema'
+        };
+        try {
+          const { error } = await _supabase.from('unidades').update(payload).eq('ID', item.id);
+          if (error) { falhas++; } else { sucesso++; }
+        } catch (e) { falhas++; }
+      }
+
+      cancelImportOs();
+      await loadUnits();
+      showMessage(`Importação concluída: ${sucesso} unidade(s) atualizada(s)${falhas ? `, ${falhas} falha(s)` : ''}.`);
+    }
+
+    async function handleImportFile(file) {
+      if (!file) return;
+      if (!userCanEdit()) { showMessage('Você não tem permissão para editar unidades.'); return; }
+
+      const name = file.name.toLowerCase();
+      try {
+        let rows = [];
+        if (name.endsWith('.xlsx') || name.endsWith('.xls')) {
+          await loadSheetJs();
+          const buffer = await file.arrayBuffer();
+          const workbook = window.XLSX.read(buffer, { type: 'array' });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          const rawRows = window.XLSX.utils.sheet_to_json(firstSheet, { header: 1, raw: false, defval: '' });
+          rows = parseSheetRows(rawRows);
+        } else {
+          const text = await file.text();
+          rows = parseDelimitedText(text);
+        }
+
+        if (!rows.length) {
+          showMessage('Não encontrei linhas válidas na planilha. Confira se ela tem as colunas OS, Data, Status e Site.');
+          return;
+        }
+
+        const plan = buildImportPlan(rows);
+        renderImportPreview(plan);
+      } catch (e) {
+        showMessage('Erro ao ler a planilha: ' + e.message);
+      }
+    }
+
     function downloadExcelFromFiltered() {
       const filtered = getFilteredUnits();
       if (!filtered.length) { showMessage('Não há dados para exportar no filtro atual.'); return; }
@@ -1295,6 +1567,12 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
     el('updateBtn').addEventListener('click', updateUnit);
     el('cancelEditBtn').addEventListener('click', () => { resetUnitForm(); exitEditMode(); showMessage('Edição cancelada.'); });
     el('exportBtn').addEventListener('click', downloadExcelFromFiltered);
+    el('importOsBtn').addEventListener('click', () => el('importOsFile').click());
+    el('importOsFile').addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      handleImportFile(file);
+      e.target.value = '';
+    });
     el('tabUnidades').addEventListener('click', () => showTab('unidades'));
     el('tabUsuarios').addEventListener('click', () => showTab('usuarios'));
     el('createUserBtn').addEventListener('click', createUser);
