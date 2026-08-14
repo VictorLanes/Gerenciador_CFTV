@@ -4,10 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VTAL Manutenção de Unidades</title>
-  
+
   <!-- Supabase JS Client via CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <style>
     :root {
       --bg: #f8fafc;
@@ -24,7 +23,6 @@
       --info: #1d4ed8;
       --shadow: 0 10px 28px rgba(15, 23, 42, .08);
     }
-
     body.dark {
       --bg: #020617;
       --bg-soft: #0f172a;
@@ -40,20 +38,15 @@
       --info: #60a5fa;
       --shadow: 0 10px 28px rgba(0, 0, 0, .35);
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       font-family: Arial, Helvetica, sans-serif;
       background: var(--bg);
       color: var(--text);
       transition: background .2s, color .2s;
     }
-
     .hidden { display: none !important; }
-
     .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-
     .header {
       background: var(--bg-soft);
       border-bottom: 1px solid var(--border);
@@ -62,7 +55,6 @@
       z-index: 20;
       box-shadow: 0 2px 10px rgba(0,0,0,.03);
     }
-
     .header-inner {
       max-width: 1400px;
       margin: 0 auto;
@@ -73,24 +65,19 @@
       gap: 18px;
       flex-wrap: wrap;
     }
-
     .brand-area { display: flex; align-items: center; gap: 14px; min-width: 280px; }
-
     .brand-icon {
       width: 48px; height: 48px; border-radius: 16px;
       background: linear-gradient(135deg, var(--primary), var(--primary-soft));
       color: var(--bg); display: flex; align-items: center; justify-content: center;
       font-weight: 800; font-size: 20px; flex-shrink: 0;
     }
-
     .brand-text small { display: block; color: var(--text-soft); font-size: 13px; margin-bottom: 2px; }
     .brand-text strong { font-size: 24px; line-height: 1.2; display: block; }
-
     .top-menu {
       display: flex; align-items: center; gap: 10px;
       flex-wrap: wrap; justify-content: flex-end; flex: 1;
     }
-
     .hamburger-btn {
       display: none;
       width: 44px; height: 44px; flex-shrink: 0;
@@ -100,7 +87,6 @@
       border: 1px solid var(--border); border-radius: 12px;
       cursor: pointer;
     }
-
     .top-chip, input, select, button, textarea {
       border: 1px solid var(--border);
       background: var(--bg-soft);
@@ -108,17 +94,14 @@
       border-radius: 14px;
       font-size: 14px;
     }
-
     .top-chip {
       padding: 10px 14px; display: inline-flex; align-items: center;
       gap: 6px; min-height: 42px; white-space: nowrap;
     }
     .top-chip strong { font-weight: 700; }
-
     input, select, button, textarea { width: 100%; padding: 12px 14px; outline: none; }
     textarea { min-height: 100px; resize: vertical; }
     input:focus, select:focus, textarea:focus { border-color: var(--text-soft); }
-
     button {
       cursor: pointer; background: var(--primary); color: var(--bg);
       font-weight: 700; transition: transform .15s ease, opacity .15s ease;
@@ -130,36 +113,29 @@
     button.warning { background: var(--warning); color: #fff; }
     button.info { background: var(--info); color: #fff; }
     button:disabled { opacity: .6; cursor: not-allowed; transform: none; }
-
     .compact-btn { width: auto; min-width: 120px; padding: 10px 14px; min-height: 42px; }
-
     .grid-stats {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 16px;
       margin-bottom: 20px;
     }
-
     .card { background: var(--bg-soft); border-radius: 24px; box-shadow: var(--shadow); border: 1px solid var(--border); }
     .card-body { padding: 22px; }
-
     .stat-card { display: flex; justify-content: space-between; align-items: flex-start; }
     .stat-card h2 { font-size: 34px; margin: 10px 0 4px; }
     .muted { color: var(--text-soft); font-size: 14px; }
-
     .icon-box {
       width: 50px; height: 50px; border-radius: 16px;
       background: var(--bg-muted); display: flex; align-items: center;
       justify-content: center; font-size: 20px;
     }
-
     .main-grid {
       display: grid;
       grid-template-columns: 1.65fr .95fr;
       gap: 20px;
       align-items: start;
     }
-
     .right-column {
       position: sticky;
       top: 80px;
@@ -168,19 +144,15 @@
       max-height: calc(100vh - 100px);
       overflow-y: auto;
     }
-
     .section-head {
       display: flex; justify-content: space-between; align-items: center;
       gap: 16px; flex-wrap: wrap; margin-bottom: 18px;
     }
     .section-head h3 { font-size: 22px; margin-bottom: 6px; }
-
     .filters, .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
     .filters input { min-width: 260px; }
     .filters select { width: 180px; }
-
     .unit-list, .permission-list, .user-list { display: grid; gap: 16px; }
-
     .unit-card, .user-card {
       border: 1px solid var(--border);
       border-radius: 22px;
@@ -188,28 +160,22 @@
       padding: 18px;
       transition: border-color .15s ease, transform .15s ease, box-shadow .15s ease;
     }
-
     .unit-card:hover { border-color: var(--text-soft); transform: translateY(-1px); }
-
     .unit-card.selected {
       border-color: var(--info);
       box-shadow: 0 0 0 2px rgba(37, 99, 235, .10);
     }
-
     .unit-top, .user-top { display: flex; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
-
     .badges {
       display: flex; gap: 8px; flex-wrap: wrap;
       margin-bottom: 12px; align-items: center;
     }
-
     .unit-title-btn {
       border: none; background: transparent; color: var(--text);
       font-size: 20px; font-weight: 700; padding: 0; width: auto;
       cursor: pointer; text-align: left;
     }
     .unit-title-btn:hover { color: var(--info); transform: none; }
-
     .badge {
       padding: 6px 10px; border-radius: 999px; font-size: 12px;
       font-weight: 700; border: 1px solid var(--border);
@@ -221,35 +187,39 @@
     .badge.warning { background: rgba(245,158,11,.12); color: var(--warning); border-color: rgba(245,158,11,.25); }
     .badge.danger  { background: rgba(239,68,68,.12);  color: var(--danger);  border-color: rgba(239,68,68,.25); }
     .badge.info    { background: rgba(37,99,235,.12);  color: var(--info);    border-color: rgba(37,99,235,.25); }
-
     .perm-badge {
       padding: 8px 20px; border-radius: 999px; font-size: 13px; font-weight: 700;
       background: var(--bg-muted); border: 1px solid var(--border); white-space: nowrap;
     }
-
     .info-grid, .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
     .unit-info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
-
     .info-item { border: 1px solid var(--border); background: var(--bg-muted); border-radius: 16px; padding: 12px; }
     .info-item strong { display: block; font-size: 12px; color: var(--text-soft); margin-bottom: 6px; }
-
     .actions-box { min-width: 290px; background: var(--bg-muted); border-radius: 18px; padding: 14px; }
     .card-info-col { flex: 1; min-width: 280px; }
-
     .action-grid, .admin-actions, .edit-actions {
       display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px;
     }
     .admin-actions { grid-template-columns: 1fr; }
     .edit-actions  { grid-template-columns: repeat(2, 1fr); margin-top: 14px; }
-
     .message {
       margin-bottom: 18px; padding: 14px 16px;
       border: 1px solid var(--border); background: var(--bg-soft);
       border-radius: 16px; font-size: 14px;
     }
-
+    .message.success {
+      border-color: rgba(34,197,94,.35);
+      background: rgba(34,197,94,.12);
+      color: var(--success);
+      font-weight: 700;
+    }
+    .message.error {
+      border-color: rgba(239,68,68,.35);
+      background: rgba(239,68,68,.12);
+      color: var(--danger);
+      font-weight: 700;
+    }
     .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
-
     .login-card {
       width: 100%; max-width: 430px; background: var(--bg-soft);
       border-radius: 28px; box-shadow: var(--shadow); padding: 28px;
@@ -257,13 +227,11 @@
     }
     .login-card h1 { margin: 16px 0 8px; }
     .text-center { text-align: center; }
-
     .permission-row {
       display: flex; align-items: center; justify-content: space-between;
       gap: 10px; border: 1px solid var(--border); padding: 14px 16px;
       border-radius: 16px; font-size: 14px; margin-top: 10px;
     }
-
     .obs-box, .summary-box, .editing-box {
       margin-top: 12px; background: var(--bg-muted); border-radius: 16px;
       padding: 12px; font-size: 14px; color: var(--text-soft);
@@ -271,24 +239,19 @@
     }
     .editing-box { border-style: solid; color: var(--text); }
     .summary-box { margin-top: 22px; margin-bottom: 22px; }
-
     .section-tabs { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
     .section-tabs button { width: auto; padding: 10px 16px; }
     .section-tabs button.active { outline: 2px solid var(--text-soft); }
-
     .small-note { font-size: 12px; color: var(--text-soft); margin-top: 8px; line-height: 1.5; }
-
     .right-column::-webkit-scrollbar { width: 4px; }
     .right-column::-webkit-scrollbar-track { background: transparent; }
     .right-column::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-
     @media (max-width: 1180px) {
       .grid-stats { grid-template-columns: repeat(2, 1fr); }
       .main-grid { grid-template-columns: 1fr; }
       .right-column { position: static; max-height: none; overflow-y: visible; }
       .top-menu { justify-content: flex-start; }
     }
-
     @media (max-width: 768px) {
       .grid-stats, .form-grid, .unit-info-grid, .info-grid { grid-template-columns: 1fr; }
       .container, .header-inner { padding: 16px; }
@@ -296,7 +259,6 @@
       .action-grid, .edit-actions { grid-template-columns: 1fr; }
       .brand-text strong { font-size: 20px; }
       .top-chip, .compact-btn { width: 100%; }
-
       .header-inner { flex-wrap: wrap; }
       .hamburger-btn { display: flex; }
       .top-menu {
@@ -307,7 +269,6 @@
         margin-top: 6px;
       }
       .top-menu.mobile-open { display: flex; }
-
       .card-body { padding: 16px; }
       .unit-card, .user-card { padding: 14px; }
       .actions-box, .card-info-col { min-width: 0; width: 100%; }
@@ -329,24 +290,20 @@
         <h1>VTAL Manutenção</h1>
         <p class="muted">Painel com acesso integrado ao Supabase.</p>
       </div>
-
       <div style="margin-top: 20px; display: grid; gap: 12px;">
         <input id="email" type="email" placeholder="Email" />
         <input id="senha" type="password" placeholder="Senha" />
         <button id="loginBtn">Entrar</button>
         <button id="forgotBtn" class="secondary">Esqueci minha senha</button>
-
         <div id="forgotBox" class="hidden" style="display:grid; gap:10px;">
           <input id="forgotEmail" type="email" placeholder="Seu email" />
           <input id="forgotSenha" type="text" placeholder="Nova senha" />
           <button id="forgotSubmit" class="secondary">Resetar minha senha</button>
         </div>
-
         <p id="loginError" style="color:#dc2626; font-size:14px;"></p>
       </div>
     </div>
   </section>
-
   <!-- APP -->
   <section id="appScreen" class="hidden">
     <header class="header">
@@ -358,9 +315,7 @@
             <strong>VTAL Manutenção de Unidades</strong>
           </div>
         </div>
-
         <button class="hamburger-btn" id="mobileMenuBtn" aria-label="Abrir menu" aria-expanded="false">☰</button>
-
         <div class="top-menu" id="topMenu">
           <div class="top-chip">Perfil: <strong id="perfilAtual"></strong></div>
           <div class="top-chip">Usuário: <strong id="nomeUsuario"></strong></div>
@@ -371,15 +326,12 @@
         </div>
       </div>
     </header>
-
     <main class="container">
       <div id="messageBox" class="message hidden"></div>
-
       <div class="section-tabs">
         <button id="tabUnidades" class="active">Unidades</button>
         <button id="tabUsuarios" class="hidden">Usuários</button>
       </div>
-
       <!-- UNIDADES -->
       <section id="unidadesSection">
         <section class="grid-stats">
@@ -388,9 +340,7 @@
           <div class="card"><div class="card-body stat-card"><div><div class="muted">Em manutenção</div><h2 id="statManutencao">0</h2><div class="muted">Precisam de acompanhamento</div></div><div class="icon-box">🛠️</div></div></div>
           <div class="card"><div class="card-body stat-card"><div><div class="muted">Total de câmeras</div><h2 id="statCameras">0</h2><div class="muted">Inventário monitorado</div></div><div class="icon-box">📷</div></div></div>
         </section>
-
         <section class="main-grid">
-
           <!-- COLUNA ESQUERDA -->
           <div class="card">
             <div class="card-body">
@@ -410,16 +360,13 @@
                   <input type="file" id="importOsFile" accept=".csv,.txt,.xls,.xlsx" class="hidden" />
                 </div>
               </div>
-
               <div id="searchSummary" class="summary-box hidden"></div>
               <div id="importPreviewBox" class="summary-box hidden"></div>
               <div id="unitList" class="unit-list"></div>
             </div>
           </div>
-
           <!-- COLUNA DIREITA -->
           <div class="right-column">
-
             <!-- PERMISSÕES (oculto a pedido do usuário; lógica de permissões continua ativa) -->
             <div class="card hidden">
               <div class="card-body">
@@ -428,7 +375,6 @@
                 <div id="permissionList" class="permission-list"></div>
               </div>
             </div>
-
             <!-- FORMULÁRIO CADASTRO / EDIÇÃO -->
             <div class="card">
               <div class="card-body">
@@ -438,10 +384,8 @@
                     <p class="muted" id="formSubtitle">Somente com permissão de inclusão.</p>
                   </div>
                 </div>
-
                 <div id="editingBox" class="editing-box hidden"></div>
                 <input id="editingUnitId" type="hidden" />
-
                 <div class="form-grid">
                   <input id="formUf" placeholder="UF" />
                   <input id="formNomeUnidade" placeholder="Nome da unidade" />
@@ -472,10 +416,8 @@
                   </select>
                   <input id="formCriador" placeholder="Criador da OS" />
                 </div>
-
                 <textarea id="formResumoOs" placeholder="Resumo da OS" style="margin-top:12px;"></textarea>
                 <textarea id="formObservacoes" placeholder="Observações" style="margin-top:12px;"></textarea>
-
                 <select id="formStatus" style="margin-top:12px;">
                   <option value="Ativa">Ativa</option>
                   <option value="Offline sem conexão">Offline sem conexão</option>
@@ -484,25 +426,20 @@
                   <option value="Pendente">Pendente</option>
                   <option value="Inativa">Inativa</option>
                 </select>
-
                 <div id="createActions" style="margin-top:12px;">
                   <button id="saveBtn">Cadastrar unidade</button>
                 </div>
-
                 <div id="editActions" class="edit-actions hidden">
                   <button id="updateBtn" class="info">Salvar alterações</button>
                   <button id="cancelEditBtn" class="secondary">Cancelar edição</button>
                 </div>
-
                 <p id="copyMessage" style="margin-top:10px; color:#16a34a; font-size:14px;"></p>
                 <p class="small-note">Clique no nome de uma unidade para carregar os dados no formulário e editar.</p>
               </div>
             </div>
-
           </div>
         </section>
       </section>
-
       <!-- USUÁRIOS -->
       <section id="usuariosSection" class="hidden">
         <div class="main-grid">
@@ -518,13 +455,11 @@
               <div id="userList" class="user-list"></div>
             </div>
           </div>
-
           <div style="display:grid; gap:20px;">
             <div class="card">
               <div class="card-body">
                 <h3 style="margin-bottom:6px;">Criar usuário</h3>
                 <p class="muted" style="margin-bottom:14px;">Somente admin.</p>
-
                 <div class="form-grid">
                   <input id="userNome" placeholder="Nome" />
                   <input id="userEmail" placeholder="Email" />
@@ -555,11 +490,9 @@
                     <option value="NÃO">Pode excluir: NÃO</option>
                   </select>
                 </div>
-
                 <button id="createUserBtn" style="margin-top:12px;">Criar usuário</button>
               </div>
             </div>
-
             <div class="card">
               <div class="card-body">
                 <h3 style="margin-bottom:6px;">Reset de senha</h3>
@@ -576,35 +509,31 @@
       </section>
     </main>
   </section>
-
   <script>
     // Configuração do Client Supabase (Corrigido)
 const SUPABASE_URL = 'https://zipnsdlqehfwrbzqhotc.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_oce5WUHXfuH_eZIDBV5IfQ_5smcJGcS';
-
 const { createClient } = window.supabase;
 const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-
     let currentUser = null;
     let units = [];
     let users = [];
     let editingUnitId = null;
     let expandedHistoryIds = new Set();
     let historyDataById = {};
-
     const el = (id) => document.getElementById(id);
-
-    function showMessage(text) {
+    function showMessage(text, type) {
       const box = el('messageBox');
       box.textContent = text;
-      box.classList.remove('hidden');
+      box.classList.remove('hidden', 'success', 'error');
+      if (type === 'success') box.classList.add('success');
+      if (type === 'error') box.classList.add('error');
+      box.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
-
     function hideMessage() {
       el('messageBox').classList.add('hidden');
       el('messageBox').textContent = '';
     }
-
     function normalizeUnits(data) {
       return (data || []).map(item => ({
         id: String(item['ID'] || ''),
@@ -633,35 +562,29 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         updatedBy: item['Atualizado por'] || ''
       }));
     }
-
     function escapeHtml(value) {
       return String(value || '')
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
     }
-
     function normalizePermissionValue(value) {
       if (value === true) return true;
       if (value === false) return false;
       const normalized = String(value || '').trim().toUpperCase();
       return normalized === 'SIM' || normalized === 'TRUE';
     }
-
     function userCanInclude() { return !!(currentUser && (currentUser.perfil === 'admin' || normalizePermissionValue(currentUser.podeIncluir))); }
     function userCanEdit()    { return !!(currentUser && (currentUser.perfil === 'admin' || normalizePermissionValue(currentUser.podeEditar))); }
     function userCanDelete()  { return !!(currentUser && (currentUser.perfil === 'admin' || normalizePermissionValue(currentUser.podeExcluir))); }
     function userCanView()    { return !!(currentUser && (currentUser.perfil === 'admin' || normalizePermissionValue(currentUser.podeVisualizar))); }
-
     async function login() {
       const email = el('email').value.trim();
       const senha = el('senha').value.trim();
       el('loginError').textContent = '';
-
       if (!email || !senha) {
         el('loginError').textContent = 'Preencha email e senha.';
         return;
       }
-
       try {
         const { data, error } = await _supabase
           .from('usuarios')
@@ -669,17 +592,14 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
           .eq('email', email)
           .eq('senha', senha)
           .single();
-
         if (error || !data) {
           el('loginError').textContent = 'Usuário ou senha inválidos.';
           return;
         }
-
         if (String(data.status).toUpperCase() === 'INATIVO') {
           el('loginError').textContent = 'Usuário inativo no sistema.';
           return;
         }
-
         currentUser = {
           id: data.id,
           nome: data.nome,
@@ -691,7 +611,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
           podeEditar: data.pode_editar || 'SIM',
           podeExcluir: data.pode_excluir || 'NÃO'
         };
-
         localStorage.setItem('vtal_user', JSON.stringify(currentUser));
         updateScreen();
         await loadUnits();
@@ -700,18 +619,15 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         el('loginError').textContent = 'Erro ao realizar login no Supabase.';
       }
     }
-
     async function resetOwnPassword() {
       const email = el('forgotEmail').value.trim();
       const novaSenha = el('forgotSenha').value.trim();
       if (!email || !novaSenha) { el('loginError').textContent = 'Informe email e nova senha.'; return; }
-
       try {
         const { error } = await _supabase
           .from('usuarios')
           .update({ senha: novaSenha })
           .eq('email', email);
-
         if (error) {
           el('loginError').textContent = 'Erro ao atualizar senha.';
         } else {
@@ -719,7 +635,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         }
       } catch (e) { el('loginError').textContent = 'Erro ao conectar ao banco.'; }
     }
-
     function logout() {
       currentUser = null; units = []; users = []; editingUnitId = null;
       localStorage.removeItem('vtal_user');
@@ -728,13 +643,11 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       el('loginError').textContent = '';
       resetUnitForm(); exitEditMode();
     }
-
     function applyTheme(mode) {
       document.body.classList.toggle('dark', mode === 'dark');
       localStorage.setItem('vtal_theme', mode);
       el('themeBtn').textContent = mode === 'dark' ? 'Modo claro' : 'Modo escuro';
     }
-
     function updateScreen() {
       el('loginScreen').classList.add('hidden');
       el('appScreen').classList.remove('hidden');
@@ -745,7 +658,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       renderPermissions();
       setFormPermissions();
     }
-
     function renderPermissions() {
       const items = [
         ['Pode visualizar', currentUser.perfil === 'admin' || normalizePermissionValue(currentUser.podeVisualizar)],
@@ -760,7 +672,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         </div>
       `).join('');
     }
-
     function setFormPermissions() {
       const canCreate = !!userCanInclude();
       const canEdit = !!userCanEdit();
@@ -774,42 +685,41 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       ].forEach(id => { el(id).disabled = !enabled; });
       el('saveBtn').disabled = !canCreate;
       el('updateBtn').disabled = !canEdit;
+      if (!canCreate) {
+        el('formSubtitle').textContent = 'Seu usuário não tem permissão de inclusão (verifique com o administrador).';
+      } else if (!editingUnitId) {
+        el('formSubtitle').textContent = 'Somente com permissão de inclusão.';
+      }
     }
-
     async function loadUnits() {
       hideMessage();
       try {
         let query = _supabase.from('unidades').select('*');
-        
+
         // Aplica filtro por UFs do usuário
         if (currentUser.perfil !== 'admin' && !currentUser.ufsPermitidas.includes('TODAS')) {
           query = query.in('UF', currentUser.ufsPermitidas);
         }
-
         const { data, error } = await query.order('Nome da unidade', { ascending: true });
-
-        if (error) { showMessage('Erro ao carregar unidades: ' + error.message); return; }
+        if (error) { console.error('Erro Supabase (loadUnits):', error); showMessage('Erro ao carregar unidades: ' + error.message, 'error'); return; }
         units = normalizeUnits(data);
         renderStats(); renderUfFilter(); renderUnits();
-      } catch (e) { showMessage('Erro ao conectar com o Supabase.'); }
+      } catch (e) { console.error('Erro de conexão (loadUnits):', e); showMessage('Erro ao conectar com o Supabase.', 'error'); }
     }
-
     async function loadUsers() {
       try {
         const { data, error } = await _supabase.from('usuarios').select('*').order('nome', { ascending: true });
-        if (error) { showMessage('Erro ao carregar usuários: ' + error.message); return; }
+        if (error) { console.error('Erro Supabase (loadUsers):', error); showMessage('Erro ao carregar usuários: ' + error.message, 'error'); return; }
         users = data || [];
         renderUsers();
-      } catch (e) { showMessage('Erro ao carregar usuários.'); }
+      } catch (e) { console.error('Erro de conexão (loadUsers):', e); showMessage('Erro ao carregar usuários.', 'error'); }
     }
-
     function renderStats() {
       el('statTotal').textContent      = units.length;
       el('statAtivas').textContent     = units.filter(u => u.status === 'Ativa').length;
       el('statManutencao').textContent = units.filter(u => u.status === 'Manutenção').length;
       el('statCameras').textContent    = units.reduce((a, u) => a + Number(u.cameras || 0), 0);
     }
-
     function renderUfFilter() {
       const select = el('ufFilter');
       const current = select.value;
@@ -818,7 +728,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         ufs.map(uf => `<option value="${escapeHtml(uf)}">${escapeHtml(uf)}</option>`).join('');
       select.value = ufs.includes(current) || current === 'all' ? current : 'all';
     }
-
     function getFilteredUnits() {
       const term = el('searchInput').value.trim().toLowerCase();
       const osTerm = el('osFilter').value.trim().toLowerCase();
@@ -839,7 +748,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
           (uf === 'all' || unit.uf === uf);
       });
     }
-
     function renderSearchSummary(filtered) {
       const box = el('searchSummary');
       const term = el('searchInput').value.trim();
@@ -854,7 +762,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       box.innerHTML = `Consulta atual: <strong>${filtered.length}</strong> resultado(s) em <strong>${escapeHtml(uf)}</strong>${details ? ` para ${details}` : ''}.`;
       box.classList.remove('hidden');
     }
-
     function getStatusBadgeClass(status) {
       if (status === 'Ativa')               return 'badge active';
       if (status === 'Manutenção')          return 'badge warning';
@@ -863,23 +770,19 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       if (status === 'Pendente')            return 'badge secondary';
       return 'badge';
     }
-
     function copyText(value, label) {
       navigator.clipboard.writeText(String(value || ''));
       el('copyMessage').textContent = `Copiado: ${label}`;
       setTimeout(() => el('copyMessage').textContent = '', 1500);
     }
-
     function renderUnits() {
       const list = el('unitList');
       const filtered = getFilteredUnits();
       renderSearchSummary(filtered);
-
       if (!filtered.length) {
         list.innerHTML = '<div class="unit-card"><div class="muted">Nenhuma unidade encontrada com os filtros aplicados.</div></div>';
         return;
       }
-
       list.innerHTML = filtered.map(unit => `
         <div class="unit-card ${editingUnitId === unit.id ? 'selected' : ''}" data-card-id="${escapeHtml(unit.id)}">
           <div class="unit-top">
@@ -895,7 +798,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
                 ${unit.alarmeMac ? `<span class="badge success">MAC alarme: ${escapeHtml(unit.alarmeMac)}</span>` : ''}
                 <span class="badge ${unit.cadeadoBluetooth === 'SIM' ? 'info' : 'secondary'}">Cadeado bluetooth: ${escapeHtml(unit.cadeadoBluetooth || 'NÃO')}</span>
               </div>
-
               <div class="unit-info-grid">
                 <div class="info-item"><strong>UF</strong><div>${escapeHtml(unit.uf)}</div></div>
                 <div class="info-item"><strong>OS</strong><div>${escapeHtml(unit.os || '-')}</div></div>
@@ -915,14 +817,11 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
                 <div class="info-item"><strong>Cadeado bluetooth</strong><div>${escapeHtml(unit.cadeadoBluetooth || 'NÃO')}</div></div>
                 <div class="info-item"><strong>Criador</strong><div>${escapeHtml(unit.criador || '-')}</div></div>
               </div>
-
               ${unit.resumoOs ? `<div class="obs-box"><strong style="color:var(--text)">Resumo da OS:</strong> ${escapeHtml(unit.resumoOs)}</div>` : ''}
               ${unit.observacoes ? `<div class="obs-box"><strong style="color:var(--text)">Observações:</strong> ${escapeHtml(unit.observacoes)}</div>` : ''}
             </div>
-
             <div class="actions-box">
               <div class="muted" style="font-weight:700; margin-bottom:8px;">Ações liberadas</div>
-
               <div class="action-grid">
                 <button class="secondary" data-copy-value="${escapeHtml(unit.login)}"       data-copy-label="Login ${escapeHtml(unit.unidade)}">Login</button>
                 <button class="secondary" data-copy-value="${escapeHtml(unit.ip)}"          data-copy-label="IP ${escapeHtml(unit.unidade)}">IP</button>
@@ -930,13 +829,11 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
                 <button class="secondary" data-copy-value="${escapeHtml(unit.senha)}"       data-copy-label="Senha ${escapeHtml(unit.unidade)}">Senha</button>
                 <button class="secondary" data-copy-value="${escapeHtml(unit.senhaCameras)}" data-copy-label="Senha câmeras ${escapeHtml(unit.unidade)}">Senha câmeras</button>
               </div>
-
               <div class="admin-actions">
                 ${userCanEdit()   ? `<button class="info"   data-edit-id="${escapeHtml(unit.id)}">Editar unidade</button>` : ''}
                 ${userCanDelete() ? `<button class="danger" data-delete-id="${escapeHtml(unit.id)}">Excluir cadastro</button>` : ''}
                 <button class="secondary" data-history-id="${escapeHtml(unit.id)}">${expandedHistoryIds.has(unit.id) ? 'Ocultar histórico de OS' : 'Histórico de OS'}</button>
               </div>
-
               <div style="margin-top:12px; font-size:12px; color:var(--text-soft); line-height:1.6;">
                 <div>Atualização: ${escapeHtml(unit.updatedAt || '-')}</div>
                 <div>Atualizado por: ${escapeHtml(unit.updatedBy || '-')}</div>
@@ -946,7 +843,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
           ${expandedHistoryIds.has(unit.id) ? renderHistoryPanel(unit.id) : ''}
         </div>
       `).join('');
-
       list.querySelectorAll('button[data-copy-value]').forEach(btn => {
         btn.addEventListener('click', () => copyText(btn.getAttribute('data-copy-value'), btn.getAttribute('data-copy-label')));
       });
@@ -960,9 +856,7 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         btn.addEventListener('click', () => toggleUnitHistory(btn.getAttribute('data-history-id')));
       });
     }
-
     // ===== HISTÓRICO DE OS (tabela historico_os no Supabase) =====
-
     async function toggleUnitHistory(id) {
       if (expandedHistoryIds.has(id)) {
         expandedHistoryIds.delete(id);
@@ -971,7 +865,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       }
       expandedHistoryIds.add(id);
       renderUnits();
-
       try {
         const { data, error } = await _supabase
           .from('historico_os')
@@ -984,22 +877,18 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       }
       renderUnits();
     }
-
     function formatHistoryTimestamp(value) {
       if (!value) return '-';
       try { return new Date(value).toLocaleString('pt-BR'); } catch (e) { return String(value); }
     }
-
     function renderHistoryPanel(id) {
       const history = historyDataById[id];
-
       if (history === undefined) {
         return `<div class="obs-box" style="margin-top:14px;">Carregando histórico de OS...</div>`;
       }
       if (!history.length) {
         return `<div class="obs-box" style="margin-top:14px;"><strong style="color:var(--text);">Histórico de OS</strong><br><span class="muted">Nenhum histórico registrado ainda para esta unidade.</span></div>`;
       }
-
       return `
         <div class="obs-box" style="margin-top:14px;">
           <strong style="color:var(--text);">Histórico de OS (${history.length})</strong>
@@ -1016,7 +905,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         </div>
       `;
     }
-
     // Guarda no histórico o registro ANTERIOR de uma unidade antes de sobrescrever a OS atual.
     // Só grava quando já existia uma OS anterior — não polui o histórico em cadastros novos.
     async function archiveOsHistoryEntry(entry) {
@@ -1035,7 +923,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         // não bloqueia o fluxo principal (cadastro/importação) se o histórico falhar
       }
     }
-
     function fillUnitForm(unit) {
       el('editingUnitId').value      = unit.id || '';
       el('formUf').value             = unit.uf || '';
@@ -1060,26 +947,21 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       el('formObservacoes').value    = unit.observacoes || '';
       el('formStatus').value         = unit.status || 'Ativa';
     }
-
     function startEditUnit(id) {
-      if (!userCanEdit()) { showMessage('Você não tem permissão para editar unidades.'); return; }
+      if (!userCanEdit()) { showMessage('Você não tem permissão para editar unidades.', 'error'); return; }
       const unit = units.find(u => u.id === String(id));
-      if (!unit) { showMessage('Unidade não encontrada para edição.'); return; }
-
+      if (!unit) { showMessage('Unidade não encontrada para edição.', 'error'); return; }
       editingUnitId = unit.id;
       fillUnitForm(unit);
-
       el('formTitle').textContent    = 'Editar unidade';
       el('formSubtitle').textContent = 'Altere as informações e salve as mudanças.';
       el('editingBox').innerHTML     = `Editando a unidade: <strong>${escapeHtml(unit.unidade)}</strong> | ID: <strong>${escapeHtml(unit.id)}</strong>`;
       el('editingBox').classList.remove('hidden');
       el('createActions').classList.add('hidden');
       el('editActions').classList.remove('hidden');
-
       setFormPermissions();
       renderUnits();
     }
-
     function exitEditMode() {
       editingUnitId = null;
       el('editingUnitId').value = '';
@@ -1092,7 +974,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       setFormPermissions();
       renderUnits();
     }
-
     function collectUnitFormData() {
       return {
         'UF': el('formUf').value.trim().toUpperCase(),
@@ -1119,38 +1000,39 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         'Atualizado por': currentUser ? currentUser.nome : 'Sistema'
       };
     }
-
     async function saveUnit() {
-      if (!userCanInclude()) { showMessage('Você não tem permissão para cadastrar unidades.'); return; }
+      if (!userCanInclude()) { showMessage('Você não tem permissão para cadastrar unidades.', 'error'); return; }
       const payload = collectUnitFormData();
-
       if (!payload['UF'] || !payload['Nome da unidade'] || !payload['Login'] || !payload['IP']) {
-        showMessage('Preencha UF, nome da unidade, login e IP.'); return;
+        showMessage('Preencha UF, nome da unidade, login e IP.', 'error'); return;
       }
-
+      el('saveBtn').disabled = true;
       try {
         const { error } = await _supabase.from('unidades').insert([payload]);
-        if (error) { showMessage('Erro ao cadastrar: ' + error.message); return; }
-
+        if (error) {
+          console.error('Erro Supabase (saveUnit):', error);
+          showMessage('Erro ao cadastrar: ' + error.message, 'error');
+          return;
+        }
         resetUnitForm(); exitEditMode(); await loadUnits();
-        showMessage('Unidade cadastrada com sucesso!');
-      } catch (e) { showMessage('Erro ao cadastrar unidade no Supabase.'); }
-    }
-
-    async function updateUnit() {
-      if (!userCanEdit()) { showMessage('Você não tem permissão para editar unidades.'); return; }
-      const id = el('editingUnitId').value.trim();
-      if (!id) { showMessage('Nenhuma unidade selecionada para edição.'); return; }
-
-      const payload = collectUnitFormData();
-
-      if (!payload['UF'] || !payload['Nome da unidade'] || !payload['Login'] || !payload['IP']) {
-        showMessage('Preencha UF, nome da unidade, login e IP.'); return;
+        showMessage('Unidade cadastrada com sucesso!', 'success');
+      } catch (e) {
+        console.error('Erro de conexão (saveUnit):', e);
+        showMessage('Erro ao cadastrar unidade no Supabase: ' + (e && e.message ? e.message : e), 'error');
+      } finally {
+        setFormPermissions();
       }
-
+    }
+    async function updateUnit() {
+      if (!userCanEdit()) { showMessage('Você não tem permissão para editar unidades.', 'error'); return; }
+      const id = el('editingUnitId').value.trim();
+      if (!id) { showMessage('Nenhuma unidade selecionada para edição.', 'error'); return; }
+      const payload = collectUnitFormData();
+      if (!payload['UF'] || !payload['Nome da unidade'] || !payload['Login'] || !payload['IP']) {
+        showMessage('Preencha UF, nome da unidade, login e IP.', 'error'); return;
+      }
       const existingUnit = units.find(u => u.id === id);
       const osChanged = existingUnit && existingUnit.os && existingUnit.os !== payload['OS'];
-
       try {
         if (osChanged) {
           await archiveOsHistoryEntry({
@@ -1163,29 +1045,30 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
             resumoOs: existingUnit.resumoOs
           });
         }
-
         const { error } = await _supabase.from('unidades').update(payload).eq('ID', id);
-        if (error) { showMessage('Erro ao atualizar: ' + error.message); return; }
-
+        if (error) {
+          console.error('Erro Supabase (updateUnit):', error);
+          showMessage('Erro ao atualizar: ' + error.message, 'error');
+          return;
+        }
         resetUnitForm(); exitEditMode(); await loadUnits();
-        showMessage('Unidade atualizada com sucesso!');
-      } catch (e) { showMessage('Erro ao editar unidade no Supabase.'); }
+        showMessage('Unidade atualizada com sucesso!', 'success');
+      } catch (e) {
+        console.error('Erro de conexão (updateUnit):', e);
+        showMessage('Erro ao editar unidade no Supabase: ' + (e && e.message ? e.message : e), 'error');
+      }
     }
-
     async function deleteUnit(id) {
-      if (!userCanDelete()) { showMessage('Você não tem permissão para excluir unidades.'); return; }
+      if (!userCanDelete()) { showMessage('Você não tem permissão para excluir unidades.', 'error'); return; }
       if (!window.confirm('Tem certeza que deseja excluir este cadastro?')) return;
-
       try {
         const { error } = await _supabase.from('unidades').delete().eq('ID', id);
-        if (error) { showMessage('Erro ao excluir: ' + error.message); return; }
-
+        if (error) { console.error('Erro Supabase (deleteUnit):', error); showMessage('Erro ao excluir: ' + error.message, 'error'); return; }
         if (editingUnitId === String(id)) { resetUnitForm(); exitEditMode(); }
         await loadUnits();
-        showMessage('Unidade excluída com sucesso!');
-      } catch (e) { showMessage('Erro ao excluir unidade.'); }
+        showMessage('Unidade excluída com sucesso!', 'success');
+      } catch (e) { console.error('Erro de conexão (deleteUnit):', e); showMessage('Erro ao excluir unidade.', 'error'); }
     }
-
     function resetUnitForm() {
       [
         'editingUnitId','formUf','formNomeUnidade','formCloudNvr','formLogin','formSenha','formSenhaCameras','formIp',
@@ -1195,21 +1078,16 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       el('formStatus').value = 'Ativa';
       el('formCadeadoBluetooth').value = 'NÃO';
     }
-
     // ===== IMPORTAÇÃO DE PLANILHA DE OS (associa por Nome da unidade / Site) =====
-
     let pendingImportPlan = null;
-
     function normalizeSiteName(value) {
       return String(value || '').trim().toUpperCase().replace(/\s+/g, ' ');
     }
-
     function normalizeHeader(value) {
       return String(value || '')
-        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .normalize('NFD').replace(/[̀-ͯ]/g, '')
         .trim().toLowerCase();
     }
-
     function parseBrDateToIso(value) {
       if (!value) return '';
       const datePart = String(value).split(' ')[0].trim();
@@ -1218,7 +1096,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       const [, dd, mm, yyyy] = m;
       return `${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`;
     }
-
     function parseBrDateTimeToDate(value) {
       if (!value) return null;
       const [datePart, timePart] = String(value).split(' ');
@@ -1228,7 +1105,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       const [hh = '00', mi = '00', ss = '00'] = (timePart || '').split(':');
       return new Date(Number(yyyy), Number(mm) - 1, Number(dd), Number(hh), Number(mi), Number(ss));
     }
-
     function mapStatusOs(rawStatus) {
       const s = normalizeHeader(rawStatus);
       if (s === 'concluida' || s === 'concluído' || s === 'concluida.') return 'Concluída';
@@ -1238,7 +1114,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       if (s === 'aberta') return 'Aberta';
       return rawStatus || '';
     }
-
     function detectDelimiter(line) {
       const tabs = (line.match(/\t/g) || []).length;
       const commas = (line.match(/,/g) || []).length;
@@ -1247,7 +1122,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       if (semicolons >= commas) return ';';
       return ',';
     }
-
     function findColumnIndexes(headerCells) {
       const normalized = headerCells.map(normalizeHeader);
       return {
@@ -1260,7 +1134,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         criador: normalized.indexOf('criador')
       };
     }
-
     function parseDelimitedText(text) {
       const lines = text.split(/\r\n|\r|\n/).filter(l => l.trim() !== '');
       if (!lines.length) return [];
@@ -1268,7 +1141,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       const headerCells = lines[0].split(delimiter);
       const colIndex = findColumnIndexes(headerCells);
       if (colIndex.site < 0) return [];
-
       const rows = [];
       for (let i = 1; i < lines.length; i++) {
         const cells = lines[i].split(delimiter);
@@ -1287,12 +1159,10 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       rows.meta = { hasResumo: colIndex.resumo >= 0, hasCriador: colIndex.criador >= 0 };
       return rows;
     }
-
     function parseSheetRows(rawRows) {
       if (!rawRows.length) return [];
       const colIndex = findColumnIndexes(rawRows[0]);
       if (colIndex.site < 0) return [];
-
       const rows = [];
       for (let i = 1; i < rawRows.length; i++) {
         const cells = rawRows[i] || [];
@@ -1311,7 +1181,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       rows.meta = { hasResumo: colIndex.resumo >= 0, hasCriador: colIndex.criador >= 0 };
       return rows;
     }
-
     function loadSheetJs() {
       return new Promise((resolve, reject) => {
         if (window.XLSX) { resolve(); return; }
@@ -1322,7 +1191,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         document.head.appendChild(script);
       });
     }
-
     // Para cada unidade (Site) presente na planilha, escolhe a OS "atual":
     // prioriza a mais recente em aberto (Andamento/Pendencia/Aberta); se não houver
     // nenhuma em aberto, usa a mais recente concluída/cancelada.
@@ -1333,7 +1201,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         if (!bySite.has(key)) bySite.set(key, []);
         bySite.get(key).push(row);
       });
-
       const result = new Map();
       bySite.forEach((siteRows, key) => {
         const withDates = siteRows.map(r => ({ ...r, _date: parseBrDateTimeToDate(r.data) }));
@@ -1347,13 +1214,11 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       });
       return result;
     }
-
     function buildImportPlan(rows) {
       const bestPerSite = pickBestRowPerSite(rows);
       const matched = [];
       const unmatched = [];
       const meta = rows.meta || { hasResumo: false, hasCriador: false };
-
       bestPerSite.forEach((row, key) => {
         const unit = units.find(u => normalizeSiteName(u.unidade) === key);
         if (unit) {
@@ -1375,15 +1240,12 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
           unmatched.push(row.site);
         }
       });
-
       return { matched, unmatched, hasResumo: meta.hasResumo, hasCriador: meta.hasCriador };
     }
-
     function renderImportPreview(plan) {
       pendingImportPlan = plan;
       const { matched, unmatched } = plan;
       const box = el('importPreviewBox');
-
       box.innerHTML = `
         <div style="margin-bottom:10px;">
           <strong>${matched.length}</strong> unidade(s) encontrada(s) para atualizar OS / Status da OS / Data de abertura${plan.hasResumo || plan.hasCriador ? ' / ' + [plan.hasCriador ? 'Criador' : '', plan.hasResumo ? 'Resumo da OS' : ''].filter(Boolean).join(' / ') : ''}.
@@ -1412,26 +1274,21 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         </div>`}
       `;
       box.classList.remove('hidden');
-
       const confirmBtn = el('confirmImportBtn');
       if (confirmBtn) confirmBtn.addEventListener('click', confirmImportOs);
       el('cancelImportBtn').addEventListener('click', cancelImportOs);
     }
-
     function cancelImportOs() {
       pendingImportPlan = null;
       el('importPreviewBox').classList.add('hidden');
       el('importPreviewBox').innerHTML = '';
       el('importOsFile').value = '';
     }
-
     async function confirmImportOs() {
       if (!pendingImportPlan || !pendingImportPlan.matched.length) return;
-      if (!userCanEdit()) { showMessage('Você não tem permissão para editar unidades.'); return; }
-
+      if (!userCanEdit()) { showMessage('Você não tem permissão para editar unidades.', 'error'); return; }
       const { matched, hasResumo, hasCriador } = pendingImportPlan;
       let sucesso = 0, falhas = 0;
-
       for (const item of matched) {
         const payload = {
           'OS': item.osNovo,
@@ -1441,9 +1298,7 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         };
         if (hasCriador) payload['Criador'] = item.criadorNovo;
         if (hasResumo) payload['RESUMO OS'] = item.resumoNovo;
-
         const osChanged = item.osAtual && item.osAtual !== item.osNovo;
-
         try {
           if (osChanged) {
             await archiveOsHistoryEntry({
@@ -1456,21 +1311,17 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
               resumoOs: item.resumoAtual
             });
           }
-
           const { error } = await _supabase.from('unidades').update(payload).eq('ID', item.id);
-          if (error) { falhas++; } else { sucesso++; }
-        } catch (e) { falhas++; }
+          if (error) { console.error('Erro Supabase (confirmImportOs):', error); falhas++; } else { sucesso++; }
+        } catch (e) { console.error('Erro de conexão (confirmImportOs):', e); falhas++; }
       }
-
       cancelImportOs();
       await loadUnits();
-      showMessage(`Importação concluída: ${sucesso} unidade(s) atualizada(s)${falhas ? `, ${falhas} falha(s)` : ''}.`);
+      showMessage(`Importação concluída: ${sucesso} unidade(s) atualizada(s)${falhas ? `, ${falhas} falha(s)` : ''}.`, falhas ? 'error' : 'success');
     }
-
     async function handleImportFile(file) {
       if (!file) return;
-      if (!userCanEdit()) { showMessage('Você não tem permissão para editar unidades.'); return; }
-
+      if (!userCanEdit()) { showMessage('Você não tem permissão para editar unidades.', 'error'); return; }
       const name = file.name.toLowerCase();
       try {
         let rows = [];
@@ -1485,23 +1336,20 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
           const text = await file.text();
           rows = parseDelimitedText(text);
         }
-
         if (!rows.length) {
-          showMessage('Não encontrei linhas válidas na planilha. Confira se ela tem as colunas OS, Data, Status e Site.');
+          showMessage('Não encontrei linhas válidas na planilha. Confira se ela tem as colunas OS, Data, Status e Site.', 'error');
           return;
         }
-
         const plan = buildImportPlan(rows);
         renderImportPreview(plan);
       } catch (e) {
-        showMessage('Erro ao ler a planilha: ' + e.message);
+        console.error('Erro ao ler planilha:', e);
+        showMessage('Erro ao ler a planilha: ' + e.message, 'error');
       }
     }
-
     function downloadExcelFromFiltered() {
       const filtered = getFilteredUnits();
-      if (!filtered.length) { showMessage('Não há dados para exportar no filtro atual.'); return; }
-
+      if (!filtered.length) { showMessage('Não há dados para exportar no filtro atual.', 'error'); return; }
       const headers = [
         'ID','UF','Nome da unidade','OS','Data da abertura da OS','Status da OS','Cloud NVR','Login','Senha','Senha câmeras','IP','HD',
         'Quantidade de câmeras','MAC do alarme','Sensores','Senha do alarme',
@@ -1511,13 +1359,11 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         u.id,u.uf,u.unidade,u.os,u.dataAberturaOs,u.statusOs,u.cloudNvr,u.login,u.senha,u.senhaCameras,u.ip,u.hd,u.cameras,
         u.alarmeMac,u.sensores,u.senhaAlarme,u.central,u.cadeadoBluetooth,u.criador,u.resumoOs,u.observacoes,u.status,u.updatedAt,u.updatedBy
       ]);
-
       const tableHtml = `
         <table>
           <tr>${headers.map(h => `<th style="background:#0f172a;color:#fff;border:1px solid #cbd5e1;padding:8px;">${h}</th>`).join('')}</tr>
           ${rows.map(r => `<tr>${r.map(c => `<td style="border:1px solid #cbd5e1;padding:8px;">${escapeHtml(c)}</td>`).join('')}</tr>`).join('')}
         </table>`;
-
       const blob = new Blob([tableHtml], { type: 'application/vnd.ms-excel;charset=utf-8;' });
       const link = document.createElement('a');
       const url = URL.createObjectURL(blob);
@@ -1528,7 +1374,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
     }
-
     async function createUser() {
       const payload = {
         nome: el('userNome').value.trim(),
@@ -1542,33 +1387,25 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         pode_excluir: el('permExcluir').value,
         status: el('userStatus').value
       };
-
       if (!payload.nome || !payload.email || !payload.senha) {
-        showMessage('Preencha nome, email e senha para o novo usuário.'); return;
+        showMessage('Preencha nome, email e senha para o novo usuário.', 'error'); return;
       }
-
       try {
         const { error } = await _supabase.from('usuarios').insert([payload]);
-        if (error) { showMessage('Erro ao criar usuário: ' + error.message); return; }
-
-        showMessage('Usuário criado com sucesso!');
+        if (error) { console.error('Erro Supabase (createUser):', error); showMessage('Erro ao criar usuário: ' + error.message, 'error'); return; }
+        showMessage('Usuário criado com sucesso!', 'success');
         ['userNome','userEmail','userSenha','userUfs'].forEach(id => el(id).value = '');
         await loadUsers();
-      } catch (e) { showMessage('Erro ao criar usuário no Supabase.'); }
+      } catch (e) { console.error('Erro de conexão (createUser):', e); showMessage('Erro ao criar usuário no Supabase.', 'error'); }
     }
-
     let editingUserId = null;
-
     function renderUsers() {
       const list = el('userList');
       if (!users.length) { list.innerHTML = '<div class="user-card"><div class="muted">Nenhum usuário cadastrado.</div></div>'; return; }
-
       const isAdmin = currentUser && currentUser.perfil === 'admin';
-
       list.innerHTML = users.map(user => {
         const uid = escapeHtml(user.id || '');
         const isEditing = editingUserId === String(user.id || '');
-
         return `
         <div class="user-card ${isEditing ? 'selected' : ''}" data-user-card="${uid}">
           <div class="user-top">
@@ -1586,7 +1423,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
                 <div class="info-item"><strong>Pode editar</strong><div>${escapeHtml(user.pode_editar || '-')}</div></div>
                 <div class="info-item"><strong>Pode excluir</strong><div>${escapeHtml(user.pode_excluir || '-')}</div></div>
               </div>
-
               ${isEditing ? `
               <div style="margin-top:16px; padding:16px; background:var(--bg-muted); border-radius:16px; border:1px solid var(--border);">
                 <div style="font-weight:700; margin-bottom:12px; font-size:14px;">✏️ Editando usuário</div>
@@ -1626,7 +1462,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
                 </div>
               </div>` : ''}
             </div>
-
             <div class="actions-box">
               <div class="muted" style="font-weight:700; margin-bottom:8px;">Ações do usuário</div>
               <div class="admin-actions">
@@ -1638,14 +1473,12 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
           </div>
         </div>`;
       }).join('');
-
       list.querySelectorAll('button[data-edit-user-id]').forEach(btn => {
         btn.addEventListener('click', () => {
           editingUserId = btn.getAttribute('data-edit-user-id');
           renderUsers();
         });
       });
-
       const saveBtn = el('saveEditUserBtn');
       if (saveBtn) {
         saveBtn.addEventListener('click', async () => {
@@ -1660,63 +1493,52 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
             pode_editar: el('editPermEditar').value,
             pode_excluir: el('editPermExcluir').value,
           };
-
           const novaSenha = el('editUserSenha').value.trim();
           if (novaSenha) payload.senha = novaSenha;
-
-          if (!payload.nome || !payload.email) { showMessage('Nome e email são obrigatórios.'); return; }
-
+          if (!payload.nome || !payload.email) { showMessage('Nome e email são obrigatórios.', 'error'); return; }
           try {
             const { error } = await _supabase.from('usuarios').update(payload).eq('id', editingUserId);
-            if (error) { showMessage('Erro ao editar usuário: ' + error.message); return; }
-
+            if (error) { console.error('Erro Supabase (editUser):', error); showMessage('Erro ao editar usuário: ' + error.message, 'error'); return; }
             editingUserId = null;
             await loadUsers();
-            showMessage('Usuário atualizado com sucesso!');
-          } catch (e) { showMessage('Erro ao editar usuário.'); }
+            showMessage('Usuário atualizado com sucesso!', 'success');
+          } catch (e) { console.error('Erro de conexão (editUser):', e); showMessage('Erro ao editar usuário.', 'error'); }
         });
       }
-
       const cancelBtn = el('cancelEditUserBtn');
       if (cancelBtn) {
         cancelBtn.addEventListener('click', () => { editingUserId = null; renderUsers(); });
       }
-
       list.querySelectorAll('button[data-reset-email]').forEach(btn => {
         btn.addEventListener('click', () => {
           el('resetEmail').value = btn.getAttribute('data-reset-email');
-          showMessage('Email carregado no campo de reset de senha.');
+          showMessage('Email carregado no campo de reset de senha.', 'success');
         });
       });
-
       list.querySelectorAll('button[data-delete-user-id]').forEach(btn => {
         btn.addEventListener('click', () => deleteUser(btn.getAttribute('data-delete-user-id')));
       });
     }
-
     async function deleteUser(id) {
       if (!window.confirm('Tem certeza que deseja excluir este usuário?')) return;
       try {
         const { error } = await _supabase.from('usuarios').delete().eq('id', id);
-        if (error) { showMessage('Erro ao excluir: ' + error.message); return; }
-        showMessage('Usuário excluído com sucesso!');
+        if (error) { console.error('Erro Supabase (deleteUser):', error); showMessage('Erro ao excluir: ' + error.message, 'error'); return; }
+        showMessage('Usuário excluído com sucesso!', 'success');
         await loadUsers();
-      } catch (e) { showMessage('Erro ao excluir usuário.'); }
+      } catch (e) { console.error('Erro de conexão (deleteUser):', e); showMessage('Erro ao excluir usuário.', 'error'); }
     }
-
     async function resetPasswordAdmin() {
       const email = el('resetEmail').value.trim();
       const novaSenha = el('resetNovaSenha').value.trim();
-      if (!email || !novaSenha) { showMessage('Informe email e nova senha.'); return; }
+      if (!email || !novaSenha) { showMessage('Informe email e nova senha.', 'error'); return; }
       try {
         const { error } = await _supabase.from('usuarios').update({ senha: novaSenha }).eq('email', email);
-        if (error) { showMessage('Erro ao resetar senha: ' + error.message); return; }
-
-        showMessage('Senha resetada com sucesso!');
+        if (error) { console.error('Erro Supabase (resetPasswordAdmin):', error); showMessage('Erro ao resetar senha: ' + error.message, 'error'); return; }
+        showMessage('Senha resetada com sucesso!', 'success');
         el('resetNovaSenha').value = '';
-      } catch (e) { showMessage('Erro ao resetar senha.'); }
+      } catch (e) { console.error('Erro de conexão (resetPasswordAdmin):', e); showMessage('Erro ao resetar senha.', 'error'); }
     }
-
     function showTab(tab) {
       const unitsTab = tab === 'unidades';
       el('unidadesSection').classList.toggle('hidden', !unitsTab);
@@ -1724,7 +1546,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       el('tabUnidades').classList.toggle('active', unitsTab);
       el('tabUsuarios').classList.toggle('active', !unitsTab);
     }
-
     // EVENTOS
     el('loginBtn').addEventListener('click', login);
     el('forgotBtn').addEventListener('click', () => el('forgotBox').classList.toggle('hidden'));
@@ -1741,7 +1562,7 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
     el('ufFilter').addEventListener('change', renderUnits);
     el('saveBtn').addEventListener('click', saveUnit);
     el('updateBtn').addEventListener('click', updateUnit);
-    el('cancelEditBtn').addEventListener('click', () => { resetUnitForm(); exitEditMode(); showMessage('Edição cancelada.'); });
+    el('cancelEditBtn').addEventListener('click', () => { resetUnitForm(); exitEditMode(); showMessage('Edição cancelada.', 'success'); });
     el('exportBtn').addEventListener('click', downloadExcelFromFiltered);
     el('importOsBtn').addEventListener('click', () => el('importOsFile').click());
     el('importOsFile').addEventListener('change', (e) => {
@@ -1755,7 +1576,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
     el('reloadUsersBtn').addEventListener('click', loadUsers);
     el('resetBtn').addEventListener('click', resetPasswordAdmin);
     el('themeBtn').addEventListener('click', () => { applyTheme(document.body.classList.contains('dark') ? 'light' : 'dark'); });
-
     // Menu mobile (hambúrguer)
     el('mobileMenuBtn').addEventListener('click', () => {
       const menu = el('topMenu');
@@ -1771,7 +1591,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       }
     });
     el('senha').addEventListener('keydown', (e) => { if (e.key === 'Enter') login(); });
-
     window.addEventListener('load', async () => {
       applyTheme(localStorage.getItem('vtal_theme') || 'light');
       const saved = localStorage.getItem('vtal_user');
