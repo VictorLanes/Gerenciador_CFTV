@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VTAL Manutenção de Unidades</title>
-
   <!-- Supabase JS Client via CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
@@ -695,7 +694,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       hideMessage();
       try {
         let query = _supabase.from('unidades').select('*');
-
         // Aplica filtro por UFs do usuário
         if (currentUser.perfil !== 'admin' && !currentUser.ufsPermitidas.includes('TODAS')) {
           query = query.in('UF', currentUser.ufsPermitidas);
@@ -1347,32 +1345,48 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         showMessage('Erro ao ler a planilha: ' + e.message, 'error');
       }
     }
-    function downloadExcelFromFiltered() {
+    // Gera um arquivo .xlsx real (binário OOXML) usando a biblioteca SheetJS,
+    // já carregada pelo fluxo de importação (loadSheetJs). Isso resolve dois problemas
+    // do método antigo (tabela HTML disfarçada de .xls): os cabeçalhos com acentuação
+    // apareciam corrompidos e o Excel exibia aviso de "arquivo não confiável" porque
+    // o conteúdo (HTML) não batia com a extensão (.xls).
+    async function downloadExcelFromFiltered() {
       const filtered = getFilteredUnits();
       if (!filtered.length) { showMessage('Não há dados para exportar no filtro atual.', 'error'); return; }
-      const headers = [
-        'ID','UF','Nome da unidade','OS','Data da abertura da OS','Status da OS','Cloud NVR','Login','Senha','Senha câmeras','IP','HD',
-        'Quantidade de câmeras','MAC do alarme','Sensores','Senha do alarme',
-        'Acesso da central','Cadeado bluetooth','Criador','RESUMO OS','Observações','Status','Última atualização','Atualizado por'
-      ];
-      const rows = filtered.map(u => [
-        u.id,u.uf,u.unidade,u.os,u.dataAberturaOs,u.statusOs,u.cloudNvr,u.login,u.senha,u.senhaCameras,u.ip,u.hd,u.cameras,
-        u.alarmeMac,u.sensores,u.senhaAlarme,u.central,u.cadeadoBluetooth,u.criador,u.resumoOs,u.observacoes,u.status,u.updatedAt,u.updatedBy
-      ]);
-      const tableHtml = `
-        <table>
-          <tr>${headers.map(h => `<th style="background:#0f172a;color:#fff;border:1px solid #cbd5e1;padding:8px;">${h}</th>`).join('')}</tr>
-          ${rows.map(r => `<tr>${r.map(c => `<td style="border:1px solid #cbd5e1;padding:8px;">${escapeHtml(c)}</td>`).join('')}</tr>`).join('')}
-        </table>`;
-      const blob = new Blob([tableHtml], { type: 'application/vnd.ms-excel;charset=utf-8;' });
-      const link = document.createElement('a');
-      const url = URL.createObjectURL(blob);
-      link.href = url;
-      link.download = 'vtal_unidades.xls';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      const exportBtn = el('exportBtn');
+      const originalLabel = exportBtn.textContent;
+      exportBtn.disabled = true;
+      exportBtn.textContent = 'Gerando...';
+      try {
+        await loadSheetJs();
+        const headers = [
+          'ID','UF','Nome da unidade','OS','Data da abertura da OS','Status da OS','Cloud NVR','Login','Senha','Senha câmeras','IP','HD',
+          'Quantidade de câmeras','MAC do alarme','Sensores','Senha do alarme',
+          'Acesso da central','Cadeado bluetooth','Criador','RESUMO OS','Observações','Status','Última atualização','Atualizado por'
+        ];
+        const rows = filtered.map(u => [
+          u.id, u.uf, u.unidade, u.os, u.dataAberturaOs, u.statusOs, u.cloudNvr, u.login, u.senha, u.senhaCameras, u.ip, u.hd, u.cameras,
+          u.alarmeMac, u.sensores, u.senhaAlarme, u.central, u.cadeadoBluetooth, u.criador, u.resumoOs, u.observacoes, u.status, u.updatedAt, u.updatedBy
+        ]);
+        const worksheetData = [headers, ...rows];
+        const worksheet = window.XLSX.utils.aoa_to_sheet(worksheetData);
+        worksheet['!cols'] = headers.map((header, colIdx) => {
+          const maxLen = worksheetData.reduce((max, row) => Math.max(max, String(row[colIdx] ?? '').length), header.length);
+          return { wch: Math.min(Math.max(maxLen + 2, 10), 45) };
+        });
+        worksheet['!autofilter'] = { ref: worksheet['!ref'] };
+        const workbook = window.XLSX.utils.book_new();
+        window.XLSX.utils.book_append_sheet(workbook, worksheet, 'Unidades');
+        const dataAtual = new Date().toISOString().slice(0, 10);
+        window.XLSX.writeFile(workbook, `vtal_unidades_${dataAtual}.xlsx`);
+        showMessage('Planilha gerada com sucesso!', 'success');
+      } catch (e) {
+        console.error('Erro ao gerar Excel:', e);
+        showMessage('Erro ao gerar a planilha: ' + (e && e.message ? e.message : e), 'error');
+      } finally {
+        exportBtn.disabled = false;
+        exportBtn.textContent = originalLabel;
+      }
     }
     async function createUser() {
       const payload = {
