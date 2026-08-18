@@ -245,44 +245,25 @@
     .right-column::-webkit-scrollbar { width: 4px; }
     .right-column::-webkit-scrollbar-track { background: transparent; }
     .right-column::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-    /* ===== TESTE DE ACESSO AO IP (iframe dentro do site, sem abrir nova aba) ===== */
-    #ipTesterBackdrop {
-      position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 70;
-      display: flex; align-items: center; justify-content: center; padding: 20px;
+    /* Select customizado: remove a seta nativa do navegador (que renderiza de forma
+       inconsistente/estranha ao passar o mouse em alguns navegadores) e usa uma seta própria,
+       consistente com o resto do design em modo claro e escuro. */
+    select {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      background-size: 15px;
+      padding-right: 38px;
+      cursor: pointer;
     }
-    #ipTesterModal {
-      width: 100%; max-width: 960px; max-height: 88vh; background: var(--bg-soft);
-      border-radius: 24px; border: 1px solid var(--border); box-shadow: var(--shadow);
-      display: flex; flex-direction: column; overflow: hidden;
+    body.dark select {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
     }
-    .ip-tester-head {
-      display: flex; justify-content: space-between; align-items: flex-start;
-      gap: 12px; padding: 18px 20px; border-bottom: 1px solid var(--border);
-    }
-    .ip-tester-head h3 { font-size: 18px; margin-bottom: 2px; }
-    .ip-tester-close {
-      width: 38px; height: 38px; border-radius: 12px; flex-shrink: 0;
-      background: var(--bg-muted); border: 1px solid var(--border); color: var(--text);
-      font-size: 18px; cursor: pointer; padding: 0;
-    }
-    .ip-tester-toolbar {
-      display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
-      padding: 14px 20px; border-bottom: 1px solid var(--border); background: var(--bg-muted);
-    }
-    .ip-tester-toolbar button { width: auto; padding: 9px 14px; font-size: 13px; }
-    .ip-tester-status {
-      font-size: 13px; font-weight: 700; padding: 7px 14px; border-radius: 999px;
-      border: 1px solid var(--border); background: var(--bg-soft); white-space: nowrap;
-    }
-    .ip-tester-status.ok      { color: var(--success); border-color: rgba(34,197,94,.35);  background: rgba(34,197,94,.12); }
-    .ip-tester-status.fail    { color: var(--danger);  border-color: rgba(239,68,68,.35);  background: rgba(239,68,68,.12); }
-    .ip-tester-status.testing { color: var(--info);    border-color: rgba(37,99,235,.35);  background: rgba(37,99,235,.12); }
-    .ip-tester-frame-wrap { flex: 1; position: relative; background: var(--bg-muted); min-height: 380px; }
-    .ip-tester-frame-wrap iframe { width: 100%; height: 100%; border: 0; min-height: 380px; display: block; }
-    .ip-tester-note {
-      padding: 12px 20px; font-size: 12px; color: var(--text-soft); line-height: 1.6;
-      border-top: 1px solid var(--border);
-    }
+    select:hover { border-color: var(--text-soft); }
+    select::-ms-expand { display: none; }
     @media (max-width: 1180px) {
       .grid-stats { grid-template-columns: repeat(2, 1fr); }
       .main-grid { grid-template-columns: 1fr; }
@@ -315,10 +296,6 @@
       .icon-box { width: 40px; height: 40px; font-size: 16px; }
       .badges { gap: 6px; }
       .badge, .perm-badge { font-size: 11px; padding: 5px 8px; }
-      #ipTesterModal { max-height: 94vh; }
-      .ip-tester-frame-wrap, .ip-tester-frame-wrap iframe { min-height: 260px; }
-      .ip-tester-toolbar { flex-direction: column; align-items: stretch; }
-      #ipTesterOpenNewTabBtn { margin-left: 0 !important; }
     }
   </style>
 </head>
@@ -387,9 +364,8 @@
             <div class="card-body">
               <div style="margin-bottom:18px;">
                 <h3 style="margin-bottom:4px;">Consulta das unidades</h3>
-                <p class="muted" style="margin-bottom:14px;">Filtros por OS, estado/UF, nome da unidade e busca geral.</p>
+                <p class="muted" style="margin-bottom:14px;">Filtros por estado/UF, nome da unidade e busca geral.</p>
                 <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-                  <input id="osFilter" placeholder="Filtrar por OS" style="width:170px; flex-shrink:0;" />
                   <select id="ufFilter" style="width:160px; flex-shrink:0;">
                     <option value="all">Todas as UFs</option>
                   </select>
@@ -397,12 +373,9 @@
                   <input id="searchInput" placeholder="Busca geral: IP, login, alarme..." style="flex:1; min-width:200px;" />
                   <button id="searchBtn" class="compact-btn" style="flex-shrink:0;">Consultar</button>
                   <button id="exportBtn" class="success compact-btn" style="flex-shrink:0;">Gerar Excel</button>
-                  <button id="importOsBtn" class="info compact-btn" style="flex-shrink:0;">Importar OS (planilha)</button>
-                  <input type="file" id="importOsFile" accept=".csv,.txt,.xls,.xlsx" class="hidden" />
                 </div>
               </div>
               <div id="searchSummary" class="summary-box hidden"></div>
-              <div id="importPreviewBox" class="summary-box hidden"></div>
               <div id="unitList" class="unit-list"></div>
             </div>
           </div>
@@ -430,16 +403,6 @@
                 <div class="form-grid">
                   <input id="formUf" placeholder="UF" />
                   <input id="formNomeUnidade" placeholder="Nome da unidade" />
-                  <input id="formOs" placeholder="OS" />
-                  <input id="formDataAberturaOs" type="date" title="Data da abertura da OS" />
-                  <select id="formStatusOs">
-                    <option value="">Status da OS</option>
-                    <option value="Aberta">Aberta</option>
-                    <option value="Em andamento">Em andamento</option>
-                    <option value="Aguardando">Aguardando</option>
-                    <option value="Concluída">Concluída</option>
-                    <option value="Cancelada">Cancelada</option>
-                  </select>
                   <input id="formCloudNvr" placeholder="Cloud NVR" />
                   <input id="formLogin" placeholder="Login" />
                   <input id="formSenha" placeholder="Senha" />
@@ -455,9 +418,7 @@
                     <option value="NÃO">Cadeado bluetooth: NÃO</option>
                     <option value="SIM">Cadeado bluetooth: SIM</option>
                   </select>
-                  <input id="formCriador" placeholder="Criador da OS" />
                 </div>
-                <textarea id="formResumoOs" placeholder="Resumo da OS" style="margin-top:12px;"></textarea>
                 <textarea id="formObservacoes" placeholder="Observações" style="margin-top:12px;"></textarea>
                 <select id="formStatus" style="margin-top:12px;">
                   <option value="Ativa">Ativa</option>
@@ -549,34 +510,6 @@
         </div>
       </section>
     </main>
-    <!-- TESTE DE ACESSO AO IP (abre dentro do próprio site, sem nova aba) -->
-    <div id="ipTesterBackdrop" class="hidden">
-      <div id="ipTesterModal">
-        <div class="ip-tester-head">
-          <div>
-            <h3>Testar acesso ao IP</h3>
-            <p class="muted" id="ipTesterSubtitle">-</p>
-          </div>
-          <button class="ip-tester-close" id="ipTesterCloseBtn" aria-label="Fechar">✕</button>
-        </div>
-        <div class="ip-tester-toolbar">
-          <button class="secondary" id="ipTesterHttpBtn">Testar HTTP</button>
-          <button class="secondary" id="ipTesterHttpsBtn">Testar HTTPS</button>
-          <span class="ip-tester-status" id="ipTesterStatus">Aguardando teste...</span>
-          <button class="info compact-btn" id="ipTesterOpenNewTabBtn" style="margin-left:auto;">Abrir em nova aba</button>
-        </div>
-        <div class="ip-tester-frame-wrap">
-          <iframe id="ipTesterFrame" title="Interface do dispositivo" referrerpolicy="no-referrer"></iframe>
-        </div>
-        <div class="ip-tester-note">
-          Esse teste tenta carregar a interface do equipamento dentro do próprio painel, testando HTTP e HTTPS. Se o site
-          estiver em HTTPS e o equipamento só responder em HTTP, o navegador pode bloquear esse carregamento por segurança
-          (conteúdo misto) — o teste apareceria como "sem resposta" mesmo com o equipamento online. Alguns equipamentos
-          também recusam esse tipo de acesso mesmo estando no ar. Por isso o resultado aqui é uma estimativa, não uma
-          confirmação definitiva — em caso de dúvida, use "Abrir em nova aba".
-        </div>
-      </div>
-    </div>
   </section>
   <script>
     // Configuração do Client Supabase (Corrigido)
@@ -588,8 +521,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
     let units = [];
     let users = [];
     let editingUnitId = null;
-    let expandedHistoryIds = new Set();
-    let historyDataById = {};
     const el = (id) => document.getElementById(id);
     function showMessage(text, type) {
       const box = el('messageBox');
@@ -608,9 +539,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         id: String(item['ID'] || ''),
         uf: item['UF'] || '',
         unidade: item['Nome da unidade'] || '',
-        os: item['OS'] || '',
-        dataAberturaOs: item['Data da abertura da OS'] || '',
-        statusOs: item['Status da OS'] || '',
         cloudNvr: item['Cloud NVR'] || '',
         login: item['Login'] || '',
         senha: item['Senha'] || '',
@@ -624,8 +552,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         central: item['Acesso da central'] || '',
         cadeadoBluetooth: item['Cadeado bluetooth'] || 'NÃO',
         observacoes: item['Observações'] || '',
-        criador: item['Criador'] || '',
-        resumoOs: item['RESUMO OS'] || '',
         status: item['Status'] || 'Ativa',
         updatedAt: item['Última atualização'] || '',
         updatedBy: item['Atualizado por'] || ''
@@ -748,9 +674,7 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       [
         'formUf','formNomeUnidade','formCloudNvr','formLogin','formSenha','formSenhaCameras','formIp',
         'formHd','formQuantidadeCameras','formAlarmeMac','formSensores',
-        'formSenhaAlarme','formCentral','formObservacoes','formStatus',
-        'formOs','formDataAberturaOs','formStatusOs','formCadeadoBluetooth',
-        'formCriador','formResumoOs'
+        'formSenhaAlarme','formCentral','formObservacoes','formStatus','formCadeadoBluetooth'
       ].forEach(id => { el(id).disabled = !enabled; });
       el('saveBtn').disabled = !canCreate;
       el('updateBtn').disabled = !canEdit;
@@ -798,20 +722,16 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
     }
     function getFilteredUnits() {
       const term = el('searchInput').value.trim().toLowerCase();
-      const osTerm = el('osFilter').value.trim().toLowerCase();
       const unitNameTerm = el('unitNameFilter').value.trim().toLowerCase();
       const uf = el('ufFilter').value;
       return units.filter(unit => {
         const text = [
           unit.uf, unit.unidade, unit.cloudNvr, unit.login, unit.ip, unit.hd,
           unit.senhaCameras, unit.alarmeMac, unit.sensores, unit.central,
-          unit.observacoes, unit.status, unit.os, unit.dataAberturaOs,
-          unit.statusOs, String(unit.cameras)
+          unit.observacoes, unit.status, String(unit.cameras)
         ].join(' ').toLowerCase();
-        const matchesOs = !osTerm || String(unit.os || '').toLowerCase().includes(osTerm);
         const matchesUnitName = !unitNameTerm || String(unit.unidade || '').toLowerCase().includes(unitNameTerm);
         return (!term || text.includes(term)) &&
-          matchesOs &&
           matchesUnitName &&
           (uf === 'all' || unit.uf === uf);
       });
@@ -819,11 +739,9 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
     function renderSearchSummary(filtered) {
       const box = el('searchSummary');
       const term = el('searchInput').value.trim();
-      const osTerm = el('osFilter').value.trim();
       const unitNameTerm = el('unitNameFilter').value.trim();
       const uf = el('ufFilter').value === 'all' ? 'todas as UFs liberadas' : el('ufFilter').value;
       const details = [
-        osTerm ? `OS <strong>${escapeHtml(osTerm)}</strong>` : '',
         unitNameTerm ? `unidade <strong>${escapeHtml(unitNameTerm)}</strong>` : '',
         term ? `termo geral <strong>${escapeHtml(term)}</strong>` : ''
       ].filter(Boolean).join(', ');
@@ -861,16 +779,11 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
                 </button>
                 <span class="${getStatusBadgeClass(unit.status)}">${escapeHtml(unit.status)}</span>
                 <span class="badge">${escapeHtml(unit.uf)}</span>
-                ${unit.os ? `<span class="badge info">OS: ${escapeHtml(unit.os)}</span>` : ''}
-                ${unit.statusOs ? `<span class="badge secondary">Status OS: ${escapeHtml(unit.statusOs)}</span>` : ''}
                 ${unit.alarmeMac ? `<span class="badge success">MAC alarme: ${escapeHtml(unit.alarmeMac)}</span>` : ''}
                 <span class="badge ${unit.cadeadoBluetooth === 'SIM' ? 'info' : 'secondary'}">Cadeado bluetooth: ${escapeHtml(unit.cadeadoBluetooth || 'NÃO')}</span>
               </div>
               <div class="unit-info-grid">
                 <div class="info-item"><strong>UF</strong><div>${escapeHtml(unit.uf)}</div></div>
-                <div class="info-item"><strong>OS</strong><div>${escapeHtml(unit.os || '-')}</div></div>
-                <div class="info-item"><strong>Data da abertura</strong><div>${escapeHtml(unit.dataAberturaOs || '-')}</div></div>
-                <div class="info-item"><strong>Status da OS</strong><div>${escapeHtml(unit.statusOs || '-')}</div></div>
                 <div class="info-item"><strong>IP</strong><div>${escapeHtml(unit.ip)}</div></div>
                 <div class="info-item"><strong>HD</strong><div>${escapeHtml(unit.hd)}</div></div>
                 <div class="info-item"><strong>Login</strong><div>${escapeHtml(unit.login)}</div></div>
@@ -883,9 +796,7 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
                 <div class="info-item"><strong>Senha alarme</strong><div>${escapeHtml(unit.senhaAlarme)}</div></div>
                 <div class="info-item"><strong>Central</strong><div>${escapeHtml(unit.central)}</div></div>
                 <div class="info-item"><strong>Cadeado bluetooth</strong><div>${escapeHtml(unit.cadeadoBluetooth || 'NÃO')}</div></div>
-                <div class="info-item"><strong>Criador</strong><div>${escapeHtml(unit.criador || '-')}</div></div>
               </div>
-              ${unit.resumoOs ? `<div class="obs-box"><strong style="color:var(--text)">Resumo da OS:</strong> ${escapeHtml(unit.resumoOs)}</div>` : ''}
               ${unit.observacoes ? `<div class="obs-box"><strong style="color:var(--text)">Observações:</strong> ${escapeHtml(unit.observacoes)}</div>` : ''}
             </div>
             <div class="actions-box">
@@ -900,8 +811,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
               <div class="admin-actions">
                 ${userCanEdit()   ? `<button class="info"   data-edit-id="${escapeHtml(unit.id)}">Editar unidade</button>` : ''}
                 ${userCanDelete() ? `<button class="danger" data-delete-id="${escapeHtml(unit.id)}">Excluir cadastro</button>` : ''}
-                ${unit.ip ? `<button class="warning" data-test-ip="${escapeHtml(unit.ip)}" data-test-name="${escapeHtml(unit.unidade)}">Testar IP (HTTP/HTTPS)</button>` : ''}
-                <button class="secondary" data-history-id="${escapeHtml(unit.id)}">${expandedHistoryIds.has(unit.id) ? 'Ocultar histórico de OS' : 'Histórico de OS'}</button>
               </div>
               <div style="margin-top:12px; font-size:12px; color:var(--text-soft); line-height:1.6;">
                 <div>Atualização: ${escapeHtml(unit.updatedAt || '-')}</div>
@@ -909,7 +818,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
               </div>
             </div>
           </div>
-          ${expandedHistoryIds.has(unit.id) ? renderHistoryPanel(unit.id) : ''}
         </div>
       `).join('');
       list.querySelectorAll('button[data-copy-value]').forEach(btn => {
@@ -921,139 +829,11 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       list.querySelectorAll('button[data-edit-id]').forEach(btn => {
         btn.addEventListener('click', () => startEditUnit(btn.getAttribute('data-edit-id')));
       });
-      list.querySelectorAll('button[data-history-id]').forEach(btn => {
-        btn.addEventListener('click', () => toggleUnitHistory(btn.getAttribute('data-history-id')));
-      });
-      list.querySelectorAll('button[data-test-ip]').forEach(btn => {
-        btn.addEventListener('click', () => openIpTester(btn.getAttribute('data-test-ip'), btn.getAttribute('data-test-name')));
-      });
-    }
-    // ===== TESTE DE ACESSO AO IP (iframe dentro do site; testa HTTP e HTTPS) =====
-    // Não existe "ping" de verdade (ICMP) dentro do navegador — é uma restrição de segurança do
-    // próprio browser, não algo que dê para contornar com código. O que fazemos aqui é tentar
-    // carregar a interface do equipamento (HTTP e/ou HTTPS) dentro de um iframe no próprio painel
-    // e observar se ela carrega dentro de um tempo limite. É uma estimativa de acesso, não um ping.
-    let ipTesterTimeoutId = null;
-    function openIpTester(ip, name) {
-      if (!ip) { showMessage('Esta unidade não tem um IP cadastrado.', 'error'); return; }
-      el('ipTesterSubtitle').textContent = `${name || 'Unidade'} — ${ip}`;
-      el('ipTesterFrame').dataset.ip = ip;
-      el('ipTesterBackdrop').classList.remove('hidden');
-      runIpTest('http');
-    }
-    function closeIpTester() {
-      el('ipTesterBackdrop').classList.add('hidden');
-      el('ipTesterFrame').src = 'about:blank';
-      if (ipTesterTimeoutId) { clearTimeout(ipTesterTimeoutId); ipTesterTimeoutId = null; }
-    }
-    function setIpTesterStatus(text, kind) {
-      const status = el('ipTesterStatus');
-      status.textContent = text;
-      status.classList.remove('ok', 'fail', 'testing');
-      if (kind) status.classList.add(kind);
-    }
-    function runIpTest(protocol) {
-      const frame = el('ipTesterFrame');
-      const ip = frame.dataset.ip;
-      if (!ip) return;
-      if (ipTesterTimeoutId) clearTimeout(ipTesterTimeoutId);
-      setIpTesterStatus(`Testando ${protocol.toUpperCase()}...`, 'testing');
-      const url = `${protocol}://${ip}`;
-      el('ipTesterOpenNewTabBtn').onclick = () => window.open(url, '_blank', 'noopener');
-      let settled = false;
-      frame.onload = () => {
-        if (settled) return;
-        settled = true;
-        clearTimeout(ipTesterTimeoutId);
-        setIpTesterStatus(`Respondeu em ${protocol.toUpperCase()} (interface carregou)`, 'ok');
-      };
-      frame.onerror = () => {
-        if (settled) return;
-        settled = true;
-        clearTimeout(ipTesterTimeoutId);
-        setIpTesterStatus(`Sem resposta em ${protocol.toUpperCase()}`, 'fail');
-      };
-      frame.src = url;
-      ipTesterTimeoutId = setTimeout(() => {
-        if (settled) return;
-        settled = true;
-        setIpTesterStatus(`Sem resposta em ${protocol.toUpperCase()} (tempo esgotado ou bloqueado)`, 'fail');
-      }, 7000);
-    }
-    // ===== HISTÓRICO DE OS (tabela historico_os no Supabase) =====
-    async function toggleUnitHistory(id) {
-      if (expandedHistoryIds.has(id)) {
-        expandedHistoryIds.delete(id);
-        renderUnits();
-        return;
-      }
-      expandedHistoryIds.add(id);
-      renderUnits();
-      try {
-        const { data, error } = await _supabase
-          .from('historico_os')
-          .select('*')
-          .eq('Unidade ID', id)
-          .order('Registrado em', { ascending: false });
-        historyDataById[id] = error ? [] : (data || []);
-      } catch (e) {
-        historyDataById[id] = [];
-      }
-      renderUnits();
-    }
-    function formatHistoryTimestamp(value) {
-      if (!value) return '-';
-      try { return new Date(value).toLocaleString('pt-BR'); } catch (e) { return String(value); }
-    }
-    function renderHistoryPanel(id) {
-      const history = historyDataById[id];
-      if (history === undefined) {
-        return `<div class="obs-box" style="margin-top:14px;">Carregando histórico de OS...</div>`;
-      }
-      if (!history.length) {
-        return `<div class="obs-box" style="margin-top:14px;"><strong style="color:var(--text);">Histórico de OS</strong><br><span class="muted">Nenhum histórico registrado ainda para esta unidade.</span></div>`;
-      }
-      return `
-        <div class="obs-box" style="margin-top:14px;">
-          <strong style="color:var(--text);">Histórico de OS (${history.length})</strong>
-          <div style="margin-top:8px; display:grid; gap:6px;">
-            ${history.map(h => `
-              <div style="border:1px solid var(--border); border-radius:10px; padding:8px 10px; font-size:12px; background:var(--bg-soft);">
-                <strong>OS ${escapeHtml(h['OS'] || '-')}</strong> — ${escapeHtml(h['Status da OS'] || '-')} · Abertura: ${escapeHtml(h['Data da abertura da OS'] || '-')}<br>
-                ${h['Criador'] ? `Criador: ${escapeHtml(h['Criador'])}<br>` : ''}
-                ${h['RESUMO OS'] ? `Resumo: ${escapeHtml(h['RESUMO OS'])}<br>` : ''}
-                <span class="muted">Substituída em: ${escapeHtml(formatHistoryTimestamp(h['Registrado em']))}</span>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      `;
-    }
-    // Guarda no histórico o registro ANTERIOR de uma unidade antes de sobrescrever a OS atual.
-    // Só grava quando já existia uma OS anterior — não polui o histórico em cadastros novos.
-    async function archiveOsHistoryEntry(entry) {
-      if (!entry || !entry.os) return;
-      try {
-        await _supabase.from('historico_os').insert([{
-          'Unidade ID': entry.id,
-          'Nome da unidade': entry.unidade,
-          'OS': entry.os,
-          'Data da abertura da OS': entry.dataAberturaOs || null,
-          'Status da OS': entry.statusOs,
-          'Criador': entry.criador,
-          'RESUMO OS': entry.resumoOs
-        }]);
-      } catch (e) {
-        // não bloqueia o fluxo principal (cadastro/importação) se o histórico falhar
-      }
     }
     function fillUnitForm(unit) {
       el('editingUnitId').value      = unit.id || '';
       el('formUf').value             = unit.uf || '';
       el('formNomeUnidade').value    = unit.unidade || '';
-      el('formOs').value             = unit.os || '';
-      el('formDataAberturaOs').value = unit.dataAberturaOs || '';
-      el('formStatusOs').value       = unit.statusOs || '';
       el('formCloudNvr').value       = unit.cloudNvr || '';
       el('formLogin').value          = unit.login || '';
       el('formSenha').value          = unit.senha || '';
@@ -1066,8 +846,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       el('formSenhaAlarme').value    = unit.senhaAlarme || '';
       el('formCentral').value        = unit.central || '';
       el('formCadeadoBluetooth').value = unit.cadeadoBluetooth || 'NÃO';
-      el('formCriador').value        = unit.criador || '';
-      el('formResumoOs').value       = unit.resumoOs || '';
       el('formObservacoes').value    = unit.observacoes || '';
       el('formStatus').value         = unit.status || 'Ativa';
     }
@@ -1102,9 +880,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       return {
         'UF': el('formUf').value.trim().toUpperCase(),
         'Nome da unidade': el('formNomeUnidade').value.trim(),
-        'OS': el('formOs').value.trim(),
-        'Data da abertura da OS': el('formDataAberturaOs').value || null,
-        'Status da OS': el('formStatusOs').value,
         'Cloud NVR': el('formCloudNvr').value.trim(),
         'Login': el('formLogin').value.trim(),
         'Senha': el('formSenha').value.trim(),
@@ -1117,8 +892,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         'Senha do alarme': el('formSenhaAlarme').value.trim(),
         'Acesso da central': el('formCentral').value.trim(),
         'Cadeado bluetooth': el('formCadeadoBluetooth').value,
-        'Criador': el('formCriador').value.trim(),
-        'RESUMO OS': el('formResumoOs').value.trim(),
         'Observações': el('formObservacoes').value.trim(),
         'Status': el('formStatus').value,
         'Atualizado por': currentUser ? currentUser.nome : 'Sistema'
@@ -1155,20 +928,7 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       if (!payload['UF'] || !payload['Nome da unidade'] || !payload['Login'] || !payload['IP']) {
         showMessage('Preencha UF, nome da unidade, login e IP.', 'error'); return;
       }
-      const existingUnit = units.find(u => u.id === id);
-      const osChanged = existingUnit && existingUnit.os && existingUnit.os !== payload['OS'];
       try {
-        if (osChanged) {
-          await archiveOsHistoryEntry({
-            id,
-            unidade: existingUnit.unidade,
-            os: existingUnit.os,
-            dataAberturaOs: existingUnit.dataAberturaOs,
-            statusOs: existingUnit.statusOs,
-            criador: existingUnit.criador,
-            resumoOs: existingUnit.resumoOs
-          });
-        }
         const { error } = await _supabase.from('unidades').update(payload).eq('ID', id);
         if (error) {
           console.error('Erro Supabase (updateUnit):', error);
@@ -1196,114 +956,10 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
     function resetUnitForm() {
       [
         'editingUnitId','formUf','formNomeUnidade','formCloudNvr','formLogin','formSenha','formSenhaCameras','formIp',
-        'formHd','formQuantidadeCameras','formAlarmeMac','formSensores','formSenhaAlarme','formCentral','formObservacoes',
-        'formOs','formDataAberturaOs','formStatusOs','formCriador','formResumoOs'
+        'formHd','formQuantidadeCameras','formAlarmeMac','formSensores','formSenhaAlarme','formCentral','formObservacoes'
       ].forEach(id => el(id).value = '');
       el('formStatus').value = 'Ativa';
       el('formCadeadoBluetooth').value = 'NÃO';
-    }
-    // ===== IMPORTAÇÃO DE PLANILHA DE OS (associa por Nome da unidade / Site) =====
-    let pendingImportPlan = null;
-    function normalizeSiteName(value) {
-      return String(value || '').trim().toUpperCase().replace(/\s+/g, ' ');
-    }
-    function normalizeHeader(value) {
-      return String(value || '')
-        .normalize('NFD').replace(/[̀-ͯ]/g, '')
-        .trim().toLowerCase();
-    }
-    function parseBrDateToIso(value) {
-      if (!value) return '';
-      const datePart = String(value).split(' ')[0].trim();
-      const m = datePart.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
-      if (!m) return '';
-      const [, dd, mm, yyyy] = m;
-      return `${yyyy}-${mm.padStart(2, '0')}-${dd.padStart(2, '0')}`;
-    }
-    function parseBrDateTimeToDate(value) {
-      if (!value) return null;
-      const [datePart, timePart] = String(value).split(' ');
-      const m = (datePart || '').match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
-      if (!m) return null;
-      const [, dd, mm, yyyy] = m;
-      const [hh = '00', mi = '00', ss = '00'] = (timePart || '').split(':');
-      return new Date(Number(yyyy), Number(mm) - 1, Number(dd), Number(hh), Number(mi), Number(ss));
-    }
-    function mapStatusOs(rawStatus) {
-      const s = normalizeHeader(rawStatus);
-      if (s === 'concluida' || s === 'concluído' || s === 'concluida.') return 'Concluída';
-      if (s === 'andamento') return 'Em andamento';
-      if (s === 'pendencia') return 'Aguardando';
-      if (s === 'cancelada') return 'Cancelada';
-      if (s === 'aberta') return 'Aberta';
-      return rawStatus || '';
-    }
-    function detectDelimiter(line) {
-      const tabs = (line.match(/\t/g) || []).length;
-      const commas = (line.match(/,/g) || []).length;
-      const semicolons = (line.match(/;/g) || []).length;
-      if (tabs >= commas && tabs >= semicolons) return '\t';
-      if (semicolons >= commas) return ';';
-      return ',';
-    }
-    function findColumnIndexes(headerCells) {
-      const normalized = headerCells.map(normalizeHeader);
-      return {
-        os: normalized.indexOf('os'),
-        data: normalized.indexOf('data'),
-        status: normalized.indexOf('status'),
-        site: normalized.indexOf('site'),
-        uf: normalized.indexOf('uf'),
-        resumo: normalized.indexOf('resumo'),
-        criador: normalized.indexOf('criador')
-      };
-    }
-    function parseDelimitedText(text) {
-      const lines = text.split(/\r\n|\r|\n/).filter(l => l.trim() !== '');
-      if (!lines.length) return [];
-      const delimiter = detectDelimiter(lines[0]);
-      const headerCells = lines[0].split(delimiter);
-      const colIndex = findColumnIndexes(headerCells);
-      if (colIndex.site < 0) return [];
-      const rows = [];
-      for (let i = 1; i < lines.length; i++) {
-        const cells = lines[i].split(delimiter);
-        const site = (cells[colIndex.site] || '').trim();
-        if (!site) continue;
-        rows.push({
-          os: colIndex.os >= 0 ? (cells[colIndex.os] || '').trim() : '',
-          data: colIndex.data >= 0 ? (cells[colIndex.data] || '').trim() : '',
-          status: colIndex.status >= 0 ? (cells[colIndex.status] || '').trim() : '',
-          site,
-          uf: colIndex.uf >= 0 ? (cells[colIndex.uf] || '').trim() : '',
-          resumo: colIndex.resumo >= 0 ? (cells[colIndex.resumo] || '').trim() : '',
-          criador: colIndex.criador >= 0 ? (cells[colIndex.criador] || '').trim() : ''
-        });
-      }
-      rows.meta = { hasResumo: colIndex.resumo >= 0, hasCriador: colIndex.criador >= 0 };
-      return rows;
-    }
-    function parseSheetRows(rawRows) {
-      if (!rawRows.length) return [];
-      const colIndex = findColumnIndexes(rawRows[0]);
-      if (colIndex.site < 0) return [];
-      const rows = [];
-      for (let i = 1; i < rawRows.length; i++) {
-        const cells = rawRows[i] || [];
-        const site = String(cells[colIndex.site] || '').trim();
-        if (!site) continue;
-        rows.push({
-          os: colIndex.os >= 0 ? String(cells[colIndex.os] || '').trim() : '',
-          data: colIndex.data >= 0 ? String(cells[colIndex.data] || '').trim() : '',
-          status: colIndex.status >= 0 ? String(cells[colIndex.status] || '').trim() : '',
-          site,
-          uf: colIndex.uf >= 0 ? String(cells[colIndex.uf] || '').trim() : '',
-          resumo: colIndex.resumo >= 0 ? String(cells[colIndex.resumo] || '').trim() : '',
-          criador: colIndex.criador >= 0 ? String(cells[colIndex.criador] || '').trim() : ''
-        });
-      }
-      rows.meta = { hasResumo: colIndex.resumo >= 0, hasCriador: colIndex.criador >= 0 };
-      return rows;
     }
     function loadSheetJs() {
       return new Promise((resolve, reject) => {
@@ -1314,162 +970,6 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
         script.onerror = () => reject(new Error('Não foi possível carregar o leitor de planilhas Excel.'));
         document.head.appendChild(script);
       });
-    }
-    // Para cada unidade (Site) presente na planilha, escolhe a OS "atual":
-    // prioriza a mais recente em aberto (Andamento/Pendencia/Aberta); se não houver
-    // nenhuma em aberto, usa a mais recente concluída/cancelada.
-    function pickBestRowPerSite(rows) {
-      const bySite = new Map();
-      rows.forEach(row => {
-        const key = normalizeSiteName(row.site);
-        if (!bySite.has(key)) bySite.set(key, []);
-        bySite.get(key).push(row);
-      });
-      const result = new Map();
-      bySite.forEach((siteRows, key) => {
-        const withDates = siteRows.map(r => ({ ...r, _date: parseBrDateTimeToDate(r.data) }));
-        const open = withDates.filter(r => {
-          const s = normalizeHeader(r.status);
-          return s === 'andamento' || s === 'pendencia' || s === 'aberta';
-        });
-        const pool = open.length ? open : withDates;
-        pool.sort((a, b) => (b._date ? b._date.getTime() : 0) - (a._date ? a._date.getTime() : 0));
-        result.set(key, pool[0]);
-      });
-      return result;
-    }
-    function buildImportPlan(rows) {
-      const bestPerSite = pickBestRowPerSite(rows);
-      const matched = [];
-      const unmatched = [];
-      const meta = rows.meta || { hasResumo: false, hasCriador: false };
-      bestPerSite.forEach((row, key) => {
-        const unit = units.find(u => normalizeSiteName(u.unidade) === key);
-        if (unit) {
-          matched.push({
-            id: unit.id,
-            unidade: unit.unidade,
-            osAtual: unit.os,
-            osNovo: row.os,
-            statusAtual: unit.statusOs,
-            statusNovo: mapStatusOs(row.status),
-            dataAtual: unit.dataAberturaOs,
-            dataNova: parseBrDateToIso(row.data),
-            resumoAtual: unit.resumoOs,
-            resumoNovo: row.resumo,
-            criadorAtual: unit.criador,
-            criadorNovo: row.criador
-          });
-        } else {
-          unmatched.push(row.site);
-        }
-      });
-      return { matched, unmatched, hasResumo: meta.hasResumo, hasCriador: meta.hasCriador };
-    }
-    function renderImportPreview(plan) {
-      pendingImportPlan = plan;
-      const { matched, unmatched } = plan;
-      const box = el('importPreviewBox');
-      box.innerHTML = `
-        <div style="margin-bottom:10px;">
-          <strong>${matched.length}</strong> unidade(s) encontrada(s) para atualizar OS / Status da OS / Data de abertura${plan.hasResumo || plan.hasCriador ? ' / ' + [plan.hasCriador ? 'Criador' : '', plan.hasResumo ? 'Resumo da OS' : ''].filter(Boolean).join(' / ') : ''}.
-          ${(!plan.hasResumo || !plan.hasCriador) ? `<br><span class="muted">${!plan.hasCriador ? 'Coluna "Criador" não encontrada na planilha — esse campo não será alterado.' : ''} ${!plan.hasResumo ? 'Coluna "Resumo" não encontrada na planilha — o campo Resumo da OS não será alterado.' : ''}</span>` : ''}
-          ${unmatched.length ? `<br><span style="color:var(--warning);"><strong>${unmatched.length}</strong> site(s) da planilha não bateram com nenhuma unidade cadastrada:</span> ${unmatched.map(escapeHtml).join(', ')}` : ''}
-        </div>
-        ${matched.length ? `
-        <div style="max-height:260px; overflow-y:auto; margin-bottom:12px; display:grid; gap:6px;">
-          ${matched.map(m => `
-            <div style="border:1px solid var(--border); border-radius:10px; padding:8px 10px; font-size:13px;">
-              <strong>${escapeHtml(m.unidade)}</strong><br>
-              OS: ${escapeHtml(m.osAtual || '-')} → ${escapeHtml(m.osNovo || '-')} &nbsp;|&nbsp;
-              Status da OS: ${escapeHtml(m.statusAtual || '-')} → ${escapeHtml(m.statusNovo || '-')} &nbsp;|&nbsp;
-              Data abertura: ${escapeHtml(m.dataAtual || '-')} → ${escapeHtml(m.dataNova || '-')}
-              ${plan.hasCriador ? `<br>Criador: ${escapeHtml(m.criadorAtual || '-')} → ${escapeHtml(m.criadorNovo || '-')}` : ''}
-              ${plan.hasResumo ? `<br>Resumo da OS: ${escapeHtml(m.resumoAtual || '-')} → ${escapeHtml(m.resumoNovo || '-')}` : ''}
-            </div>
-          `).join('')}
-        </div>
-        <div style="display:flex; gap:10px;">
-          <button class="info" id="confirmImportBtn" style="width:auto;">Confirmar atualização</button>
-          <button class="secondary" id="cancelImportBtn" style="width:auto;">Cancelar</button>
-        </div>` : `
-        <div style="display:flex; gap:10px;">
-          <button class="secondary" id="cancelImportBtn" style="width:auto;">Fechar</button>
-        </div>`}
-      `;
-      box.classList.remove('hidden');
-      const confirmBtn = el('confirmImportBtn');
-      if (confirmBtn) confirmBtn.addEventListener('click', confirmImportOs);
-      el('cancelImportBtn').addEventListener('click', cancelImportOs);
-    }
-    function cancelImportOs() {
-      pendingImportPlan = null;
-      el('importPreviewBox').classList.add('hidden');
-      el('importPreviewBox').innerHTML = '';
-      el('importOsFile').value = '';
-    }
-    async function confirmImportOs() {
-      if (!pendingImportPlan || !pendingImportPlan.matched.length) return;
-      if (!userCanEdit()) { showMessage('Você não tem permissão para editar unidades.', 'error'); return; }
-      const { matched, hasResumo, hasCriador } = pendingImportPlan;
-      let sucesso = 0, falhas = 0;
-      for (const item of matched) {
-        const payload = {
-          'OS': item.osNovo,
-          'Data da abertura da OS': item.dataNova || null,
-          'Status da OS': item.statusNovo,
-          'Atualizado por': currentUser ? currentUser.nome : 'Sistema'
-        };
-        if (hasCriador) payload['Criador'] = item.criadorNovo;
-        if (hasResumo) payload['RESUMO OS'] = item.resumoNovo;
-        const osChanged = item.osAtual && item.osAtual !== item.osNovo;
-        try {
-          if (osChanged) {
-            await archiveOsHistoryEntry({
-              id: item.id,
-              unidade: item.unidade,
-              os: item.osAtual,
-              dataAberturaOs: item.dataAtual,
-              statusOs: item.statusAtual,
-              criador: item.criadorAtual,
-              resumoOs: item.resumoAtual
-            });
-          }
-          const { error } = await _supabase.from('unidades').update(payload).eq('ID', item.id);
-          if (error) { console.error('Erro Supabase (confirmImportOs):', error); falhas++; } else { sucesso++; }
-        } catch (e) { console.error('Erro de conexão (confirmImportOs):', e); falhas++; }
-      }
-      cancelImportOs();
-      await loadUnits();
-      showMessage(`Importação concluída: ${sucesso} unidade(s) atualizada(s)${falhas ? `, ${falhas} falha(s)` : ''}.`, falhas ? 'error' : 'success');
-    }
-    async function handleImportFile(file) {
-      if (!file) return;
-      if (!userCanEdit()) { showMessage('Você não tem permissão para editar unidades.', 'error'); return; }
-      const name = file.name.toLowerCase();
-      try {
-        let rows = [];
-        if (name.endsWith('.xlsx') || name.endsWith('.xls')) {
-          await loadSheetJs();
-          const buffer = await file.arrayBuffer();
-          const workbook = window.XLSX.read(buffer, { type: 'array' });
-          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-          const rawRows = window.XLSX.utils.sheet_to_json(firstSheet, { header: 1, raw: false, defval: '' });
-          rows = parseSheetRows(rawRows);
-        } else {
-          const text = await file.text();
-          rows = parseDelimitedText(text);
-        }
-        if (!rows.length) {
-          showMessage('Não encontrei linhas válidas na planilha. Confira se ela tem as colunas OS, Data, Status e Site.', 'error');
-          return;
-        }
-        const plan = buildImportPlan(rows);
-        renderImportPreview(plan);
-      } catch (e) {
-        console.error('Erro ao ler planilha:', e);
-        showMessage('Erro ao ler a planilha: ' + e.message, 'error');
-      }
     }
     // Gera um arquivo .xlsx real (binário OOXML) usando a biblioteca SheetJS,
     // já carregada pelo fluxo de importação (loadSheetJs). Isso resolve dois problemas
@@ -1486,13 +986,13 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       try {
         await loadSheetJs();
         const headers = [
-          'ID','UF','Nome da unidade','OS','Data da abertura da OS','Status da OS','Cloud NVR','Login','Senha','Senha câmeras','IP','HD',
+          'ID','UF','Nome da unidade','Cloud NVR','Login','Senha','Senha câmeras','IP','HD',
           'Quantidade de câmeras','MAC do alarme','Sensores','Senha do alarme',
-          'Acesso da central','Cadeado bluetooth','Criador','RESUMO OS','Observações','Status','Última atualização','Atualizado por'
+          'Acesso da central','Cadeado bluetooth','Observações','Status','Última atualização','Atualizado por'
         ];
         const rows = filtered.map(u => [
-          u.id, u.uf, u.unidade, u.os, u.dataAberturaOs, u.statusOs, u.cloudNvr, u.login, u.senha, u.senhaCameras, u.ip, u.hd, u.cameras,
-          u.alarmeMac, u.sensores, u.senhaAlarme, u.central, u.cadeadoBluetooth, u.criador, u.resumoOs, u.observacoes, u.status, u.updatedAt, u.updatedBy
+          u.id, u.uf, u.unidade, u.cloudNvr, u.login, u.senha, u.senhaCameras, u.ip, u.hd, u.cameras,
+          u.alarmeMac, u.sensores, u.senhaAlarme, u.central, u.cadeadoBluetooth, u.observacoes, u.status, u.updatedAt, u.updatedBy
         ]);
         const worksheetData = [headers, ...rows];
         const worksheet = window.XLSX.utils.aoa_to_sheet(worksheetData);
@@ -1697,32 +1197,18 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
     });
     el('searchBtn').addEventListener('click', renderUnits);
     el('searchInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') renderUnits(); });
-    el('osFilter').addEventListener('keydown', (e) => { if (e.key === 'Enter') renderUnits(); });
     el('unitNameFilter').addEventListener('keydown', (e) => { if (e.key === 'Enter') renderUnits(); });
     el('ufFilter').addEventListener('change', renderUnits);
     el('saveBtn').addEventListener('click', saveUnit);
     el('updateBtn').addEventListener('click', updateUnit);
     el('cancelEditBtn').addEventListener('click', () => { resetUnitForm(); exitEditMode(); showMessage('Edição cancelada.', 'success'); });
     el('exportBtn').addEventListener('click', downloadExcelFromFiltered);
-    el('importOsBtn').addEventListener('click', () => el('importOsFile').click());
-    el('importOsFile').addEventListener('change', (e) => {
-      const file = e.target.files && e.target.files[0];
-      handleImportFile(file);
-      e.target.value = '';
-    });
     el('tabUnidades').addEventListener('click', () => showTab('unidades'));
     el('tabUsuarios').addEventListener('click', () => showTab('usuarios'));
     el('createUserBtn').addEventListener('click', createUser);
     el('reloadUsersBtn').addEventListener('click', loadUsers);
     el('resetBtn').addEventListener('click', resetPasswordAdmin);
     el('themeBtn').addEventListener('click', () => { applyTheme(document.body.classList.contains('dark') ? 'light' : 'dark'); });
-    el('ipTesterHttpBtn').addEventListener('click', () => runIpTest('http'));
-    el('ipTesterHttpsBtn').addEventListener('click', () => runIpTest('https'));
-    el('ipTesterCloseBtn').addEventListener('click', closeIpTester);
-    el('ipTesterBackdrop').addEventListener('click', (e) => { if (e.target.id === 'ipTesterBackdrop') closeIpTester(); });
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !el('ipTesterBackdrop').classList.contains('hidden')) closeIpTester();
-    });
     // Menu mobile (hambúrguer)
     el('mobileMenuBtn').addEventListener('click', () => {
       const menu = el('topMenu');
