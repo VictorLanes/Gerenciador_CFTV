@@ -245,6 +245,44 @@
     .right-column::-webkit-scrollbar { width: 4px; }
     .right-column::-webkit-scrollbar-track { background: transparent; }
     .right-column::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    /* ===== TESTE DE ACESSO AO IP (iframe dentro do site, sem abrir nova aba) ===== */
+    #ipTesterBackdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 70;
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    #ipTesterModal {
+      width: 100%; max-width: 960px; max-height: 88vh; background: var(--bg-soft);
+      border-radius: 24px; border: 1px solid var(--border); box-shadow: var(--shadow);
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .ip-tester-head {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: 12px; padding: 18px 20px; border-bottom: 1px solid var(--border);
+    }
+    .ip-tester-head h3 { font-size: 18px; margin-bottom: 2px; }
+    .ip-tester-close {
+      width: 38px; height: 38px; border-radius: 12px; flex-shrink: 0;
+      background: var(--bg-muted); border: 1px solid var(--border); color: var(--text);
+      font-size: 18px; cursor: pointer; padding: 0;
+    }
+    .ip-tester-toolbar {
+      display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+      padding: 14px 20px; border-bottom: 1px solid var(--border); background: var(--bg-muted);
+    }
+    .ip-tester-toolbar button { width: auto; padding: 9px 14px; font-size: 13px; }
+    .ip-tester-status {
+      font-size: 13px; font-weight: 700; padding: 7px 14px; border-radius: 999px;
+      border: 1px solid var(--border); background: var(--bg-soft); white-space: nowrap;
+    }
+    .ip-tester-status.ok      { color: var(--success); border-color: rgba(34,197,94,.35);  background: rgba(34,197,94,.12); }
+    .ip-tester-status.fail    { color: var(--danger);  border-color: rgba(239,68,68,.35);  background: rgba(239,68,68,.12); }
+    .ip-tester-status.testing { color: var(--info);    border-color: rgba(37,99,235,.35);  background: rgba(37,99,235,.12); }
+    .ip-tester-frame-wrap { flex: 1; position: relative; background: var(--bg-muted); min-height: 380px; }
+    .ip-tester-frame-wrap iframe { width: 100%; height: 100%; border: 0; min-height: 380px; display: block; }
+    .ip-tester-note {
+      padding: 12px 20px; font-size: 12px; color: var(--text-soft); line-height: 1.6;
+      border-top: 1px solid var(--border);
+    }
     @media (max-width: 1180px) {
       .grid-stats { grid-template-columns: repeat(2, 1fr); }
       .main-grid { grid-template-columns: 1fr; }
@@ -277,6 +315,10 @@
       .icon-box { width: 40px; height: 40px; font-size: 16px; }
       .badges { gap: 6px; }
       .badge, .perm-badge { font-size: 11px; padding: 5px 8px; }
+      #ipTesterModal { max-height: 94vh; }
+      .ip-tester-frame-wrap, .ip-tester-frame-wrap iframe { min-height: 260px; }
+      .ip-tester-toolbar { flex-direction: column; align-items: stretch; }
+      #ipTesterOpenNewTabBtn { margin-left: 0 !important; }
     }
   </style>
 </head>
@@ -507,6 +549,34 @@
         </div>
       </section>
     </main>
+    <!-- TESTE DE ACESSO AO IP (abre dentro do próprio site, sem nova aba) -->
+    <div id="ipTesterBackdrop" class="hidden">
+      <div id="ipTesterModal">
+        <div class="ip-tester-head">
+          <div>
+            <h3>Testar acesso ao IP</h3>
+            <p class="muted" id="ipTesterSubtitle">-</p>
+          </div>
+          <button class="ip-tester-close" id="ipTesterCloseBtn" aria-label="Fechar">✕</button>
+        </div>
+        <div class="ip-tester-toolbar">
+          <button class="secondary" id="ipTesterHttpBtn">Testar HTTP</button>
+          <button class="secondary" id="ipTesterHttpsBtn">Testar HTTPS</button>
+          <span class="ip-tester-status" id="ipTesterStatus">Aguardando teste...</span>
+          <button class="info compact-btn" id="ipTesterOpenNewTabBtn" style="margin-left:auto;">Abrir em nova aba</button>
+        </div>
+        <div class="ip-tester-frame-wrap">
+          <iframe id="ipTesterFrame" title="Interface do dispositivo" referrerpolicy="no-referrer"></iframe>
+        </div>
+        <div class="ip-tester-note">
+          Esse teste tenta carregar a interface do equipamento dentro do próprio painel, testando HTTP e HTTPS. Se o site
+          estiver em HTTPS e o equipamento só responder em HTTP, o navegador pode bloquear esse carregamento por segurança
+          (conteúdo misto) — o teste apareceria como "sem resposta" mesmo com o equipamento online. Alguns equipamentos
+          também recusam esse tipo de acesso mesmo estando no ar. Por isso o resultado aqui é uma estimativa, não uma
+          confirmação definitiva — em caso de dúvida, use "Abrir em nova aba".
+        </div>
+      </div>
+    </div>
   </section>
   <script>
     // Configuração do Client Supabase (Corrigido)
@@ -830,6 +900,7 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
               <div class="admin-actions">
                 ${userCanEdit()   ? `<button class="info"   data-edit-id="${escapeHtml(unit.id)}">Editar unidade</button>` : ''}
                 ${userCanDelete() ? `<button class="danger" data-delete-id="${escapeHtml(unit.id)}">Excluir cadastro</button>` : ''}
+                ${unit.ip ? `<button class="warning" data-test-ip="${escapeHtml(unit.ip)}" data-test-name="${escapeHtml(unit.unidade)}">Testar IP (HTTP/HTTPS)</button>` : ''}
                 <button class="secondary" data-history-id="${escapeHtml(unit.id)}">${expandedHistoryIds.has(unit.id) ? 'Ocultar histórico de OS' : 'Histórico de OS'}</button>
               </div>
               <div style="margin-top:12px; font-size:12px; color:var(--text-soft); line-height:1.6;">
@@ -853,6 +924,61 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
       list.querySelectorAll('button[data-history-id]').forEach(btn => {
         btn.addEventListener('click', () => toggleUnitHistory(btn.getAttribute('data-history-id')));
       });
+      list.querySelectorAll('button[data-test-ip]').forEach(btn => {
+        btn.addEventListener('click', () => openIpTester(btn.getAttribute('data-test-ip'), btn.getAttribute('data-test-name')));
+      });
+    }
+    // ===== TESTE DE ACESSO AO IP (iframe dentro do site; testa HTTP e HTTPS) =====
+    // Não existe "ping" de verdade (ICMP) dentro do navegador — é uma restrição de segurança do
+    // próprio browser, não algo que dê para contornar com código. O que fazemos aqui é tentar
+    // carregar a interface do equipamento (HTTP e/ou HTTPS) dentro de um iframe no próprio painel
+    // e observar se ela carrega dentro de um tempo limite. É uma estimativa de acesso, não um ping.
+    let ipTesterTimeoutId = null;
+    function openIpTester(ip, name) {
+      if (!ip) { showMessage('Esta unidade não tem um IP cadastrado.', 'error'); return; }
+      el('ipTesterSubtitle').textContent = `${name || 'Unidade'} — ${ip}`;
+      el('ipTesterFrame').dataset.ip = ip;
+      el('ipTesterBackdrop').classList.remove('hidden');
+      runIpTest('http');
+    }
+    function closeIpTester() {
+      el('ipTesterBackdrop').classList.add('hidden');
+      el('ipTesterFrame').src = 'about:blank';
+      if (ipTesterTimeoutId) { clearTimeout(ipTesterTimeoutId); ipTesterTimeoutId = null; }
+    }
+    function setIpTesterStatus(text, kind) {
+      const status = el('ipTesterStatus');
+      status.textContent = text;
+      status.classList.remove('ok', 'fail', 'testing');
+      if (kind) status.classList.add(kind);
+    }
+    function runIpTest(protocol) {
+      const frame = el('ipTesterFrame');
+      const ip = frame.dataset.ip;
+      if (!ip) return;
+      if (ipTesterTimeoutId) clearTimeout(ipTesterTimeoutId);
+      setIpTesterStatus(`Testando ${protocol.toUpperCase()}...`, 'testing');
+      const url = `${protocol}://${ip}`;
+      el('ipTesterOpenNewTabBtn').onclick = () => window.open(url, '_blank', 'noopener');
+      let settled = false;
+      frame.onload = () => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(ipTesterTimeoutId);
+        setIpTesterStatus(`Respondeu em ${protocol.toUpperCase()} (interface carregou)`, 'ok');
+      };
+      frame.onerror = () => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(ipTesterTimeoutId);
+        setIpTesterStatus(`Sem resposta em ${protocol.toUpperCase()}`, 'fail');
+      };
+      frame.src = url;
+      ipTesterTimeoutId = setTimeout(() => {
+        if (settled) return;
+        settled = true;
+        setIpTesterStatus(`Sem resposta em ${protocol.toUpperCase()} (tempo esgotado ou bloqueado)`, 'fail');
+      }, 7000);
     }
     // ===== HISTÓRICO DE OS (tabela historico_os no Supabase) =====
     async function toggleUnitHistory(id) {
@@ -1590,6 +1716,13 @@ const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
     el('reloadUsersBtn').addEventListener('click', loadUsers);
     el('resetBtn').addEventListener('click', resetPasswordAdmin);
     el('themeBtn').addEventListener('click', () => { applyTheme(document.body.classList.contains('dark') ? 'light' : 'dark'); });
+    el('ipTesterHttpBtn').addEventListener('click', () => runIpTest('http'));
+    el('ipTesterHttpsBtn').addEventListener('click', () => runIpTest('https'));
+    el('ipTesterCloseBtn').addEventListener('click', closeIpTester);
+    el('ipTesterBackdrop').addEventListener('click', (e) => { if (e.target.id === 'ipTesterBackdrop') closeIpTester(); });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !el('ipTesterBackdrop').classList.contains('hidden')) closeIpTester();
+    });
     // Menu mobile (hambúrguer)
     el('mobileMenuBtn').addEventListener('click', () => {
       const menu = el('topMenu');
